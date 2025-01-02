@@ -15,6 +15,10 @@ class Directory:
         return os.path.join(Settings.Directory.env)
     
     @staticmethod
+    def env_example():
+        return os.path.join(Directory.env(), 'example')
+    
+    @staticmethod
     def venv(repo_dir):
         return os.path.join(repo_dir, Settings.Directory.Name.venv)
     

@@ -4,11 +4,29 @@ from ..utils.extract import Extract
 from ..utils.directory import Directory
 from ..utils.file import File
 
+ENV_EXAMPLE_DIR = Directory.env_example()
 ENV_DIR = Directory.env()
 REPO_DIR = Directory.repos()
 
 class Environment:
     class Files:
+        @staticmethod
+        def _setup():
+            """
+            Copies '/env/example/' .env files ('.env.backend.example' etc.) to '/env/' 
+            and removes '*.example' from the filenames.
+            Does not overwrite existing files.
+            """
+            for env_example_file in os.listdir(ENV_EXAMPLE_DIR):
+                if env_example_file.endswith('.example'):
+                    env_example_path = os.path.join(ENV_EXAMPLE_DIR, env_example_file)
+                    env_path = os.path.join(ENV_DIR, env_example_file.replace('.example', ''))
+                    if not os.path.exists(env_path):
+                        shutil.copyfile(env_example_path, env_path)
+                        print(f"Copied '{env_example_path}' to '{env_path}' (replaced if existed).")
+                    else:
+                        print(f"File '{env_path}' already exists. Skipping.")
+
         @staticmethod
         def generate(
             backend: bool = False,
@@ -16,6 +34,8 @@ class Environment:
             bikes: list[dict] = None
             ):
             """Generate .env files for the backend, frontend, and/or bikes."""
+
+            Environment.Files._setup()
 
             def _backend():
                 Environment._copy_env_file(
