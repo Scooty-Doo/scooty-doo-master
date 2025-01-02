@@ -11,6 +11,10 @@ class Directory:
         return os.path.join(Directory.Repo.backend(), Settings.Directory.Name.database)
     
     @staticmethod
+    def mocked_data():
+        return os.path.join(Directory.root(), Settings.Directory.mocked_data)
+
+    @staticmethod
     def env():
         return os.path.join(Settings.Directory.env)
     

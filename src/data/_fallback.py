@@ -1,7 +1,8 @@
 from ..utils.settings import Settings
 from ..utils.file import File
+from ..utils.directory import Directory
 
-MOCKED_DATA_DIR = Settings.Directory.mocked_data
+MOCKED_DATA_DIR = Directory.mocked_data()
 
 class Fallback:
 
