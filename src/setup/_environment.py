@@ -7,7 +7,7 @@ from ..utils.file import File
 ROOT_DIR = Directory.root()
 ENV_EXAMPLE_DIR = Directory.env_example()
 ENV_DIR = Directory.env()
-REPO_DIR = Directory.repos()
+REPO_DIR = Directory.repositories()
 
 class Environment:
     class Files:

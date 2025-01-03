@@ -40,7 +40,7 @@
 
         **or...**
 
-        git submodule foreach --recursive git pull origin main  ¨
+        git submodule foreach --recursive git pull origin main  
 
         **or if you want to update a specific submodule...**  
 

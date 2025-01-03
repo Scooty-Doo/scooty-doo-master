@@ -4,16 +4,27 @@ load_dotenv()
 from .setup.setup import Setup
 from .data.get import Get
 from .utils.settings import Settings
+from .utils.repositories import Repositories
 
 class Main:
     def __init__(self, use_submodules=False):
         self.get = Get()
+        self.repositories = Repositories()
         if use_submodules:
             self._use_submodules()
+        if not use_submodules:
+            self._use_local_repositories()
     
-    def _use_submodules(self):
+    def _use_submodules(self, auto_pull=True):
         """Changes the REPOSITORIES_DIRECTORY environment variable to the submodules directory."""
         os.environ["REPOSITORIES_DIRECTORY"] = Settings.Directory.Name.submodules
+        if auto_pull:
+            self.repositories.submodules.get.all()
+
+    def _use_local_repositories(self):
+        """Pull repositories to the local repositories folder."""
+        os.environ["REPOSITORIES_DIRECTORY"] = Settings.Directory.local_repositories
+        self.repositories.local.get.all(branch='main')
 
     def _setup_backend(self, start_server, already_setup):
         Setup.backend(start_server, already_setup)
@@ -51,8 +62,7 @@ if __name__ == "__main__":
         frontend=False
     )
 
+# TODO: Add deinitailization option for submodules.
+
 # TODO: Next step is to init the Hivemind (repos/bike/src/main.py) server.
 #       Put the logic in src.setup.bike.py > Bike._start_fast_api_server().
-
-# NOTE: Run "python -m get_repos" to fetch the repos (backend, frontend, bike) to /repos.
-# python -m src.main

@@ -7,6 +7,7 @@ class Settings:
         data = 'data'
         env = 'env'
         repositories = os.getenv("REPOSITORIES_DIRECTORY", 'repositories')
+        local_repositories = 'repositories'
         class Name:
             backend = 'backend'
             frontend = 'frontend'

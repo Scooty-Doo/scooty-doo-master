@@ -27,8 +27,12 @@ class Directory:
         return os.path.join(repo_dir, Settings.Directory.Name.venv)
     
     @staticmethod
-    def repos():
+    def repositories():
         return os.path.join(Directory.root(), Settings.Directory.repositories)
+    
+    @staticmethod
+    def local_repositories():
+        return os.path.join(Directory.root(), Settings.Directory.local_repositories)
 
     class Repo:
         @staticmethod
