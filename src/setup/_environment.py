@@ -4,6 +4,7 @@ from ..utils.extract import Extract
 from ..utils.directory import Directory
 from ..utils.file import File
 
+ROOT_DIR = Directory.root()
 ENV_EXAMPLE_DIR = Directory.env_example()
 ENV_DIR = Directory.env()
 REPO_DIR = Directory.repos()
@@ -17,15 +18,28 @@ class Environment:
             and removes '*.example' from the filenames.
             Does not overwrite existing files.
             """
-            for env_example_file in os.listdir(ENV_EXAMPLE_DIR):
-                if env_example_file.endswith('.example'):
-                    env_example_path = os.path.join(ENV_EXAMPLE_DIR, env_example_file)
-                    env_path = os.path.join(ENV_DIR, env_example_file.replace('.example', ''))
+            _root_env()
+            _repositories_env()
+
+            def _root_env():
+                if not os.path.exists(os.path.join(ROOT_DIR, '.env')):
+                    example_env_path = os.path.join(ROOT_DIR, '.env.example')
+                    env_path = os.path.join(ROOT_DIR, '.env')
+                    if not os.path.exists(example_env_path):
+                        raise FileNotFoundError(f"Example .env file '{example_env_path}' does not exist.")
                     if not os.path.exists(env_path):
-                        shutil.copyfile(env_example_path, env_path)
-                        print(f"Copied '{env_example_path}' to '{env_path}' (replaced if existed).")
-                    else:
-                        print(f"File '{env_path}' already exists. Skipping.")
+                        shutil.copyfile(example_env_path, env_path)
+
+            def _repositories_env():
+                for env_example_file in os.listdir(ENV_EXAMPLE_DIR):
+                    if env_example_file.endswith('.example'):
+                        env_example_path = os.path.join(ENV_EXAMPLE_DIR, env_example_file)
+                        env_path = os.path.join(ENV_DIR, env_example_file.replace('.example', ''))
+                        if not os.path.exists(env_path):
+                            shutil.copyfile(env_example_path, env_path)
+                            print(f"Copied '{env_example_path}' to '{env_path}' (replaced if existed).")
+                        else:
+                            print(f"File '{env_path}' already exists. Skipping.")
 
         @staticmethod
         def generate(

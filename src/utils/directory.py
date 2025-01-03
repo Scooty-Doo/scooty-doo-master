@@ -28,7 +28,7 @@ class Directory:
     
     @staticmethod
     def repos():
-        return os.path.join(Directory.root(), Settings.Directory.repos)
+        return os.path.join(Directory.root(), Settings.Directory.repositories)
 
     class Repo:
         @staticmethod
@@ -45,4 +45,4 @@ class Directory:
 
         @staticmethod
         def get(name):
-            return os.path.join(Directory.root(), Settings.Directory.repos, name)
+            return os.path.join(Directory.root(), Settings.Directory.repositories, name)
