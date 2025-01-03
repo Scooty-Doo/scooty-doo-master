@@ -6,13 +6,14 @@ class Settings:
         mocked_data = 'repos/backend/database/mock_data/data/generated/'
         data = 'data'
         env = 'env'
-        repositories = os.getenv("REPOSITORIES", 'repositories')
+        repositories = os.getenv("REPOSITORIES_DIRECTORY", 'repositories')
         class Name:
             backend = 'backend'
             frontend = 'frontend'
             bike = 'bike'
             database = 'database'
             venv = '.venv'
+            submodules = 'submodules'
     
     class Filenames:
         class Mocked:

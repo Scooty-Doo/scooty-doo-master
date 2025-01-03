@@ -1,11 +1,19 @@
+import os
 from dotenv import load_dotenv
 load_dotenv()
 from .setup.setup import Setup
 from .data.get import Get
+from .utils.settings import Settings
 
 class Main:
-    def __init__(self):
+    def __init__(self, use_submodules=False):
         self.get = Get()
+        if use_submodules:
+            self._use_submodules()
+    
+    def _use_submodules(self):
+        """Changes the REPOSITORIES_DIRECTORY environment variable to the submodules directory."""
+        os.environ["REPOSITORIES_DIRECTORY"] = Settings.Directory.Name.submodules
 
     def _setup_backend(self, start_server, already_setup):
         Setup.backend(start_server, already_setup)
@@ -34,7 +42,9 @@ class Main:
             self._setup_frontend()
 
 if __name__ == "__main__":
-    main = Main()
+    main = Main(
+        use_submodules=False
+    )
     main.run(
         skip_setup=True,
         bikes=True,
