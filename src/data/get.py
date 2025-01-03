@@ -4,7 +4,7 @@ from ..utils.file import File
 from ._fallback import Fallback
 
 def _url(url, endpoint):
-    return f'{url}/{endpoint}'
+    return f'{url.rstrip("/")}/{endpoint.lstrip("/")}'
 
 def _extract_data_from_response_json(data):
     """Extracts the 'data' key from the response.json() that has JSON:API formatting."""

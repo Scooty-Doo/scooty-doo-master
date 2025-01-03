@@ -3,6 +3,7 @@ import shutil
 from ..utils.extract import Extract
 from ..utils.directory import Directory
 from ..utils.file import File
+from ..utils.serialize import Serialize
 
 ROOT_DIR = Directory.root()
 ENV_EXAMPLE_DIR = Directory.env_example()
@@ -18,9 +19,6 @@ class Environment:
             and removes '*.example' from the filenames.
             Does not overwrite existing files.
             """
-            _root_env()
-            _repositories_env()
-
             def _root_env():
                 if not os.path.exists(os.path.join(ROOT_DIR, '.env')):
                     example_env_path = os.path.join(ROOT_DIR, '.env.example')
@@ -40,6 +38,8 @@ class Environment:
                             print(f"Copied '{env_example_path}' to '{env_path}' (replaced if existed).")
                         else:
                             print(f"File '{env_path}' already exists. Skipping.")
+            _root_env()
+            _repositories_env()
 
         @staticmethod
         def generate(
@@ -71,8 +71,8 @@ class Environment:
                 lines = File.Read.lines(output_env_file)
                 existing_lines = Extract.Lines.not_startswith(lines, ('BIKE_IDS=', 'POSITIONS='))
                 new_lines = [
-                    f"BIKE_IDS={','.join(map(str, bike_ids))}",
-                    f"POSITIONS={','.join(map(str, positions))}"]
+                    f"BIKE_IDS={Serialize.bike_ids(bike_ids)}",
+                    f"POSITIONS={Serialize.positions(positions)}"]
                 output_env_content = existing_lines + new_lines
                 File.Write.lines(output_env_file, output_env_content)
                 print(f"Generated .env file for the bikes at '{output_env_file}'.")

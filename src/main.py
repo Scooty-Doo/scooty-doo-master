@@ -46,7 +46,7 @@ class Main:
     #    self.zone_types = self.get.zone_types()
     
     def run(self, skip_setup=False, bikes=True, frontend=False):
-        self._setup_backend(start_server=True, already_setup=skip_setup)
+        self._setup_backend(start_server=True, already_setup=True) #skip_setup)
         if bikes:
             self._setup_bikes(start_server=True, already_setup=skip_setup)
         if frontend:
@@ -57,10 +57,12 @@ if __name__ == "__main__":
         use_submodules=False
     )
     main.run(
-        skip_setup=True,
+        skip_setup=False,
         bikes=True,
         frontend=False
     )
+
+# python -m src.main
 
 # TODO: Add deinitailization option for submodules.
 

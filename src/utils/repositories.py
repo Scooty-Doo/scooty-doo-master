@@ -81,7 +81,7 @@ class _Submodules:
                 print("Initializing all submodules...")
                 subprocess.run(["git", "submodule", "update", "--init", "--recursive"], check=True)
 
-            def _update_submodules():
+            def _update_local_submodules():
                 """
                 Updates all submodules to the latest commit on the main branch of each submodule.
                 """
@@ -89,7 +89,7 @@ class _Submodules:
                 subprocess.run(["git", "submodule", "foreach", "--recursive", "git", "pull", "origin", "main"], check=True)
 
             _initialize_submodules()
-            _update_submodules()
+            _update_local_submodules()
 
     class Deinitialize:
         def all(self):
@@ -100,3 +100,11 @@ class _Submodules:
             """
             print("Deinitializing all submodules...")
             subprocess.run(["git", "submodule", "deinit", "-f", "--all", ], check=True)
+
+if __name__ == "__main__":
+    repositories = Repositories()
+    repositories.local.get.all()
+    #repositories.submodules.get.all()
+    # repositories.submodules.deinitialize.all()
+
+    # python -m src.utils.repositories

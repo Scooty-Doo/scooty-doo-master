@@ -21,11 +21,14 @@ class Backend:
 
     @staticmethod
     def _setup_database():
-        print("Starting PostgreSQL and pgAdmin containers...")
-        Command.run(["docker-compose", "up", "-d"], cwd=DATABASE_DIR)
-        print("Creating database tables...")
-        table_creation_module = "api.db.table_creation"
-        Command.run([PYTHON_EXECUTABLE, "-m", table_creation_module], cwd=REPO_DIR)
+        try:
+            print("Starting PostgreSQL and pgAdmin containers...")
+            Command.run(["docker-compose", "up", "-d"], cwd=DATABASE_DIR)
+            print("Creating database tables...")
+            table_creation_module = "api.db.table_creation"
+            Command.run([PYTHON_EXECUTABLE, "-m", table_creation_module], cwd=REPO_DIR)
+        except Exception as e:
+            print(f"Make sure Docker Desktop is running. Failed to setup the database: {e}")
 
     @staticmethod
     def _load_mock_data():

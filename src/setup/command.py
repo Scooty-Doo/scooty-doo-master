@@ -18,3 +18,5 @@ class Command:
         except subprocess.CalledProcessError as e:
             print(f"Error: Command '{' '.join(command)}' failed with exit code {e.returncode}")
             sys.exit(1)
+
+# TODO: What about subprocess.run() and subprocess.Popen()?
