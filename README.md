@@ -33,16 +33,20 @@
 
         git submodule update --remote --no-fetch
 
-    2. **By pulling submodules contents to local repo:**  
+    2. **By pulling submodules contents to local repository:**  
 
         2.1. ***Pull latest commit:***  
         git submodule update --remote --merge  
-        **or...**  
-        git submodule foreach --recursive git pull origin main  
+
+        **or...**
+
+        git submodule foreach --recursive git pull origin main  ¨
+
         **or if you want to update a specific submodule...**  
-        git -C submodules/backend pull origin main
-        git -C submodules/bike pull origin main
-        git -C submodules/frontend pull origin main
+
+        git -C submodules/backend pull origin main  
+        git -C submodules/bike pull origin main  
+        git -C submodules/frontend pull origin main  
 
         2.2. ***Update remote master repository submodule references:***  
         git add submodules/*  
