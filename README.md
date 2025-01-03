@@ -7,6 +7,8 @@
 
     git clone --recurse-submodules https://github.com/Scooty-Doo/scooty-doo-master
 
+NOTE: All further instructions related to managing submodules can be ignored because Main runs the appropriate commands automatically.
+
 - **Initialize submodules in local repository, i.e. pull submodule contents to /submodules:**  
 
     git submodule update --init --recursive
