@@ -1,0 +1,12 @@
+/repos/backend/
+/repos/frontend/
+/repos/bike/
+/data/*.json
+/logs
+*.env
+*.env.backend
+*.env.frontend
+*.env.bike
+__pycache__
+*.pyc
+*.log
