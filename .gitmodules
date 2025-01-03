@@ -1,9 +1,9 @@
 [submodule "backend"]
-	path = backend
+	path = submodules/backend
 	url = https://github.com/Scooty-Doo/scooty-doo-backend
 [submodule "frontend"]
-	path = frontend
+	path = submodules/frontend
 	url = https://github.com/Scooty-Doo/scooty-doo-frontend
 [submodule "bike"]
-	path = bike
+	path = submodules/bike
 	url = https://github.com/Scooty-Doo/scooty-doo-bike

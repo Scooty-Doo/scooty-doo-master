@@ -1,6 +1,6 @@
-/repos/backend/
-/repos/frontend/
-/repos/bike/
+/repositories/backend/
+/repositories/frontend/
+/repositories/bike/
 /data/*.json
 /logs
 *.env
