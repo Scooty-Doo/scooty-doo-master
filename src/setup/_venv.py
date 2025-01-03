@@ -51,7 +51,6 @@ class Venv:
         Install project dependencies using pip.
         1. Upgrade pip.
         2. Install dependencies from requirements.txt.
-        3. 
         """
         repo_dir = os.path.dirname(venv_dir) # Get the directory of the virtual environment
         python_executable = Venv.get_python_executable(venv_dir)
