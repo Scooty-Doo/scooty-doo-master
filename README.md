@@ -1,3 +1,7 @@
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Scooty-Doo/scooty-doo-master/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/Scooty-Doo/scooty-doo-master/?branch=main)
+[![Code Coverage](https://scrutinizer-ci.com/g/Scooty-Doo/scooty-doo-master/badges/coverage.png?b=main)](https://scrutinizer-ci.com/g/Scooty-Doo/scooty-doo-master/?branch=main)
+[![Build Status](https://scrutinizer-ci.com/g/Scooty-Doo/scooty-doo-master/badges/build.png?b=main)](https://scrutinizer-ci.com/g/Scooty-Doo/scooty-doo-master/build-status/main)
+
 # scooty-doo-master
 ### ***Master repository for the Scooty-Doo application.***
 
