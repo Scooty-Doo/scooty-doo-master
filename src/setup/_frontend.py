@@ -5,7 +5,6 @@ from ..utils.docker import Docker
 
 ROOT_DIR = Directory.root()
 REPO_DIR = Directory.Repo.frontend()
-DOCKER_COMPOSE_FILE = Directory.docker_compose(REPO_DIR)
 
 class Frontend:
     """
@@ -20,7 +19,7 @@ class Frontend:
         def _build():
             print("Building the frontend Docker image...")
             try:
-                Docker.Compose.build(DOCKER_COMPOSE_FILE)
+                Docker.Compose.build(REPO_DIR, npm=True, reinstall=True)
                 print("Frontend Docker image built successfully.")
             except Exception as e:
                 print(f"Failed to build the frontend Docker image: {e}")
@@ -30,7 +29,7 @@ class Frontend:
         def _start():
             print("Starting the frontend Docker container...")
             try:
-                Docker.Compose.up(DOCKER_COMPOSE_FILE)
+                Docker.Compose.up(REPO_DIR)
                 print("Frontend Docker container started successfully.")
             except Exception as e:
                 print(f"Failed to start the frontend Docker container: {e}")
@@ -40,7 +39,7 @@ class Frontend:
         def _stop():
             print("Stopping the frontend Docker container...")
             try:
-                Docker.Compose.down(DOCKER_COMPOSE_FILE)
+                Docker.Compose.down(REPO_DIR)
                 print("Frontend Docker container stopped successfully.")
             except Exception as e:
                 print(f"Failed to stop the frontend Docker container: {e}")
@@ -53,7 +52,7 @@ class Frontend:
 
         @staticmethod
         def status():
-            Docker.Compose.status(DOCKER_COMPOSE_FILE)
+            Docker.Compose.status(REPO_DIR)
 
     @staticmethod
     def setup():
@@ -68,8 +67,8 @@ class Frontend:
 
 if __name__ == "__main__":
     frontend = Frontend()
-    #frontend.setup()
-    #frontend.run()
+    frontend.setup()
+    frontend.run()
     frontend.Docker.status()
 
 # python -m src.setup._frontend
