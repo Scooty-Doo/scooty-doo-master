@@ -1,6 +1,19 @@
 from ..utils.command import Command
 
 class Repository:
+    class Checkout:
+        @staticmethod
+        def files(repository_path, files: list):
+            if not files:
+                print("No files to checkout.")
+                return
+            try:
+                Command.run(["git", "-C", repository_path, "checkout", "--", *files], raise_exception=True)
+                print(f"Successfully checked out files: {files}")
+            except Exception as e:
+                print(f"Error checking out files {files}: {e}")
+                raise e
+
     @staticmethod
     def fetch(repository_path):
         Command.run(["git", "-C", repository_path, "fetch"], raise_exception=True)
@@ -10,8 +23,31 @@ class Repository:
         Command.run(["git", "-C", repository_path, "checkout", branch], raise_exception=True)
     
     @staticmethod
-    def pull(repository_path):
-        Command.run(["git", "-C", repository_path, "pull"], raise_exception=True)
+    def pull(repository_path, force=False, branch=None):
+        """
+        Pull the latest changes from the remote repository.
+        
+        Args:
+            repository_path (str): The path to the local repository.
+            force (bool, optional): Whether to force the pull, disregarding any local changes. Defaults to False.
+            branch (str, optional): The branch to pull from. Defaults to None, which means "main".
+        """
+        def _pull():
+            Command.run(["git", "-C", repository_path, "pull"], raise_exception=True)
+        if not force:
+            _pull()
+        if force:
+            # METHOD 1 (HEAVY)
+            #Repository.fetch(repository_path)
+            #branch = "main" if not branch else branch
+            #remote_branch = f"origin/{branch}"
+            #reset_command = ["git", "-C", repository_path, "reset", "--hard", remote_branch]
+            #Command.run(reset_command, raise_exception=True)
+
+            # METHOD 2 (LIGHT)
+            #files_to_checkout = ["package.json"]
+            #Repository.Checkout.files(repository_path, files_to_checkout)
+            _pull()
     
     @staticmethod
     def clone(repository_url, repository_path, branch=None):

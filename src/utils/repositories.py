@@ -26,7 +26,7 @@ class _Local:
         def __init__(self, repositories):
             self.repositories = dict(repositories)
 
-        def _get_repository(self, name, branch=None):
+        def _get_repository(self, name, branch=None, force=False):
             repository_url = self.repositories.get(name)
             repository_path = os.path.join(LOCAL_REPOSITORIES_DIR, name)
             if not repository_url:
@@ -37,10 +37,10 @@ class _Local:
                     print(f"Switching to branch '{branch}' in {name}...")
                     Repository.fetch(repository_path)
                     Repository.checkout(repository_path, branch)
-                    Repository.pull(repository_path)
+                    Repository.pull(repository_path, force=force, branch=branch)
                 else:
                     print(f"Pulling latest changes in {name} on the current branch...")
-                    Repository.pull(repository_path)
+                    Repository.pull(repository_path, force=force)
             else:
                 print(f"Cloning {name}...")
                 Repository.clone(repository_url, repository_path, branch)
@@ -49,14 +49,15 @@ class _Local:
             self._get_repository("backend", branch)
 
         def frontend(self, branch=None):
-            self._get_repository("frontend", branch)
+            self._get_repository("frontend", branch, force=True)
 
         def bike(self, branch=None):
             self._get_repository("bike", branch)
 
         def all(self, branch=None):
-            for name in self.repositories.keys():
-                self._get_repository(name, branch)
+            self._get_repository("backend", branch)
+            self._get_repository("frontend", branch, force=True)
+            self._get_repository("bike", branch)
 
 class _Submodules:
     def __init__(self):
