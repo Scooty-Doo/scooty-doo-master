@@ -26,9 +26,9 @@ class Frontend:
                 sys.exit(1)
         
         @staticmethod
-        def _restart():
+        def _start():
             try:
-                Docker.Compose.restart(REPO_DIR)
+                Docker.Compose.up(REPO_DIR, npm=True)
                 print("Frontend Docker container restarted successfully.")
             except Exception as e:
                 print(f"Failed to restart the frontend Docker container: {e}")
@@ -45,7 +45,7 @@ class Frontend:
     
     @staticmethod
     def run():
-        Frontend.Docker._restart()
+        Frontend.Docker._start()
         Frontend.Docker.status()
         print("Hivemind Bike server started.")
 

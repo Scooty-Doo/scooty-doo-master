@@ -28,21 +28,25 @@ class Docker:
                 try:
                     print("Running npm run build...")
                     Command.run([npm_filename, "run", "build"], directory=directory, inherit_environment=True)
-                    Command.run(["docker-compose", "up", "webclient-prod", "-d"], directory=directory)
                 except Exception as e:
                     print(f"Failed to run NPM build: {e}")
                     return
             if not npm:
                 try:
                     print("Building the Docker image...")
-                    Command.run(["docker-compose", "up", "-d"], directory=directory)
+                    Command.run(["docker-compose", "build"], directory=directory)
                     print("Docker image built successfully.")    
                 except Exception as e:
                     print(f"Failed to build the Docker image: {e}")
 
         @staticmethod
-        def up(directory):
-            Command.run(["docker-compose", "up", "-d"], directory=directory)
+        def up(directory, npm=False):
+            Docker.Compose.down(directory)
+            if not npm:
+                Command.run(["docker-compose", "up", "-d"], directory=directory)
+            if npm:
+                Command.run(["docker-compose", "up", "webclient-prod", "-d"], directory=directory)
+
 
         @staticmethod
         def down(directory):
