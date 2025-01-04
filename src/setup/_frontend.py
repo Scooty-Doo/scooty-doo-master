@@ -1,57 +1,75 @@
-import subprocess
 import sys
-from ._venv import Venv
 from ._environment import Environment
 from ..utils.directory import Directory
+from ..utils.docker import Docker
 
 ROOT_DIR = Directory.root()
 REPO_DIR = Directory.Repo.frontend()
-VENV_DIR = Directory.venv(REPO_DIR)
-PYTHON_EXECUTABLE = Venv.get_python_executable(VENV_DIR)
+DOCKER_COMPOSE_FILE = Directory.docker_compose(REPO_DIR)
 
 class Frontend:
     """
     Frontend class to manage the setup of the frontend instance.
     """
     @staticmethod
-    def _venv():
-        Venv.setup(VENV_DIR)
-
-    @staticmethod
     def _env():
         Environment.Files.generate(frontend=True)
-    
-    @staticmethod
-    def _start_server():
-        """
-        Starts the frontend server.
-        """
-        print("Starting the frontend server...")
-        #MAIN_MODULE = "placeholder"
-        #try:
-        #    subprocess.Popen(
-        #        [PYTHON_EXECUTABLE, "-m", MAIN_MODULE],
-        #        cwd=REPO_DIR,
-        #        stdout=sys.stdout,
-        #        stderr=sys.stderr
-        #    )
-        #    print("Frontend server started successfully.")
-        #except Exception as e:
-        #    print(f"Failed to start the frontend server: {e}")
-        #    sys.exit(1)
+
+    class Docker:
+        @staticmethod
+        def _build():
+            print("Building the frontend Docker image...")
+            try:
+                Docker.Compose.build(DOCKER_COMPOSE_FILE)
+                print("Frontend Docker image built successfully.")
+            except Exception as e:
+                print(f"Failed to build the frontend Docker image: {e}")
+                sys.exit(1)
+
+        @staticmethod
+        def _start():
+            print("Starting the frontend Docker container...")
+            try:
+                Docker.Compose.up(DOCKER_COMPOSE_FILE)
+                print("Frontend Docker container started successfully.")
+            except Exception as e:
+                print(f"Failed to start the frontend Docker container: {e}")
+                sys.exit(1)
+
+        @staticmethod
+        def _stop():
+            print("Stopping the frontend Docker container...")
+            try:
+                Docker.Compose.down(DOCKER_COMPOSE_FILE)
+                print("Frontend Docker container stopped successfully.")
+            except Exception as e:
+                print(f"Failed to stop the frontend Docker container: {e}")
+                sys.exit(1)
+        
+        @staticmethod
+        def _restart():
+            Frontend.Docker._stop()
+            Frontend.Docker._start()
+
+        @staticmethod
+        def status():
+            Docker.Compose.status(DOCKER_COMPOSE_FILE)
 
     @staticmethod
-    def setup(bikes):
-        Frontend._venv()
-        Frontend._env(bikes)
+    def setup():
+        Frontend._env()
+        Frontend.Docker._build()
     
     @staticmethod
     def run():
-        Frontend._start_server()
+        Frontend.Docker._restart()
+        Frontend.Docker.status()
         print("Hivemind Bike server started.")
 
 if __name__ == "__main__":
     frontend = Frontend()
-    frontend.setup()
+    #frontend.setup()
+    #frontend.run()
+    frontend.Docker.status()
 
 # python -m src.setup._frontend

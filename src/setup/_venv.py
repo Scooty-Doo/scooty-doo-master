@@ -2,7 +2,9 @@ import os
 import platform
 import subprocess
 import sys
-from .command import Command
+from ..utils.command import Command
+from ..utils.dependencies import Dependencies
+from ..utils.directory import Directory
 
 IS_WINDOWS = platform.system() == "Windows"
 
@@ -12,27 +14,11 @@ class Venv:
     def get_python_executable(venv_dir):
         """
         Get the path to the Python executable within the virtual environment.
-
-        Returns:
-            str: Path to the Python executable.
         """
         if IS_WINDOWS:
             return os.path.join(venv_dir, "Scripts", "python.exe")
         else:
             return os.path.join(venv_dir, "bin", "python")
-        
-    @staticmethod
-    def get_pip_executable(venv_dir):
-        """
-        Get the path to the pip executable within the virtual environment.
-
-        Returns:
-            str: Path to the pip executable.
-        """
-        if IS_WINDOWS:
-            return os.path.join(venv_dir, "Scripts", "pip.exe")
-        else:
-            return os.path.join(venv_dir, "bin", "pip")
 
     @staticmethod
     def _build_venv(venv_dir):
@@ -57,9 +43,7 @@ class Venv:
 
         print(f"Installing dependencies...")
         try:
-            Command.run([python_executable, "-m", "pip", "install", "--upgrade", "pip"])
-            requirements_path = os.path.join(repo_dir, "requirements.txt")
-            Command.run([python_executable, "-m", "pip", "install", "-r", requirements_path], cwd=repo_dir)
+            Dependencies.install(python_executable, repo_dir)
             print(f"Dependencies installed successfully.\n")
         except subprocess.CalledProcessError as e:
             print(f"Dependency installation failed: {e}")

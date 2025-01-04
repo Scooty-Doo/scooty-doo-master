@@ -1,8 +1,8 @@
-import subprocess
 import sys
 from ._venv import Venv
 from ._environment import Environment
 from ..utils.directory import Directory
+from ..utils.command import Command
 
 ROOT_DIR = Directory.root()
 REPO_DIR = Directory.Repo.bike()
@@ -24,18 +24,17 @@ class Bike:
         Environment.Files.generate(bikes=bikes)
     
     @staticmethod
-    def _start_fast_api_server():
+    def _start_server():
         """
         Starts the FastAPI server for the bike hivemind.
         """
         print("Starting the FastAPI server for bike hivemind...")
         MAIN_MODULE = "src.main"
         try:
-            subprocess.Popen(
+            Command.run(
                 [PYTHON_EXECUTABLE, "-m", MAIN_MODULE],
-                cwd=REPO_DIR,
-                stdout=sys.stdout,
-                stderr=sys.stderr
+                directory=REPO_DIR,
+                stream_output=True
             )
             print("FastAPI server for the bike hivemind started successfully.")
         except Exception as e:
@@ -49,7 +48,7 @@ class Bike:
     
     @staticmethod
     def run():
-        Bike._start_fast_api_server()
+        Bike._start_server()
         print("Hivemind Bike server started.")
 
 if __name__ == "__main__":

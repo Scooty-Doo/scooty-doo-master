@@ -1,6 +1,7 @@
 import os
-import subprocess
 from .directory import Directory
+from ..utils.command import Command
+from .repository import Repository
 
 LOCAL_REPOSITORIES_DIR = Directory.local_repositories()
 
@@ -27,27 +28,22 @@ class _Local:
 
         def _get_repository(self, name, branch=None):
             repository_url = self.repositories.get(name)
+            repository_path = os.path.join(LOCAL_REPOSITORIES_DIR, name)
             if not repository_url:
                 raise ValueError(f"Unknown repository: {name}")
-
-            repository_path = os.path.join(LOCAL_REPOSITORIES_DIR, name)
-
             if os.path.isdir(repository_path):
                 print(f"Repository {name} already exists locally.")
                 if branch:
                     print(f"Switching to branch '{branch}' in {name}...")
-                    subprocess.run(["git", "-C", repository_path, "fetch"], check=True)
-                    subprocess.run(["git", "-C", repository_path, "checkout", branch], check=True)
-                    subprocess.run(["git", "-C", repository_path, "pull"], check=True)
+                    Repository.fetch(repository_path)
+                    Repository.checkout(repository_path, branch)
+                    Repository.pull(repository_path)
                 else:
                     print(f"Pulling latest changes in {name} on the current branch...")
-                    subprocess.run(["git", "-C", repository_path, "pull"], check=True)
+                    Repository.pull(repository_path)
             else:
                 print(f"Cloning {name}...")
-                clone_cmd = ["git", "clone", repository_url, repository_path]
-                if branch:
-                    clone_cmd.extend(["-b", branch])
-                subprocess.run(clone_cmd, check=True)
+                Repository.clone(repository_url, repository_path, branch)
 
         def backend(self, branch=None):
             self._get_repository("backend", branch)
@@ -79,14 +75,14 @@ class _Submodules:
                 Submodules update to their latest commit in the master repository.
                 """
                 print("Initializing all submodules...")
-                subprocess.run(["git", "submodule", "update", "--init", "--recursive"], check=True)
+                Command.run(["git", "submodule", "update", "--init", "--recursive"], raise_exception=True)
 
             def _update_local_submodules():
                 """
                 Updates all submodules to the latest commit on the main branch of each submodule.
                 """
                 print("Updating (pulling) all submodules...")
-                subprocess.run(["git", "submodule", "foreach", "--recursive", "git", "pull", "origin", "main"], check=True)
+                Command.run(["git", "submodule", "foreach", "--recursive", "git", "pull", "origin", "main"], raise_exception=True)
 
             _initialize_submodules()
             _update_local_submodules()
@@ -99,7 +95,7 @@ class _Submodules:
             Remote repositories are not affected.
             """
             print("Deinitializing all submodules...")
-            subprocess.run(["git", "submodule", "deinit", "-f", "--all", ], check=True)
+            Command.run(["git", "submodule", "deinit", "-f", "--all", ], raise_exception=True)
 
 if __name__ == "__main__":
     repositories = Repositories()

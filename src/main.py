@@ -46,11 +46,11 @@ class Main:
     #    self.zone_types = self.get.zone_types()
     
     def run(self, skip_setup=False, bikes=True, frontend=False):
-        self._setup_backend(start_server=True, already_setup=True) #skip_setup)
+        self._setup_backend(start_server=True, already_setup=skip_setup)
         if bikes:
             self._setup_bikes(start_server=True, already_setup=skip_setup)
         if frontend:
-            self._setup_frontend()
+            self._setup_frontend(start_server=True, already_setup=skip_setup)
 
 if __name__ == "__main__":
     main = Main(
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     main.run(
         skip_setup=False,
         bikes=True,
-        frontend=False
+        frontend=True
     )
 
 # python -m src.main

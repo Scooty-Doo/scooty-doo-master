@@ -23,5 +23,8 @@ class Setup:
             Bike.run()
     
     @staticmethod
-    def frontend():
-        Frontend.setup()
+    def frontend(start_server=True, already_setup=False):
+        if not already_setup:
+            Frontend.setup()
+        if start_server:
+            Frontend.run()

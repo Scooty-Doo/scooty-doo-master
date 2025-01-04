@@ -27,6 +27,10 @@ class Directory:
         return os.path.join(repo_dir, Settings.Directory.Name.venv)
     
     @staticmethod
+    def docker_compose(repo_dir):
+        return os.path.join(repo_dir, 'docker-compose.yml')
+    
+    @staticmethod
     def repositories():
         return os.path.join(Directory.root(), Settings.Directory.repositories)
     
