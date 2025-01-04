@@ -24,31 +24,15 @@ class Frontend:
             except Exception as e:
                 print(f"Failed to build the frontend Docker image: {e}")
                 sys.exit(1)
-
-        @staticmethod
-        def _start():
-            print("Starting the frontend Docker container...")
-            try:
-                Docker.Compose.up(REPO_DIR)
-                print("Frontend Docker container started successfully.")
-            except Exception as e:
-                print(f"Failed to start the frontend Docker container: {e}")
-                sys.exit(1)
-
-        @staticmethod
-        def _stop():
-            print("Stopping the frontend Docker container...")
-            try:
-                Docker.Compose.down(REPO_DIR)
-                print("Frontend Docker container stopped successfully.")
-            except Exception as e:
-                print(f"Failed to stop the frontend Docker container: {e}")
-                sys.exit(1)
         
         @staticmethod
         def _restart():
-            Frontend.Docker._stop()
-            Frontend.Docker._start()
+            try:
+                Docker.Compose.restart(REPO_DIR)
+                print("Frontend Docker container restarted successfully.")
+            except Exception as e:
+                print(f"Failed to restart the frontend Docker container: {e}")
+                sys.exit(1)
 
         @staticmethod
         def status():
