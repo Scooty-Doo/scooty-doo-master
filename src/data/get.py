@@ -35,7 +35,7 @@ class Get:
                 result = Fallback.bikes(save_to_json=save_to_json)
                 return result
             raise requests.exceptions.RequestException(f"Failed to request bikes: {e}") from e
-    
+
     def trips(self, save_to_json=True, fallback=False):
         url = _url(self.url, self.endpoints.Trips.get_all)
         try:
@@ -50,7 +50,7 @@ class Get:
                 result = Fallback.trips(save_to_json=save_to_json)
                 return result
             raise requests.exceptions.RequestException(f"Failed to request zones: {e}") from e
-        
+
     def users(self, save_to_json=True, fallback=False):
         url = _url(self.url, self.endpoints.Users.get_all)
         try:
@@ -65,7 +65,7 @@ class Get:
                 result = Fallback.users(save_to_json=save_to_json)
                 return result
             raise requests.exceptions.RequestException(f"Failed to request zones: {e}") from e
-        
+
     def zones(self, save_to_json=True, fallback=True):
         url = _url(self.url, self.endpoints.Zones.get_all)
         try:

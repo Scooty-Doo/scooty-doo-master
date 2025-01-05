@@ -12,7 +12,7 @@ class Repositories:
             "frontend": "https://github.com/Scooty-Doo/scooty-doo-frontend.git",
             "bike": "https://github.com/Scooty-Doo/scooty-doo-bike.git"
         }
-        
+
         self.local = _Local(repositories=self.repositories)
         self.submodules = _Submodules()
 

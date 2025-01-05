@@ -1,5 +1,4 @@
 import sys
-import os
 from ._venv import Venv
 from ._environment import Environment
 from ..utils.directory import Directory
@@ -42,16 +41,16 @@ class Bike:
             except Exception as e:
                 print(f"Failed to stop the bike Docker container: {e}")
                 sys.exit(1)
-        
+
         @staticmethod
         def _restart():
             Bike.Docker._down()
             Bike.Docker._up()
-        
+
         @staticmethod
         def status():
             Docker.Compose.status(REPO_DIR)
-        
+
         @staticmethod
         def logs():
             Docker.Compose.logs(REPO_DIR)
@@ -65,7 +64,7 @@ class Bike:
         if not bikes:
             print("No bikes provided to generate .env file for.")
         Environment.Files.generate(bikes=bikes, master_docker_compose_file=master_docker_compose_file)
-    
+
     @staticmethod
     def _start_server(docker=True):
         """
@@ -96,16 +95,8 @@ class Bike:
         if docker:
             Bike.Docker._build()
         Bike._env(bikes, master_docker_compose_file)
-    
+
     @staticmethod
     def run():
         Bike._start_server()
         print("Hivemind Bike server started.")
-
-if __name__ == "__main__":
-    bike = Bike()
-    bike.setup()
-
-# python -m src.setup._bike
-
-# TODO: Arrange a Docker setup for bike repo.

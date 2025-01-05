@@ -10,7 +10,7 @@ class Setup:
     def backend(start_server=True, already_setup=True, docker=True):
         if not already_setup:
             Backend.setup(docker)
-        if start_server:    
+        if start_server:
             Backend.run(docker)
 
     @staticmethod
@@ -21,7 +21,7 @@ class Setup:
             Bike.setup(bikes, docker=docker, master_docker_compose_file=master_docker_compose_file)
         if start_server:
             Bike.run()
-    
+
     @staticmethod
     def frontend(start_server=True, already_setup=False):
         if not already_setup:

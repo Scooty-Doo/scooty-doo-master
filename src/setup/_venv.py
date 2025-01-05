@@ -26,11 +26,11 @@ class Venv:
         Create a virtual environment if it doesn't exist.
         """
         if not os.path.exists(venv_dir):
-            print(f"Creating virtual environment...")
+            print("Creating virtual environment...")
             Command.run([sys.executable, "-m", "venv", venv_dir])
         else:
-            print(f"Virtual environment already exists.\n")
-    
+            print("Virtual environment already exists.\n")
+
     @staticmethod
     def _install_dependencies(venv_dir):
         """
@@ -41,18 +41,20 @@ class Venv:
         repo_dir = os.path.dirname(venv_dir) # Get the directory of the virtual environment
         python_executable = Venv.get_python_executable(venv_dir)
 
-        print(f"Installing dependencies...")
+        print("Installing dependencies...")
         try:
             Dependencies.install(python_executable, repo_dir)
-            print(f"Dependencies installed successfully.\n")
+            print("Dependencies installed successfully.\n")
         except subprocess.CalledProcessError as e:
             print(f"Dependency installation failed: {e}")
             sys.exit(1)
 
+    @staticmethod
     def setup(venv_dir):
         Venv._build_venv(venv_dir)
         Venv._install_dependencies(venv_dir)
 
+    @staticmethod
     def setup_master_venv():
         """
         Setup the master virtual environment.

@@ -24,7 +24,7 @@ class Backend:
             except Exception as e:
                 print(f"Failed to build the backend Docker image: {e}")
                 sys.exit(1)
-        
+
         @staticmethod
         def _up():
             try:
@@ -33,7 +33,7 @@ class Backend:
             except Exception as e:
                 print(f"Failed to start the backend Docker container: {e}")
                 sys.exit(1)
-        
+
         @staticmethod
         def _down():
             try:
@@ -42,16 +42,16 @@ class Backend:
             except Exception as e:
                 print(f"Failed to stop the backend Docker container: {e}")
                 sys.exit(1)
-        
+
         @staticmethod
         def _restart():
             Backend.Docker._down()
             Backend.Docker._up()
-        
+
         @staticmethod
         def status():
             Docker.Compose.status(REPO_DIR)
-        
+
         @staticmethod
         def logs():
             Docker.Compose.logs(REPO_DIR)
@@ -98,7 +98,7 @@ class Backend:
         except Exception as e:
             print(f"Failed to start the FastAPI server: {e}")
             sys.exit(1)
-    
+
     @staticmethod
     def setup(docker=True):
         Backend._venv()
@@ -128,11 +128,6 @@ class Backend:
         print("Coverage reports generated.\n")
 
 if __name__ == "__main__":
-    """
-    Entry point for the script.
-    Usage:
-        python src/backend.py
-    """
     backend = Backend()
     backend.run()
 

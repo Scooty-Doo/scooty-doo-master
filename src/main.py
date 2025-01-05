@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
+
 from .setup.setup import Setup
 from .data.get import Get
 from .utils.settings import Settings
@@ -15,7 +17,7 @@ class Main:
             self._use_submodules()
         if not use_submodules:
             self._use_local_repositories()
-    
+
     def _use_submodules(self, auto_pull=True):
         """Changes the REPOSITORIES_DIRECTORY environment variable to the submodules directory."""
         os.environ["REPOSITORIES_DIRECTORY"] = Settings.Directory.Name.submodules
@@ -53,7 +55,7 @@ class Main:
         if frontend:
             ports.append(os.getenv("FRONTEND_PORT"))
         Chrome.Open.window(*ports)
-    
+
     def run(self, skip_setup=False, bikes=True, frontend=False, open_chrome_tabs=False, docker=True, master_docker_compose_file=True):
         self._setup_backend(start_server=True, already_setup=skip_setup, docker=docker)
         if bikes:

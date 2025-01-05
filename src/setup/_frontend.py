@@ -24,7 +24,7 @@ class Frontend:
             except Exception as e:
                 print(f"Failed to build the frontend Docker image: {e}")
                 sys.exit(1)
-        
+
         @staticmethod
         def _start():
             try:
@@ -37,7 +37,7 @@ class Frontend:
         @staticmethod
         def status():
             Docker.Compose.status(REPO_DIR)
-        
+
         @staticmethod
         def logs():
             Docker.Compose.logs(REPO_DIR)
@@ -46,7 +46,7 @@ class Frontend:
     def setup():
         Frontend._env()
         Frontend.Docker._build()
-    
+
     @staticmethod
     def run():
         Frontend.Docker._start()

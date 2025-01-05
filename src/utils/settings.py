@@ -15,7 +15,7 @@ class Settings:
             database = 'database'
             venv = '.venv'
             submodules = 'submodules'
-    
+
     class Filenames:
         class Mocked:
             bikes = 'bikes_with_updated_positions.csv'

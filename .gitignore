@@ -9,5 +9,12 @@
 *.env.bike
 __pycache__
 *.pyc
+*.pyo
+*.pyd
 *.log
 venv/
+*.md
+!README.md
+*.coverage
+*.pytest_cache/
+htmlcov/

@@ -15,7 +15,7 @@ class Fallback:
         if save_to_json:
             File.Save.to_json(data=result, folder=Settings.Directory.data, filename=filename)
         return result
-    
+
     @staticmethod
     def trips(save_to_json=True):
         filename = Settings.Filenames.Mocked.trips
@@ -25,7 +25,7 @@ class Fallback:
         if save_to_json:
             File.Save.to_json(data=result, folder=Settings.Directory.data, filename=filename)
         return result
-    
+
     @staticmethod
     def users(save_to_json=True):
         filename = Settings.Filenames.Mocked.users
@@ -35,7 +35,7 @@ class Fallback:
         if save_to_json:
             File.Save.to_json(data=result, folder=Settings.Directory.data, filename=filename)
         return result
-    
+
     @staticmethod
     def zones(save_to_json=True):
         filename = Settings.Filenames.Mocked.zones
@@ -45,7 +45,7 @@ class Fallback:
         if save_to_json:
             File.Save.to_json(data=result, folder=Settings.Directory.data, filename=filename)
         return result
-    
+
     @staticmethod
     def zone_types(save_to_json=True):
         filename = Settings.Filenames.Mocked.zone_types

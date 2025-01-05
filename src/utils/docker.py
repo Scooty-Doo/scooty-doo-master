@@ -13,7 +13,7 @@ class Docker:
                 try:
                     Command.run([npm_filename, "--version"], inherit_environment=True)
                     return True
-                except Exception as e:
+                except Exception:
                     return False
             if npm:
                 if not _npm_exists():
@@ -36,7 +36,7 @@ class Docker:
                 try:
                     print("Building the Docker image...")
                     Command.run(["docker-compose", "build"], directory=directory)
-                    print("Docker image built successfully.")    
+                    print("Docker image built successfully.")
                 except Exception as e:
                     print(f"Failed to build the Docker image: {e}")
 
@@ -51,20 +51,20 @@ class Docker:
         @staticmethod
         def down(directory):
             Command.run(["docker-compose", "down"], directory=directory)
-        
+
         @staticmethod
         def restart(directory):
             Docker.Compose.down(directory)
             Docker.Compose.up(directory)
-        
+
         @staticmethod
         def status(directory):
             Command.run(["docker-compose", "ps"], directory=directory)
-        
+
         @staticmethod
         def logs(directory):
             Command.run(["docker-compose", "logs", "-f"], directory=directory)
-    
+
     class Desktop:
         @staticmethod
         def is_running():

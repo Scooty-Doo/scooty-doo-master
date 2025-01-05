@@ -6,7 +6,7 @@ class Serialize:
         For storage in environment file.
         """
         return ','.join([f"{longitude}:{latitude}" for (longitude, latitude) in positions])
-    
+
     @staticmethod
     def bike_ids(bike_ids: list[int]) -> str:
         """
