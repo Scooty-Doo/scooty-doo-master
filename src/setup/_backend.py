@@ -65,7 +65,7 @@ class Backend:
         Backend._start_server()
 
     @staticmethod
-    def tests(self):
+    def tests():
         """
         Run tests using pytest with optional coverage.
         """

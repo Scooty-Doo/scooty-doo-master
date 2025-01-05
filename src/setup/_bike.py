@@ -61,15 +61,10 @@ class Bike:
         Venv.setup(VENV_DIR)
 
     @staticmethod
-    def _env(bikes, master_docker_compose_file=True):
+    def _env(bikes, master_docker_compose_file):
         if not bikes:
             print("No bikes provided to generate .env file for.")
-        Environment.Files.generate(bikes=bikes)
-        backend_port = str(os.getenv("BACKEND_PORT"))
-        if not master_docker_compose_file:
-            os.environ["BACKEND_URL"] = f"http://host.docker.internal:{backend_port}/"
-        else:
-            os.environ["BACKEND_URL"] = f"http://localhost:{backend_port}/"
+        Environment.Files.generate(bikes=bikes, master_docker_compose_file=master_docker_compose_file)
     
     @staticmethod
     def _start_server(docker=True):

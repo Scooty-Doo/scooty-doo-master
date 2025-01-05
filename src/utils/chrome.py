@@ -11,7 +11,8 @@ class Chrome:
             if IS_WINDOWS:
                 if ports:
                     urls = [f"http://localhost:{port}" for port in ports if port]
-                    Command.run([CHROME_EXECUTABLE] + urls)
+                    Command.run([CHROME_EXECUTABLE] + ["--new-tab"] + urls)
+                    print("Please manually refresh the tabs if they do not load.")
                 else:
                     Command.run([CHROME_EXECUTABLE])
             else:

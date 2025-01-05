@@ -34,7 +34,7 @@ class Main:
         bikes = None
         if not already_setup:
             bikes = self.get.bikes()
-        Setup.bike(start_server, bikes, already_setup, master_docker_compose_file=True)
+        Setup.bike(start_server, bikes, already_setup, master_docker_compose_file=master_docker_compose_file)
 
     def _setup_frontend(self):
         Setup.frontend()

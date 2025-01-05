@@ -45,7 +45,8 @@ class Environment:
         def generate(
             backend: bool = False,
             frontend: bool = False,
-            bikes: list[dict] = None
+            bikes: list[dict] = None,
+            master_docker_compose_file: bool = True
             ):
             """Generate .env files for the backend, frontend, and/or bikes."""
 
@@ -59,7 +60,7 @@ class Environment:
                 Environment._copy_env_file(
                     source_env_filename='.env.frontend',
                     target_repo=Directory.Repo.frontend())
-            def _bikes(bikes):
+            def _bikes(bikes, master_docker_compose_file):
                 target_repo = Directory.Repo.bike()
                 Environment._copy_env_file(
                     source_env_filename='.env.bike',
@@ -69,10 +70,17 @@ class Environment:
                 positions = Extract.Bike.positions(bikes)
                 output_env_file = os.path.join(target_repo, '.env')
                 lines = File.Read.lines(output_env_file)
-                existing_lines = Extract.Lines.not_startswith(lines, ('BIKE_IDS=', 'POSITIONS='))
+                existing_lines = Extract.Lines.not_startswith(lines, ('BIKE_IDS=', 'POSITIONS=', 'BACKEND_URL='))
+                backend_port = os.getenv("BACKEND_PORT")
+                backend_url = f"http://localhost:{backend_port}"
+                if not master_docker_compose_file:
+                    backend_url = f"http://host.docker.internal:{backend_port}"
+                print(f"master_docker_compose_file is {master_docker_compose_file}.")
+                print(f"Bike .env File is using backend URL: {backend_url}")
                 new_lines = [
                     f"BIKE_IDS={Serialize.bike_ids(bike_ids)}",
-                    f"POSITIONS={Serialize.positions(positions)}"]
+                    f"POSITIONS={Serialize.positions(positions)}",
+                    f"BACKEND_URL={backend_url}"]
                 output_env_content = existing_lines + new_lines
                 File.Write.lines(output_env_file, output_env_content)
                 print(f"Generated .env file for the bikes at '{output_env_file}'.")
@@ -82,7 +90,7 @@ class Environment:
             if frontend:
                 _frontend()
             if bikes:
-                _bikes(bikes)
+                _bikes(bikes, master_docker_compose_file)
             if not (backend or frontend or bikes):
                 print("At least one of 'backend', 'frontend', or 'bikes' must be True.")
 
