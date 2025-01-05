@@ -63,7 +63,7 @@ class Docker:
 
         @staticmethod
         def logs(directory):
-            Command.run(["docker-compose", "logs", "-f"], directory=directory)
+            Command.run(["docker-compose", "logs", "-f"], directory=directory, raise_exception=False)
 
     class Desktop:
         @staticmethod

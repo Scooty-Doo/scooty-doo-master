@@ -38,5 +38,6 @@ def test_install_dependencies_fail(mock_install):
     """
     coverage for an exception in _install_dependencies
     """
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit) as exc_info:
         Venv._install_dependencies("/fake/venv")
+    assert exc_info.value.code == 1

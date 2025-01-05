@@ -3,6 +3,11 @@ import requests
 from unittest.mock import patch, MagicMock
 from src.data.get import Get
 
+@pytest.fixture(autouse=True)
+def set_env(monkeypatch):
+    monkeypatch.setenv("BACKEND_URL", "http://localhost:8000/")
+    monkeypatch.setenv("TOKEN", "test_token")
+
 @patch("src.data.get.requests.get")
 def test_get_bikes_success(mock_get):
     """

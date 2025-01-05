@@ -33,7 +33,7 @@ def test_docker_desktop_start_already_running(mock_run):
         Docker.Desktop.start()
         assert mock_run.call_count == 0
 
-@patch("os.startfile")
+@patch("src.utils.docker.os.startfile")
 @patch("src.utils.command.Command.run")
 def test_docker_desktop_start_windows(mock_run, mock_startfile):
     """

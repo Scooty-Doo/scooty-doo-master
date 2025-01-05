@@ -75,7 +75,7 @@ if __name__ == "__main__":
     )
     main.run(
         skip_setup=False,
-        bikes=False,
+        bikes=True,
         frontend=False,
         open_chrome_tabs=True,
         docker=True,
@@ -84,5 +84,7 @@ if __name__ == "__main__":
 
 # python -m src.main
 
+
+# python -m pytest --cov=src --cov-report=html
+
 # TODO: Bash script to run the program?
-# test
