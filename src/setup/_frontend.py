@@ -37,6 +37,10 @@ class Frontend:
         @staticmethod
         def status():
             Docker.Compose.status(REPO_DIR)
+        
+        @staticmethod
+        def logs():
+            Docker.Compose.logs(REPO_DIR)
 
     @staticmethod
     def setup():
@@ -47,6 +51,7 @@ class Frontend:
     def run():
         Frontend.Docker._start()
         Frontend.Docker.status()
+        Frontend.Docker.logs()
         print("Hivemind Bike server started.")
 
 if __name__ == "__main__":

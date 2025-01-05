@@ -22,6 +22,7 @@ class Backend:
     @staticmethod
     def _database():
         try:
+            Docker.Desktop.start()
             print("Starting PostgreSQL and pgAdmin containers...")
             Docker.Compose.up(DATABASE_DIR)
             print("Creating database tables...")

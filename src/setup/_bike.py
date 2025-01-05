@@ -1,8 +1,10 @@
 import sys
+import os
 from ._venv import Venv
 from ._environment import Environment
 from ..utils.directory import Directory
 from ..utils.command import Command
+from ..utils.docker import Docker
 
 ROOT_DIR = Directory.root()
 REPO_DIR = Directory.Repo.bike()
@@ -13,26 +15,77 @@ class Bike:
     """
     Bike class to manage the setup of individual bike instances.
     """
+    class Docker:
+        @staticmethod
+        def _build():
+            try:
+                print("Building the bike Docker image...")
+                Docker.Compose.build(REPO_DIR)
+            except Exception as e:
+                print(f"Failed to build the bike Docker image: {e}")
+                sys.exit(1)
+
+        @staticmethod
+        def _up():
+            try:
+                print("Starting the bike Docker container...")
+                Docker.Compose.up(REPO_DIR)
+            except Exception as e:
+                print(f"Failed to start the bike Docker container: {e}")
+                sys.exit(1)
+
+        @staticmethod
+        def _down():
+            try:
+                print("Stopping the bike Docker container...")
+                Docker.Compose.down(REPO_DIR)
+            except Exception as e:
+                print(f"Failed to stop the bike Docker container: {e}")
+                sys.exit(1)
+        
+        @staticmethod
+        def _restart():
+            Bike.Docker._down()
+            Bike.Docker._up()
+        
+        @staticmethod
+        def status():
+            Docker.Compose.status(REPO_DIR)
+        
+        @staticmethod
+        def logs():
+            Command.run(["docker-compose", "logs"], directory=REPO_DIR)
+
     @staticmethod
     def _venv():
         Venv.setup(VENV_DIR)
 
     @staticmethod
-    def _env(bikes):
+    def _env(bikes, master_docker_compose_file=True):
         if not bikes:
             print("No bikes provided to generate .env file for.")
         Environment.Files.generate(bikes=bikes)
+        backend_port = str(os.getenv("BACKEND_PORT"))
+        if not master_docker_compose_file:
+            os.environ["BACKEND_URL"] = f"http://host.docker.internal:{backend_port}/"
+        else:
+            os.environ["BACKEND_URL"] = f"http://localhost:{backend_port}/"
     
     @staticmethod
-    def _start_server():
+    def _start_server(docker=True):
         """
         Starts the FastAPI server for the bike hivemind.
         """
         print("Starting the FastAPI server for bike hivemind...")
-        MAIN_MODULE = "src.main"
+        if docker:
+            Bike.Docker._up()
+            Bike.Docker.status()
+            Bike.Docker.logs()
+            return
+        main_module = "src.main"
         try:
             Command.run(
-                [PYTHON_EXECUTABLE, "-m", MAIN_MODULE],
+                [PYTHON_EXECUTABLE, "-m", main_module],
                 directory=REPO_DIR,
                 stream_output=True
             )
@@ -42,9 +95,12 @@ class Bike:
             sys.exit(1)
 
     @staticmethod
-    def setup(bikes):
-        Bike._venv()
-        Bike._env(bikes)
+    def setup(bikes, docker=True, master_docker_compose_file=True):
+        if not docker:
+            Bike._venv()
+        if docker:
+            Bike.Docker._build()
+        Bike._env(bikes, master_docker_compose_file)
     
     @staticmethod
     def run():

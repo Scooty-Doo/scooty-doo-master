@@ -1,5 +1,6 @@
 import os
 import platform
+import sys
 from .command import Command
 
 class Docker:
@@ -47,7 +48,6 @@ class Docker:
             if npm:
                 Command.run(["docker-compose", "up", "webclient-prod", "-d"], directory=directory)
 
-
         @staticmethod
         def down(directory):
             Command.run(["docker-compose", "down"], directory=directory)
@@ -60,5 +60,46 @@ class Docker:
         @staticmethod
         def status(directory):
             Command.run(["docker-compose", "ps"], directory=directory)
+        
+        @staticmethod
+        def logs(directory):
+            Command.run(["docker-compose", "logs", "-f"], directory=directory)
     
-    
+    class Desktop:
+        @staticmethod
+        def is_running():
+            """
+            Check if Docker Desktop is running by attempting to retrieve Docker information.
+            """
+            try:
+                Command.run(["docker", "info"], asynchronous=False, kwargs={"verbose": False})
+                print("Docker Desktop is running.")
+                return True
+            except Exception:
+                print("Docker Desktop is not running.")
+                return False
+
+        @staticmethod
+        def start():
+            try:
+                if Docker.Desktop.is_running():
+                    print("Docker Desktop is already running.")
+                    return
+                print("Starting the Docker Desktop application...")
+                is_windows = platform.system() == "Windows"
+                if is_windows:
+                    print("Starting the Docker Desktop application...")
+                    docker_desktop_executable = r'C:\Program Files\Docker\Docker\Docker Desktop.exe'
+                    if os.path.exists(docker_desktop_executable):
+                        os.startfile(docker_desktop_executable)
+                else:
+                    print("Please start Docker Desktop manually.")
+            except Exception as e:
+                print(f"Failed to start the Docker Desktop application: {e}")
+                sys.exit(1)
+
+if __name__ == "__main__":
+    print(f'Docker Desktop is running: {Docker.Desktop.is_running()}')
+    Docker.Desktop.start()
+
+    # python -m src.utils.docker
