@@ -15,6 +15,47 @@ class Backend:
     """
     Backend class to manage the setup of the backend server.
     """
+    class Docker:
+        @staticmethod
+        def _build():
+            try:
+                print("Building the backend Docker image...")
+                Docker.Compose.build(REPO_DIR)
+            except Exception as e:
+                print(f"Failed to build the backend Docker image: {e}")
+                sys.exit(1)
+        
+        @staticmethod
+        def _up():
+            try:
+                print("Starting the backend Docker container...")
+                Docker.Compose.up(REPO_DIR)
+            except Exception as e:
+                print(f"Failed to start the backend Docker container: {e}")
+                sys.exit(1)
+        
+        @staticmethod
+        def _down():
+            try:
+                print("Stopping the backend Docker container...")
+                Docker.Compose.down(REPO_DIR)
+            except Exception as e:
+                print(f"Failed to stop the backend Docker container: {e}")
+                sys.exit(1)
+        
+        @staticmethod
+        def _restart():
+            Backend.Docker._down()
+            Backend.Docker._up()
+        
+        @staticmethod
+        def status():
+            Docker.Compose.status(REPO_DIR)
+        
+        @staticmethod
+        def logs():
+            Docker.Compose.logs(REPO_DIR)
+
     @staticmethod
     def _venv():
         Venv.setup(VENV_DIR)
@@ -38,7 +79,12 @@ class Backend:
         Command.run([PYTHON_EXECUTABLE, "-m", load_mock_data_module], directory=REPO_DIR)
 
     @staticmethod
-    def _start_server():
+    def _start_server(docker=True):
+        if docker:
+            Backend.Docker._up()
+            Backend.Docker.status()
+            Backend.Docker.logs()
+            return
         print("Starting the FastAPI server...")
         command = [
             PYTHON_EXECUTABLE,
@@ -54,15 +100,17 @@ class Backend:
             sys.exit(1)
     
     @staticmethod
-    def setup():
+    def setup(docker=True):
         Backend._venv()
         Backend._database()
         time.sleep(5)
         Backend._mock_data()
+        if docker:
+            Backend.Docker._build()
 
     @staticmethod
-    def run():
-        Backend._start_server()
+    def run(docker=True):
+        Backend._start_server(docker)
 
     @staticmethod
     def tests():

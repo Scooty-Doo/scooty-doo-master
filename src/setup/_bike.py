@@ -54,7 +54,7 @@ class Bike:
         
         @staticmethod
         def logs():
-            Command.run(["docker-compose", "logs"], directory=REPO_DIR)
+            Docker.Compose.logs(REPO_DIR)
 
     @staticmethod
     def _venv():

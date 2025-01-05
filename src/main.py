@@ -27,14 +27,14 @@ class Main:
         os.environ["REPOSITORIES_DIRECTORY"] = Settings.Directory.local_repositories
         self.repositories.local.get.all(branch='main')
 
-    def _setup_backend(self, start_server, already_setup):
-        Setup.backend(start_server, already_setup)
+    def _setup_backend(self, start_server, already_setup, docker=True):
+        Setup.backend(start_server, already_setup, docker)
 
-    def _setup_bikes(self, start_server, already_setup, master_docker_compose_file=True):
+    def _setup_bikes(self, start_server, already_setup, docker=True, master_docker_compose_file=True):
         bikes = None
         if not already_setup:
             bikes = self.get.bikes()
-        Setup.bike(start_server, bikes, already_setup, master_docker_compose_file=master_docker_compose_file)
+        Setup.bike(start_server, bikes, already_setup, docker, master_docker_compose_file=master_docker_compose_file)
 
     def _setup_frontend(self):
         Setup.frontend()
@@ -54,30 +54,32 @@ class Main:
             ports.append(os.getenv("FRONTEND_PORT"))
         Chrome.Open.window(*ports)
     
-    def run(self, skip_setup=False, bikes=True, frontend=False, open_chrome_tabs=False, master_docker_compose_file=True):
-        self._setup_backend(start_server=True, already_setup=skip_setup)
+    def run(self, skip_setup=False, bikes=True, frontend=False, open_chrome_tabs=False, docker=True, master_docker_compose_file=True):
+        self._setup_backend(start_server=True, already_setup=skip_setup, docker=docker)
         if bikes:
-            self._setup_bikes(start_server=True, already_setup=skip_setup, master_docker_compose_file=master_docker_compose_file)
+            self._setup_bikes(start_server=True, already_setup=skip_setup, docker=docker, master_docker_compose_file=master_docker_compose_file)
         if frontend:
             self._setup_frontend(start_server=True, already_setup=skip_setup)
         if open_chrome_tabs:
             self._open_chrome_tabs(bikes=bikes, frontend=frontend)
 
 if __name__ == "__main__":
+
+    # NOTE: Run to auto-setup venv in master repository:
+    # python -m src.setup._venv
+
     main = Main(
         use_submodules=False
     )
     main.run(
         skip_setup=False,
-        bikes=True,
+        bikes=False,
         frontend=False,
         open_chrome_tabs=True,
+        docker=True,
         master_docker_compose_file=False
     )
 
 # python -m src.main
 
 # TODO: Bash script to run the program?
-
-# TODO: Fix Chrome.Open.window() method to actually open all the tabs.
-# TODO: Fix Setup._bike.Bike._env() method to actually set the BACKEND_URL environment variable to host.docker.internal.

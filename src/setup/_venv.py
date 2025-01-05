@@ -52,3 +52,15 @@ class Venv:
     def setup(venv_dir):
         Venv._build_venv(venv_dir)
         Venv._install_dependencies(venv_dir)
+
+    def setup_master_venv():
+        """
+        Setup the master virtual environment.
+        """
+        venv_dir = os.path.join(Directory.root(), "venv")
+        Venv.setup(venv_dir)
+
+if __name__ == "__main__":
+    Venv.setup_master_venv()
+
+    # python -m src.setup._venv

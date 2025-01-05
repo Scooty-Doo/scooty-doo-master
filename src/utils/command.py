@@ -12,14 +12,18 @@ class Command:
         stream_output: bool = False,
         inherit_environment: bool = False,
         **kwargs
-        # TODO: Maybe add a log_file parameter to log the output to a file.
         ):
         """
         Run a shell command using subprocess.
 
         Args:
-            command (list): The command and its arguments as a list.
-            cwd (str, optional): The directory to run the command in. Defaults to None.
+            command (list): The command to run.
+            directory (str, optional): The directory to run the command in. Defaults to None.
+            asynchronous (bool, optional): Whether to run the command asynchronously. Defaults to True.
+            raise_exception (bool, optional): Whether to raise an exception if the command fails. Defaults to True.
+            stream_output (bool, optional): Whether to stream the output to the console. Defaults to False.
+            inherit_environment (bool, optional): Whether to inherit the current environment variables. Defaults to False.
+            **kwargs: Additional keyword arguments to pass to subprocess.
         """
         try:
             print(f"Running command: {' '.join(command)}")
