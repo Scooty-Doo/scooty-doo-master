@@ -2,12 +2,10 @@ import pytest
 import requests
 from unittest.mock import patch, MagicMock
 from src.data.get import Get
+from src.utils.settings import Settings
 
-@pytest.fixture(autouse=True)
-def set_env(monkeypatch):
-    monkeypatch.setenv("BACKEND_URL", "http://localhost:8000/")
-    monkeypatch.setenv("TOKEN", "test_token")
-
+@patch.object(Settings.Endpoints, 'backend_url', 'http://localhost:8000/')
+@patch.object(Settings.Endpoints, 'token', 'test_token')
 @patch("src.data.get.requests.get")
 def test_get_bikes_success(mock_get):
     """
@@ -23,12 +21,16 @@ def test_get_bikes_success(mock_get):
     assert result == [{"id": "1"}, {"id": "2"}]
     mock_get.assert_called_once()
 
+@patch.object(Settings.Endpoints, 'backend_url', 'http://localhost:8000/')
+@patch.object(Settings.Endpoints, 'token', 'test_token')
 @patch("src.data.get.requests.get", side_effect=Exception("Connection error"))
 def test_get_bikes_fallback(mock_get):
     get = Get()
     with pytest.raises(Exception):
         get.bikes()
- 
+
+@patch.object(Settings.Endpoints, 'backend_url', 'http://localhost:8000/')
+@patch.object(Settings.Endpoints, 'token', 'test_token')
 @pytest.mark.parametrize("method_name", ["bikes", "trips", "users", "zones", "zone_types"])
 @patch("src.data.get.requests.get")
 def test_get_no_save_to_json(mock_get, method_name):
@@ -44,6 +46,8 @@ def test_get_no_save_to_json(mock_get, method_name):
         mock_save.assert_not_called()
         assert result == [{"id": "123"}]
 
+@patch.object(Settings.Endpoints, 'backend_url', 'http://localhost:8000/')
+@patch.object(Settings.Endpoints, 'token', 'test_token')
 @pytest.mark.parametrize("method_name", ["bikes", "trips", "users", "zones", "zone_types"])
 @patch("src.data.get.requests.get")
 def test_get_save_to_json(mock_get, method_name):
@@ -59,6 +63,8 @@ def test_get_save_to_json(mock_get, method_name):
         mock_save.assert_called_once()
         assert result == [{"id": "999"}]
 
+@patch.object(Settings.Endpoints, 'backend_url', 'http://localhost:8000/')
+@patch.object(Settings.Endpoints, 'token', 'test_token')
 @patch("src.data.get.requests.get", side_effect=requests.exceptions.Timeout("Timeout error"))
 def test_get_bikes_timeout(mock_get):
     get = Get()
