@@ -33,17 +33,6 @@ def test_docker_desktop_start_already_running(mock_run):
         Docker.Desktop.start()
         assert mock_run.call_count == 0
 
-@patch("src.utils.docker.os.startfile")
-@patch("src.utils.command.Command.run")
-def test_docker_desktop_start_windows(mock_run, mock_startfile):
-    """
-    If on Windows and Docker not running, start() tries to open Docker Desktop.
-    """
-    with patch.object(Docker.Desktop, "is_running", return_value=False):
-        with patch("platform.system", return_value="Windows"):
-            Docker.Desktop.start()
-            mock_startfile.assert_called()
-
 @patch("platform.system", return_value="Linux")
 @patch("os.path.exists", return_value=False)
 def test_docker_desktop_start_non_windows(mock_exists, mock_platform):

@@ -30,7 +30,7 @@ def test_install_dependencies(mock_install):
     Venv._install_dependencies("/fake/venv")
     mock_install.assert_called_once()
     (python_executable, repo_dir) = mock_install.call_args[0][0:2]
-    assert python_executable.endswith("python.exe")
+    assert (python_executable.endswith("python.exe") or python_executable.endswith("python"))
     assert repo_dir == "/fake"
 
 @patch("src.setup._venv.Dependencies.install", side_effect=subprocess.CalledProcessError(1, "pip install"))

@@ -91,7 +91,7 @@ class Docker:
                     print("Starting the Docker Desktop application...")
                     docker_desktop_executable = r'C:\Program Files\Docker\Docker\Docker Desktop.exe'
                     if os.path.exists(docker_desktop_executable):
-                        os.startfile(docker_desktop_executable)
+                        Command.run([docker_desktop_executable], asynchronous=False, kwargs={"verbose": False})
                 else:
                     print("Please start Docker Desktop manually.")
             except Exception as e:
