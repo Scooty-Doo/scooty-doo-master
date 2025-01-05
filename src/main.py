@@ -85,6 +85,7 @@ if __name__ == "__main__":
 # python -m src.main
 
 
-# python -m pytest --cov=src --cov-report=html
+# python -m pytest --cov=src --cov-report=html 
+# python -m pytest --cov=src --cov-report=term-missing
 
 # TODO: Bash script to run the program?

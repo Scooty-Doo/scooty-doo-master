@@ -5,8 +5,6 @@ CHROME_EXECUTABLE = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
 IS_WINDOWS = platform.system() == "Windows"
 
 class Chrome:
-    CHROME_EXECUTABLE = CHROME_EXECUTABLE
-    IS_WINDOWS = IS_WINDOWS
     class Open:
         @staticmethod
         def window(*ports):
