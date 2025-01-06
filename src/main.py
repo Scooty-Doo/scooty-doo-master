@@ -1,4 +1,5 @@
 import os
+import logging
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -8,6 +9,26 @@ from .data.get import Get
 from .utils.settings import Settings
 from .utils.repositories import Repositories
 from .utils.chrome import Chrome
+from .utils.directory import Directory
+
+LOGS_DIR = Directory.logs()
+os.makedirs(LOGS_DIR, exist_ok=True)
+
+def setup_logger():
+    logger = logging.getLogger('master')
+    logger.setLevel(logging.DEBUG)
+    log_file = os.path.join(LOGS_DIR, 'master.log')
+    fh = logging.FileHandler(log_file)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    return logger
+
+logger = setup_logger()
 
 class Main:
     def __init__(self, use_submodules=False):
@@ -49,9 +70,6 @@ if __name__ == "__main__":
 
     # NOTE: Run to auto-setup venv in master repository:
     # python -m src.setup._venv
-
-    #from .setup._master import Master
-    #Master.setup()
 
     main = Main(
         use_submodules=False

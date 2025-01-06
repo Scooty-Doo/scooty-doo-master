@@ -6,6 +6,7 @@ class Settings:
         mocked_data = 'repos/backend/database/mock_data/data/generated/'
         data = 'data'
         env = 'env'
+        logs = 'logs'
         repositories = os.getenv("REPOSITORIES_DIRECTORY", 'repositories')
         local_repositories = 'repositories'
         class Name:

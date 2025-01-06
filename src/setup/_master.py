@@ -1,5 +1,5 @@
 import os
-import platform
+from ._environment import Environment
 from ..utils.docker import Docker
 from ..utils.directory import Directory
 
@@ -8,8 +8,6 @@ DATABASE_CONTAINER = os.getenv("DATABASE_CONTAINER", 'database-db-1')
 DATABASE_ADMINER_CONTAINER = os.getenv("DATABASE_ADMINER_CONTAINER", 'database-adminer-1')
 BACKEND_CONTAINER = os.getenv("BACKEND_CONTAINER", 'api')
 BIKE_CONTAINER = os.getenv("BIKE_CONTAINER", 'bike_hivemind_app')
-BACKEND_BASH_FILE = os.path.join(Directory.Repo.backend(), "start.sh")
-IS_WINDOWS = platform.system() == "Windows"
 
 class Master:
     class Docker:
@@ -51,8 +49,8 @@ class Master:
 
     @staticmethod
     def setup():
+        Environment.Files.generate()
         Master.Docker.restart()
-
 
 if __name__ == "__main__":
     Master.setup()
