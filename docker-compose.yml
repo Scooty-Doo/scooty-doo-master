@@ -62,6 +62,35 @@ services:
       - scooty-web
     restart: unless-stopped
     depends_on:
+      - db
+      - api
+
+  # webclient-dev:
+  #   build:
+  #     context: ./repositories/frontend
+  #     dockerfile: ./dockerfiles/dev/Dockerfile
+  #   container_name: scooty-web-dev
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./repositories/frontend/src:/app/src
+  #   networks:
+  #     - scooty-web
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - api
+
+  webclient-prod:
+    build:
+      context: ./repositories/frontend
+      dockerfile: ./dockerfiles/prod/Dockerfile
+    container_name: scooty-web-prod
+    ports:
+      - "3000:3000"
+    networks:
+      - scooty-web
+    restart: unless-stopped
+    depends_on:
       - api
 
 volumes:

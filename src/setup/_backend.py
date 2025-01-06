@@ -74,9 +74,9 @@ class Backend:
 
 if __name__ == "__main__":
     backend = Backend()
-    #backend.run()
-    backend.Docker._down()
-    backend.Docker._clear()
+    backend.run()
+    #backend.Docker._down()
+    #backend.Docker._clear()
 
     # Optional: Uncomment the following line to run tests after setting up the backend
     #backend.run_tests()

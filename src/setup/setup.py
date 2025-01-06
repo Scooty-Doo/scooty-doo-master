@@ -8,11 +8,8 @@ class Setup:
     Setup class to manage the setup of the backend, frontend, and bike instances.
     """
     @staticmethod
-    def backend(start_server=True, already_setup=True, docker=True):
-        if not already_setup:
-            Backend._setup(docker)
-        if start_server:
-            Backend.run(docker)
+    def backend():
+        Backend.run()
 
     @staticmethod
     def bike(start_server=True, bikes=None, already_setup=False, docker=True, master_docker_compose=True):

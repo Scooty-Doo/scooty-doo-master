@@ -1,4 +1,5 @@
 import os
+import platform
 from ..utils.docker import Docker
 from ..utils.directory import Directory
 
@@ -7,6 +8,8 @@ DATABASE_CONTAINER = os.getenv("DATABASE_CONTAINER", 'database-db-1')
 DATABASE_ADMINER_CONTAINER = os.getenv("DATABASE_ADMINER_CONTAINER", 'database-adminer-1')
 BACKEND_CONTAINER = os.getenv("BACKEND_CONTAINER", 'api')
 BIKE_CONTAINER = os.getenv("BIKE_CONTAINER", 'bike_hivemind_app')
+BACKEND_BASH_FILE = os.path.join(Directory.Repo.backend(), "start.sh")
+IS_WINDOWS = platform.system() == "Windows"
 
 class Master:
     class Docker:
@@ -55,3 +58,5 @@ if __name__ == "__main__":
     Master.setup()
 
     # python -m src.setup._master
+
+    # NOTE: repositories/backend/start.sh needs to be "LF" line endings for Docker to run the script.
