@@ -1,6 +1,7 @@
 import os
 import platform
 import sys
+import time
 from .command import Command
 
 class Docker:
@@ -65,25 +66,41 @@ class Docker:
         def logs(directory):
             Command.run(["docker-compose", "logs", "-f"], directory=directory, raise_exception=False)
     
+    class Container:
+        @staticmethod
+        def stop(name):
+            try:
+                Command.run(["docker", "stop", name], asynchronous=False, raise_exception=False)
+                print(f"Container '{name}' stopped successfully.")
+            except Exception as e:
+                print(f"Failed to stop container '{name}': {e}")
+        
+        @staticmethod
+        def delete(name):
+            try:
+                Command.run(["docker", "rm", "-f", name], asynchronous=False, raise_exception=False)
+                print(f"Container '{name}' deleted successfully.")
+            except Exception as e:
+                print(f"Failed to delete container '{name}': {e}")
+    
     class Network:
         @staticmethod
         def create(name):
             try:
-                Command.run(["docker", "network", "create", name], raise_exception=True)
+                Command.run(["docker", "network", "create", name], asynchronous=False, raise_exception=False)
                 print(f"Network '{name}' created successfully.")
             except Exception as e:
                 print(f"Failed to create network '{name}': {e}")
         
         @staticmethod
         def recreate(name):
-            if Docker.Network.exists(name):
-                Docker.Network.delete(name)
+            Docker.Network.delete(name)
             Docker.Network.create(name)
 
         @staticmethod
         def connect(network, container):
             try:
-                Command.run(["docker", "network", "connect", network, container], raise_exception=True)
+                Command.run(["docker", "network", "connect", network, container], asynchronous=False, raise_exception=False)
                 print(f"Container '{container}' connected to network '{network}' successfully.")
             except Exception as e:
                 print(f"Failed to connect container '{container}' to network '{network}': {e}")
@@ -91,7 +108,7 @@ class Docker:
         @staticmethod
         def delete(name):
             try:
-                Command.run(["docker", "network", "rm", name], raise_exception=True)
+                Command.run(["docker", "network", "rm", name], asynchronous=False, raise_exception=False)
                 print(f"Network '{name}' deleted successfully.")
             except Exception as e:
                 print(f"Failed to delete network '{name}': {e}")
@@ -99,10 +116,7 @@ class Docker:
         @staticmethod
         def disconnect(network, container):
             try:
-                if not Docker.Network.is_connected(network, container):
-                    print(f"Container '{container}' is not connected to network '{network}'. Skipping.")
-                    return
-                Command.run(["docker", "network", "disconnect", network, container], raise_exception=True)
+                Command.run(["docker", "network", "disconnect", network, container], asynchronous=False, raise_exception=False)
                 print(f"Container '{container}' disconnected from network '{network}' successfully.")
             except Exception as e:
                 print(f"Failed to disconnect container '{container}' from network '{network}': {e}")
@@ -110,36 +124,24 @@ class Docker:
         @staticmethod
         def inspect(name):
             try:
-                Command.run(["docker", "network", "inspect", name], raise_exception=True)
+                Command.run(["docker", "network", "inspect", name], asynchronous=False, raise_exception=False)
             except Exception as e:
                 print(f"Failed to inspect network '{name}': {e}")
         
         @staticmethod
-        def ls():
+        def show():
             try:
-                Command.run(["docker", "network", "ls"], raise_exception=True)
+                Command.run(["docker", "network", "ls"], asynchronous=False, raise_exception=False)
             except Exception as e:
                 print(f"Failed to display networks: {e}")
         
         @staticmethod
         def prune():
             try:
-                Command.run(["docker", "network", "prune", "-f"], raise_exception=True)
+                Command.run(["docker", "network", "prune", "-f"], asynchronous=False, raise_exception=False)
                 print("Pruned all unused networks successfully.")
             except Exception as e:
                 print(f"Failed to prune unused networks: {e}")
-        
-        @staticmethod
-        def exists(name):
-            """
-            Checks if a network exists using 'docker network ls'.
-            Returns True if it exists, False otherwise.
-            """
-            pass
-        
-        @staticmethod
-        def is_connected(network, container):
-            pass
 
     class Desktop:
         @staticmethod
@@ -168,6 +170,7 @@ class Docker:
                     docker_desktop_executable = r'C:\Program Files\Docker\Docker\Docker Desktop.exe'
                     if os.path.exists(docker_desktop_executable):
                         Command.run([docker_desktop_executable], asynchronous=False)
+                        time.sleep(10)
                 else:
                     print("Please start Docker Desktop manually.")
             except Exception as e:

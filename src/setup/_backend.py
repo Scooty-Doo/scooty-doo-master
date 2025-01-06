@@ -130,6 +130,7 @@ class Backend:
 
 if __name__ == "__main__":
     backend = Backend()
+    backend.setup(docker=True)
     backend.run()
 
     # Optional: Uncomment the following line to run tests after setting up the backend
