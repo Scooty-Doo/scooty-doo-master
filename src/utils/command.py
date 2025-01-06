@@ -9,6 +9,7 @@ class Command:
         asynchronous: bool = True,
         raise_exception: bool = True,
         stream_output: bool = False,
+        return_output: bool = False,
         inherit_environment: bool = False,
         **kwargs
         ):
@@ -30,12 +31,15 @@ class Command:
             if inherit_environment:
                 #env = os.environ.copy() # TODO: Can probably be refactored away.
                 env = None
+            stdout = None
+            stderr = None
             if stream_output:
                 stdout = sys.stdout
                 stderr = sys.stderr
-            if not stream_output:
-                stdout = None
-                stderr = None
+            if return_output:
+                stdout = subprocess.PIPE
+                stderr = subprocess.PIPE
+
             if asynchronous and raise_exception:
                 subprocess.check_call(command, cwd=directory, stdout=stdout, stderr=stderr, env=env, **kwargs)
             if asynchronous and not raise_exception:

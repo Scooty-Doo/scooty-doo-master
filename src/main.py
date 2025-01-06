@@ -8,6 +8,7 @@ from .data.get import Get
 from .utils.settings import Settings
 from .utils.repositories import Repositories
 from .utils.chrome import Chrome
+from .utils.docker import Docker
 
 class Main:
     def __init__(self, use_submodules=False):
@@ -57,9 +58,18 @@ class Main:
         Chrome.Open.window(*ports)
 
     def run(self, skip_setup=False, bikes=True, frontend=False, open_chrome_tabs=False, docker=True, master_docker_compose_file=True):
+        if docker and not master_docker_compose_file:
+            print("Checking if network exists...")
+            Docker.Network.disconnect(network="scooty-web", container="api")
+            Docker.Network.disconnect(network="scooty-web", container="bike_hivemind_app")
+            Docker.Network.recreate(name="scooty-web")
         self._setup_backend(start_server=True, already_setup=skip_setup, docker=docker)
+        if docker and not master_docker_compose_file:
+            Docker.Network.connect(network="scooty-web", container="api")
         if bikes:
             self._setup_bikes(start_server=True, already_setup=skip_setup, docker=docker, master_docker_compose_file=master_docker_compose_file)
+            if docker and not master_docker_compose_file:
+                Docker.Network.connect(network="scooty-web", container="bike_hivemind_app")
         if frontend:
             self._setup_frontend(start_server=True, already_setup=skip_setup)
         if open_chrome_tabs:

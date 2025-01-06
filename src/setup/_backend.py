@@ -111,6 +111,7 @@ class Backend:
     @staticmethod
     def run(docker=True):
         Backend._start_server(docker)
+        time.sleep(5)
 
     @staticmethod
     def tests():
