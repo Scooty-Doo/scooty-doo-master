@@ -1,0 +1,19 @@
+services:
+  simulation:
+    build:
+      context: ./simulation
+      dockerfile: Dockerfile
+    container_name: simulation_app
+    environment:
+      - BACKEND_URL=http://api:8000/
+      - TOKEN=${TOKEN}
+    networks:
+      - scooty-web
+    depends_on:
+      - api
+      - db
+    restart: on-failure # unless-stopped
+    # Volumes for live code changes during development
+    volumes:
+      - ./simulation/src:/app/simulation/src
+      - ./src:/app/src
