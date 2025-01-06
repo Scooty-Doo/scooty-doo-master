@@ -73,8 +73,8 @@ class Environment:
                 existing_lines = Extract.Lines.not_startswith(lines, ('BIKE_IDS=', 'POSITIONS=', 'BACKEND_URL='))
                 backend_port = os.getenv("BACKEND_PORT")
                 backend_url = f"http://localhost:{backend_port}"
-                if not master_docker_compose_file:
-                    backend_url = f"http://host.docker.internal:{backend_port}"
+                #if not master_docker_compose_file:
+                #    backend_url = f"http://host.docker.internal:{backend_port}"
                 print(f"master_docker_compose_file is {master_docker_compose_file}.")
                 print(f"Bike .env File is using backend URL: {backend_url}")
                 new_lines = [

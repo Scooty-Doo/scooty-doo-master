@@ -48,7 +48,7 @@ class Master:
             Master.Docker.up()
             Master.Docker.status()
             Master.Docker.logs()
-        
+
     @staticmethod
     def setup():
         Master.Docker.restart()
