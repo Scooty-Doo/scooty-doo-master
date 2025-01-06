@@ -4,6 +4,7 @@ from ..utils.directory import Directory
 DATABASE_ADMIN_CONTAINER = "database-adminer-1"
 DATABASE_CONTAINER = "database-db-1"
 BACKEND_CONTAINER = "api"
+BIKE_CONTAINER = "bike_hivemind_app"
 
 class Master:
     @staticmethod
@@ -11,9 +12,11 @@ class Master:
         Docker.Container.stop(DATABASE_ADMIN_CONTAINER)
         Docker.Container.stop(DATABASE_CONTAINER)
         Docker.Container.stop(BACKEND_CONTAINER)
+        Docker.Container.stop(BIKE_CONTAINER)
         Docker.Container.delete(DATABASE_ADMIN_CONTAINER)
         Docker.Container.delete(DATABASE_CONTAINER)
         Docker.Container.delete(BACKEND_CONTAINER)
+        Docker.Container.delete(BIKE_CONTAINER)
 
     @staticmethod
     def setup():
