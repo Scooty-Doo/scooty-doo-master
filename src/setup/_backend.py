@@ -5,7 +5,7 @@ from ..utils.directory import Directory
 
 REPO_DIR = Directory.Repo.backend()
 DATABASE_CONTAINER = os.getenv("DATABASE_CONTAINER", 'database-db-1')
-DATABASE_ADMINER_CONTAINER = os.getenv("DATABASE_ADMINER_CONTAINER", 'database-adminer-1') # 'database-adminer-1' # os.getenv("DATABASE_GUI_CONTAINER_NAME")'
+DATABASE_ADMINER_CONTAINER = os.getenv("DATABASE_ADMINER_CONTAINER", 'database-adminer-1')
 BACKEND_CONTAINER = os.getenv("BACKEND_CONTAINER", 'api')
 
 class Backend:
@@ -54,7 +54,7 @@ class Backend:
             Docker.Compose.logs(REPO_DIR)
         
         @staticmethod
-        def _delete():
+        def _clear():
             Docker.Container.delete(DATABASE_CONTAINER)
             Docker.Container.delete(DATABASE_ADMINER_CONTAINER)
             Docker.Container.delete(BACKEND_CONTAINER)
@@ -62,7 +62,7 @@ class Backend:
     @staticmethod
     def _setup():
         Backend.Docker._down()
-        Backend.Docker._delete()
+        Backend.Docker._clear()
         Backend.Docker._build()
         Backend.Docker._up()
         Backend.Docker.status()
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     backend = Backend()
     #backend.run()
     backend.Docker._down()
-    backend.Docker._delete()
+    backend.Docker._clear()
 
     # Optional: Uncomment the following line to run tests after setting up the backend
     #backend.run_tests()

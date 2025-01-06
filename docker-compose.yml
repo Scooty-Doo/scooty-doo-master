@@ -48,6 +48,21 @@ services:
       - scooty-web
     links:
       - db:db
+  
+  bike_hivemind:
+    build:
+      context: ./repositories/bike
+      dockerfile: Dockerfile
+    container_name: bike_hivemind_app
+    env_file:
+      - ./repositories/bike/.env
+    ports:
+      - "8001:8001"
+    networks:
+      - scooty-web
+    restart: unless-stopped
+    depends_on:
+      - api
 
 volumes:
   pgdata:
