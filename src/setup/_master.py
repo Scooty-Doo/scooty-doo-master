@@ -1,27 +1,20 @@
-from ..utils.docker import Docker
 from ..utils.directory import Directory
+from ..utils.command import Command
 
-DATABASE_ADMIN_CONTAINER = "database-adminer-1"
-DATABASE_CONTAINER = "database-db-1"
-BACKEND_CONTAINER = "api"
-BIKE_CONTAINER = "bike_hivemind_app"
+BACKEND_DIR = Directory.Repo.backend()
+BIKE_DIR = Directory.Repo.bike()
+FRONTEND_DIR = Directory.Repo.frontend()
 
 class Master:
     @staticmethod
-    def _delete_containers():
-        Docker.Container.stop(DATABASE_ADMIN_CONTAINER)
-        Docker.Container.stop(DATABASE_CONTAINER)
-        Docker.Container.stop(BACKEND_CONTAINER)
-        Docker.Container.stop(BIKE_CONTAINER)
-        Docker.Container.delete(DATABASE_ADMIN_CONTAINER)
-        Docker.Container.delete(DATABASE_CONTAINER)
-        Docker.Container.delete(BACKEND_CONTAINER)
-        Docker.Container.delete(BIKE_CONTAINER)
+    def _delete_venv():
+        for directory in [BACKEND_DIR, BIKE_DIR, FRONTEND_DIR]:
+            Command.run(["rm", "-rf", Directory.venv(directory)])
+        
 
     @staticmethod
     def setup():
-        Master._delete_containers()
-        Docker.Compose.up(Directory.root())
+        Master._delete_venv()
 
 if __name__ == "__main__":
     Master.setup()

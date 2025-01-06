@@ -1,5 +1,4 @@
 import os
-import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,7 +8,6 @@ from .data.get import Get
 from .utils.settings import Settings
 from .utils.repositories import Repositories
 from .utils.chrome import Chrome
-from .utils.docker import Docker
 
 class Main:
     def __init__(self, use_submodules=False):
@@ -31,14 +29,14 @@ class Main:
         os.environ["REPOSITORIES_DIRECTORY"] = Settings.Directory.local_repositories
         self.repositories.local.get.all(branch='main')
 
-    def _setup_backend(self, start_server, already_setup, docker=True):
-        Setup.backend(start_server, already_setup, docker)
+    def _setup_backend():
+        Setup.backend()
 
-    def _setup_bikes(self, start_server, already_setup, docker=True, master_docker_compose_file=True):
+    def _setup_bikes(self, start_server, already_setup, docker=False, master_docker_compose=False):
         bikes = None
         if not already_setup:
             bikes = self.get.bikes()
-        Setup.bike(start_server, bikes, already_setup, docker, master_docker_compose_file=master_docker_compose_file)
+        Setup.bike(start_server, bikes, already_setup, docker, master_docker_compose=master_docker_compose)
 
     def _setup_frontend(self):
         Setup.frontend()
@@ -61,7 +59,7 @@ class Main:
     def run(self, skip_setup=False, bikes=True, frontend=False, open_chrome_tabs=False, docker=True, master_docker_compose_file=True):
         self._setup_backend(start_server=True, already_setup=skip_setup, docker=docker)
         if bikes:
-            self._setup_bikes(start_server=True, already_setup=skip_setup, docker=docker, master_docker_compose_file=master_docker_compose_file)
+            self._setup_bikes(start_server=True, already_setup=skip_setup, docker=docker, master_docker_compose=master_docker_compose_file)
         if frontend:
             self._setup_frontend(start_server=True, already_setup=skip_setup)
         if open_chrome_tabs:
@@ -72,6 +70,9 @@ if __name__ == "__main__":
     # NOTE: Run to auto-setup venv in master repository:
     # python -m src.setup._venv
 
+    from .setup._master import Master
+    Master.setup()
+
     main = Main(
         use_submodules=False
     )
@@ -79,8 +80,8 @@ if __name__ == "__main__":
         skip_setup=False,
         bikes=True,
         frontend=False,
-        open_chrome_tabs=True,
-        docker=True,
+        open_chrome_tabs=False,
+        docker=False,
         master_docker_compose_file=False
     )
 

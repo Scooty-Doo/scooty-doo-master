@@ -2,6 +2,8 @@ services:
   db:
     image: postgis/postgis
     container_name: database-db-1
+    networks:
+      - scooty-web
     restart: always
     environment:
       POSTGRES_DB: sddb
@@ -14,6 +16,8 @@ services:
 
   adminer:
     image: adminer
+    networks:
+      - scooty-web
     container_name: database-adminer-1
     restart: always
     depends_on:
@@ -42,21 +46,8 @@ services:
       - "8000:8000"
     networks:
       - scooty-web
-
-  bike:
-    build:
-      context: ./repositories/bike
-      dockerfile: Dockerfile
-    container_name: bike_hivemind_app
-    restart: always
-    depends_on:
-      - db
-    environment:
-      ENVIRONMENT: local
-    ports:
-      - "8001:8001"
-    networks:
-      - scooty-web
+    links:
+      - db:db
 
 volumes:
   pgdata:

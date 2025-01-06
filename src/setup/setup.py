@@ -1,6 +1,7 @@
 from ._backend import Backend
 from ._bike import Bike
 from ._frontend import Frontend
+from ._master import Master
 
 class Setup:
     """
@@ -9,16 +10,16 @@ class Setup:
     @staticmethod
     def backend(start_server=True, already_setup=True, docker=True):
         if not already_setup:
-            Backend.setup(docker)
+            Backend._setup(docker)
         if start_server:
             Backend.run(docker)
 
     @staticmethod
-    def bike(start_server=True, bikes=None, already_setup=False, docker=True, master_docker_compose_file=True):
+    def bike(start_server=True, bikes=None, already_setup=False, docker=True, master_docker_compose=True):
         if not already_setup:
             if not bikes:
                 print("No bikes provided to generate .env file for.")
-            Bike.setup(bikes, docker=docker, master_docker_compose_file=master_docker_compose_file)
+            Bike.setup(bikes, docker=docker, master_docker_compose_file=master_docker_compose)
         if start_server:
             Bike.run()
 
@@ -28,3 +29,7 @@ class Setup:
             Frontend.setup()
         if start_server:
             Frontend.run()
+
+    @staticmethod
+    def master():
+        Master.setup()
