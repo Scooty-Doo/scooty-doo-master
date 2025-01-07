@@ -44,7 +44,9 @@ async def main():
     print(f"Number of trips: {trip_count}")
 
     print(f"Starting trip for user {user_ids[0]} on bike {bike_ids[0]}")
-    await outgoing.trips.start_trip(user_id=user_ids[0], bike_id=3)
+    await outgoing.trips.start_trip(user_id=652134919185249768, bike_id=3)
+    # 652134919185249768 (uneligible for trip)
+    # 652134919185249742 (eligible for trip)
 
 if __name__ == "__main__":
     asyncio.run(main())
