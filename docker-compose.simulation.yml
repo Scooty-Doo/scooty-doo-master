@@ -10,9 +10,10 @@ services:
     networks:
       - scooty-web
     depends_on:
+      - bike_hivemind
       - api
       - db
-    restart: on-failure # unless-stopped
+    restart: unless-stopped # on-failure
     # Volumes for live code changes during development
     volumes:
       - ./simulation/src:/app/simulation/src

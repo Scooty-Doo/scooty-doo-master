@@ -53,7 +53,7 @@ services:
     build:
       context: ./repositories/bike
       dockerfile: Dockerfile
-    container_name: bike_hivemind_app
+    container_name: bike_hivemind
     env_file:
       - ./repositories/bike/.env
     ports:

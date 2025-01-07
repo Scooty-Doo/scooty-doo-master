@@ -45,8 +45,8 @@ class Repository:
             #Command.run(reset_command, raise_exception=True)
 
             # METHOD 2 (LIGHT)
-            #files_to_checkout = ["package.json"]
-            #Repository.Checkout.files(repository_path, files_to_checkout)
+            files_to_checkout = ["package.json", "package-lock.json"]
+            Repository.Checkout.files(repository_path, files_to_checkout)
             _pull()
 
     @staticmethod

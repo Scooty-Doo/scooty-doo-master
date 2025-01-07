@@ -1,5 +1,6 @@
 import os
 import logging
+import platform
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -54,6 +55,8 @@ class Main:
         Setup.master()
 
     def _open_chrome_tabs(self, bikes=True, frontend=True): # NOTE: Maybe remove due to OS dependency?
+        if not platform.system() == "Windows":
+            return
         ports = [os.getenv("BACKEND_PORT") + "/docs"]
         if bikes:
             ports.append(os.getenv("BIKES_PORT") + "/docs")
@@ -75,7 +78,7 @@ if __name__ == "__main__":
         use_submodules=False
     )
     main.run(
-        open_chrome_tabs=True
+        open_chrome_tabs=True # NOTE: Can be True if not Windows, but will not open Chrome tabs.
     )
 
 # python -m src.main
@@ -83,5 +86,6 @@ if __name__ == "__main__":
 
 # python -m pytest --cov=src --cov-report=html 
 # python -m pytest --cov=src --cov-report=term-missing
+# TODO: Include master venv setup i main
 
 # TODO: Bash script to run the program?

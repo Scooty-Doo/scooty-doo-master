@@ -43,13 +43,15 @@ class Environment:
 
         @staticmethod
         def generate(
+            master: bool = True,
             backend: bool = True,
             frontend: bool = True,
             bikes: bool = True
             ):
             """Generate .env files for the backend, frontend, and/or bikes."""
 
-            Environment.Files._setup()
+            if master:
+                Environment.Files._setup()
 
             def _backend():
                 Environment._copy_env_file(
