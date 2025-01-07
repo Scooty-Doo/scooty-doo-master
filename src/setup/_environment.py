@@ -85,3 +85,8 @@ class Environment:
             raise FileNotFoundError(f"Target directory '{target_dir}' does not exist.")
         shutil.copyfile(env_source_path, env_target_path)
         print(f"Copied '{env_source_path}' to '{env_target_path}' (replaced if existed).")
+
+if __name__ == "__main__":
+    Environment.Files._setup()
+
+    # python -m src.setup._environment
