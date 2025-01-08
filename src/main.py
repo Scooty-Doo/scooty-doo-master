@@ -32,9 +32,10 @@ def setup_logger():
 logger = setup_logger()
 
 class Main:
-    def __init__(self, use_submodules=False):
+    def __init__(self, use_submodules=False, backend_branch='main'):
         self.get = Get()
         self.repositories = Repositories()
+        self.backend_branch = backend_branch
         if use_submodules:
             self._use_submodules()
         if not use_submodules:
@@ -52,7 +53,9 @@ class Main:
     def _use_local_repositories(self):
         """Pull repositories to the local repositories folder."""
         os.environ["REPOSITORIES_DIRECTORY"] = Settings.Directory.local_repositories
-        self.repositories.local.get.all(branch='main')
+        self.repositories.local.get.backend(branch=self.backend_branch)
+        self.repositories.local.get.frontend(branch='main')
+        self.repositories.local.get.bike(branch='main')
 
     def _setup_master(self, simulation=False, rebuild=False):
         Setup.master(simulation, rebuild)
@@ -84,11 +87,12 @@ if __name__ == "__main__":
         Venv.setup_master_venv()
 
     main = Main(
-        use_submodules=False
+        use_submodules=False,
+        backend_branch='main',
     )
     main.run(
         simulation=True,
-        rebuild=False,
+        rebuild=True,
         open_chrome_tabs=False # NOTE: Can be True if not Windows, but will not open Chrome tabs.
     )
 

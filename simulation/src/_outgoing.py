@@ -42,6 +42,7 @@ class Trips:
                 print(f"Succesfully started trip for user {user_id} on bike {bike_id}")
                 return response.json()
             except httpx.RequestError as e:
+                print(f"Failed to start trip for url: {url}")
                 raise httpx.RequestError(f"Failed to start trip: {e}") from e
 
     async def end_trip(self, trip_id: int, user_id: int, bike_id: int, maintenance: bool = False, ignore_zone: bool = True):
