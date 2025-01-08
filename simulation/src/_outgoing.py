@@ -39,6 +39,7 @@ class Trips:
                 response = await client.post(url, headers=self.headers, data=json.dumps(payload), timeout=10.0)
                 response.raise_for_status()
                 print(response.json())
+                print(f"Succesfully started trip for user {user_id} on bike {bike_id}")
                 return response.json()
             except httpx.RequestError as e:
                 raise httpx.RequestError(f"Failed to start trip: {e}") from e

@@ -52,7 +52,7 @@ async def main():
         user_trip_map[user_id] = trip_ids.pop()
 
     for user_id, trip_id in user_trip_map.items():
-        print(f"Starting trip for user {user_id} on trip {trip_id}")
+        print(f"Attempting to start trip for user {user_id} on trip {trip_id}")
         await outgoing.trips.start_trip(user_id=user_id, trip_id=trip_id)
 
     #print(f"Starting trip for user {user_ids[0]} on bike {bike_ids[0]}")
