@@ -37,7 +37,7 @@ async def main():
         trip_count = len(trips)
         print(f"Number of trips: {trip_count}")
 
-        async def generate_unique_trips(user_ids, bike_ids, trips):
+        def generate_unique_trips(user_ids, bike_ids, trips):
             """Generate unique (user_id, bike_id, trip_id, linestring) trips where no 'user_id', 'bike_id', or 'trip' repeats."""
             trip_ids = Extract.Trip.ids(trips)
             linestrings = Extract.Trip.routes(trips)
@@ -90,7 +90,7 @@ async def main():
                     unsuccessful_move_bikes += 1
             return successful_move_bikes, unsuccessful_move_bikes, moved_trips
 
-        successful_move_bikes, unsuccessful_move_bikes, moved_bikes = await move_bikes(started_trips)
+        successful_move_bikes, unsuccessful_move_bikes, moved_trips = await move_bikes(started_trips)
         print(f"Successfully moved {successful_move_bikes} bikes.")
         print(f"Failed to move {unsuccessful_move_bikes} bikes.")
         print(f"Percentage of successful bikes moved: {successful_move_bikes / (successful_move_bikes + unsuccessful_move_bikes) * 100}%")
@@ -110,12 +110,26 @@ async def main():
                     print(f"Failed to end trip for user {user_id} on bike {bike_id}: {e}")
                     unsuccessful_end_trips += 1
             return successful_end_trips, unsuccessful_end_trips, ended_trips
-
-        successful_end_trips, unsuccessful_end_trips, ended_trips = await end_trips(started_trips)
-        print(f"Successfully ended {successful_end_trips} trips.")
-        print(f"Failed to end {unsuccessful_end_trips} trips.")
-        print(f"Percentage of successful trips: {successful_end_trips / (successful_end_trips + unsuccessful_end_trips) * 100}%")
-        assert successful_end_trips > 0, "No trips ended successfully."
+        
+        active_trip_count = len(moved_trips)
+        ended_trip_count = 0
+        allowed_attempts = 10
+        sleep_period = 30
+        while ended_trip_count < active_trip_count and allowed_attempts > 0:
+            print(f"Attempting to end {active_trip_count} trips.")
+            successful_end_trips, unsuccessful_end_trips, ended_trips = await end_trips(moved_trips)
+            print(f"Successfully ended {successful_end_trips} trips.")
+            print(f"Failed to end {unsuccessful_end_trips} trips.")
+            print(f"Percentage of successful trips: {successful_end_trips / (successful_end_trips + unsuccessful_end_trips) * 100}%")
+            ended_trip_count = successful_end_trips
+            allowed_attempts -= 1
+            print(f"Allowed attempts left: {allowed_attempts}. Waiting {sleep_period} seconds for next attempt.")
+            await asyncio.sleep(sleep_period)
+        
+        total_attempts = allowed_attempts
+        total_time = sleep_period * total_attempts
+        assert ended_trip_count > 0, f"No trips ended successfully after {total_time} seconds and {total_attempts} attempts."
+        print(f"Ended {ended_trip_count} trips successfully after {total_time} seconds and {total_attempts} attempts.")
 
         end_condition = True
         print("End of simulation. End condition met.")
