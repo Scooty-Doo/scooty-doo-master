@@ -13,7 +13,7 @@ services:
       - bike_hivemind
       - api
       - db
-    restart: "on-failure" #unless-stopped # on-failure
+    restart: "no" #unless-stopped # on-failure
     # Volumes for live code changes during development
     volumes:
       - ./simulation/src:/app/simulation/src

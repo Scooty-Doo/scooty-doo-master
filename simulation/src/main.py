@@ -2,13 +2,15 @@ from src.data.get import Get
 from src.utils.extract import Extract
 from ._outgoing import Outgoing
 import asyncio
+from time import time
+from shapely.geometry import Point
 
 async def main():
     end_condition = False
     while not end_condition:
         print("Welcome to the Matrix.")
         wait_for_boot = 30
-        print("Waiting 10 seconds to boot up the simulation.")
+        print(f"Waiting {wait_for_boot} seconds to boot up the simulation.")
         await asyncio.sleep(wait_for_boot)
 
         get = Get()
@@ -96,46 +98,104 @@ async def main():
         print(f"Percentage of successful bikes moved: {successful_move_bikes / (successful_move_bikes + unsuccessful_move_bikes) * 100}%")
         assert successful_move_bikes > 0, "No bikes moved successfully."
 
+        def get_moved_trips_with_duration(moved_trips):
+            def _get_distance_in_km(linestring):
+                def _convert_to_kilometers(distance):
+                    return distance / 1000
+                start_point = Point(linestring[0])
+                end_point = Point(linestring[-1])
+                distance = start_point.distance(end_point)
+                return _convert_to_kilometers(distance)
+            
+            def _get_duration_in_seconds(distance_in_km, speed_in_kmh):
+                return (distance_in_km / speed_in_kmh) * 3600
+            
+            def _sort_trips_by_ascending_duration(trips_with_duration):
+                return sorted(trips_with_duration, key=lambda x: x[-1])
+
+            moved_trips_with_duration = []
+            for user_id, bike_id, trip_id, linestring in moved_trips:
+                distance_in_km = _get_distance_in_km(linestring)
+                speed_in_kmh = 1000
+                duration_in_seconds = _get_duration_in_seconds(distance_in_km, speed_in_kmh)
+                moved_trips_with_duration.append((user_id, bike_id, trip_id, linestring, duration_in_seconds))
+            return _sort_trips_by_ascending_duration(moved_trips_with_duration)
+        
+        sorted_moved_trips = get_moved_trips_with_duration(moved_trips)
+
         async def end_trips(moved_trips):
             successful_end_trips = 0
             unsuccessful_end_trips = 0
             ended_trips = []
-            for user_id, bike_id, trip_id, linestring in moved_trips:
+            for user_id, bike_id, trip_id, linestring, duration in moved_trips:
                 print(f"Attempting to end trip for user {user_id} on bike {bike_id}")
                 try:
                     await outgoing.trips.end_trip(user_id=user_id, bike_id=bike_id, trip_id=trip_id)
                     successful_end_trips += 1
-                    ended_trips.append((user_id, bike_id, linestring))
+                    ended_trips.append((user_id, bike_id, trip_id, linestring))
                 except Exception as e:
                     print(f"Failed to end trip for user {user_id} on bike {bike_id}: {e}")
                     unsuccessful_end_trips += 1
             return successful_end_trips, unsuccessful_end_trips, ended_trips
+
+        def _filter_trips_by_duration(moved_trips, elapsed_seconds):
+            trips_to_end_now = [trip for trip in moved_trips if trip[-1] <= elapsed_seconds]
+            remaining_trips = [trip for trip in moved_trips if trip[-1] > elapsed_seconds]
+            return trips_to_end_now, remaining_trips
+
+        async def manage_trip_endings(moved_trips):
+            start_time = time()
+            active_trip_count = len(moved_trips)
+            ended_trip_count = 0
+            allowed_attempts = 12
+            sleep_period = 20
+            total_attempts = 0
+            margin_of_error = 10
+
+            failed_trips = []
+
+            while ended_trip_count < active_trip_count and allowed_attempts > 0:
+                elapsed_seconds = int(time() - start_time)
+                print(f"Elapsed time: {elapsed_seconds} seconds.")
+
+                moved_trips_with_margin = [(user_id, bike_id, trip_id, linestring, duration + margin_of_error) for user_id, bike_id, trip_id, linestring, duration in moved_trips]
+                moved_trips_with_margin.extend(failed_trips)
+                failed_trips = []
+                trips_to_end_now, remaining_trips = _filter_trips_by_duration(moved_trips_with_margin, elapsed_seconds)
+                if not trips_to_end_now:
+                    print(f"No trips ready to end at {elapsed_seconds} seconds.")
+                else:
+                    print(f"Attempting to end {len(trips_to_end_now)} trips at {elapsed_seconds} seconds.")
+                    successful_end_trips, unsuccessful_end_trips, ended_trips = await end_trips(trips_to_end_now)
+                    print(f"Successfully ended {successful_end_trips} trips.")
+                    print(f"Failed to end {unsuccessful_end_trips} trips.")
+                    ended_trip_count += successful_end_trips
+                    print(f"Percentage of successful trips: {successful_end_trips / (successful_end_trips + unsuccessful_end_trips) * 100}%")
+                    failed_trips.extend([trip for trip in trips_to_end_now if trip not in ended_trips])
+
+                allowed_attempts -= 1
+                total_attempts += 1
+
+                if remaining_trips or failed_trips:
+                    print(f"Remaining trips: {len(remaining_trips) + len(failed_trips)}. Waiting {sleep_period} seconds for next attempt.")
+                    await asyncio.sleep(sleep_period)
+                else:
+                    print("All trips have been ended.")
+                    break
+
+            total_time = sleep_period * total_attempts
+            assert ended_trip_count > 0, f"No trips ended successfully after {total_time} seconds and {total_attempts} attempts."
+            print(f"Ended {ended_trip_count} trips successfully after {total_time} seconds and {total_attempts} attempts.")
         
-        active_trip_count = len(moved_trips)
-        ended_trip_count = 0
-        allowed_attempts = 10
-        sleep_period = 30
-        while ended_trip_count < active_trip_count and allowed_attempts > 0:
-            print(f"Attempting to end {active_trip_count} trips.")
-            successful_end_trips, unsuccessful_end_trips, ended_trips = await end_trips(moved_trips)
-            print(f"Successfully ended {successful_end_trips} trips.")
-            print(f"Failed to end {unsuccessful_end_trips} trips.")
-            print(f"Percentage of successful trips: {successful_end_trips / (successful_end_trips + unsuccessful_end_trips) * 100}%")
-            ended_trip_count = successful_end_trips
-            allowed_attempts -= 1
-            print(f"Allowed attempts left: {allowed_attempts}. Waiting {sleep_period} seconds for next attempt.")
-            await asyncio.sleep(sleep_period)
-        
-        total_attempts = allowed_attempts
-        total_time = sleep_period * total_attempts
-        assert ended_trip_count > 0, f"No trips ended successfully after {total_time} seconds and {total_attempts} attempts."
-        print(f"Ended {ended_trip_count} trips successfully after {total_time} seconds and {total_attempts} attempts.")
+        await manage_trip_endings(sorted_moved_trips)
 
         end_condition = True
         print("End of simulation. End condition met.")
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+    # TODO: ändra default_speed till en environment variable för cykeln! I nuläget har jag ställt den till 1000 kmh i cykeln och här i simulation.src.main
 
     # NOTE: To run use:
     # python -m src.main

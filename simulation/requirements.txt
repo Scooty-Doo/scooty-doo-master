@@ -1,3 +1,4 @@
 requests
 httpx
 asyncio
+shapely==2.0.6
