@@ -38,27 +38,26 @@ class Trips:
             try:
                 response = await client.post(url, headers=self.headers, data=json.dumps(payload), timeout=10.0)
                 response.raise_for_status()
-                print(response.json())
                 print(f"Succesfully started trip for user {user_id} on bike {bike_id}")
                 return response.json()
             except httpx.RequestError as e:
                 print(f"Failed to start trip for url: {url}")
                 raise httpx.RequestError(f"Failed to start trip: {e}") from e
 
-    async def end_trip(self, trip_id: int, user_id: int, bike_id: int, maintenance: bool = False, ignore_zone: bool = True):
+    async def end_trip(self, user_id: int, bike_id: int, trip_id: int):
         url = _url(self.backend_url, f"/v1/trips/{trip_id}")
         payload = {
             "user_id": user_id,
-            "bike_id": bike_id,
-            "maintenance": maintenance,
-            "ignore_zone": ignore_zone
+            "bike_id": bike_id
         }
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.patch(url, headers=self.headers, data=json.dumps(payload), timeout=10.0)
                 response.raise_for_status()
+                print(f"Succesfully ended trip for user {user_id} on bike {bike_id}")
                 return response.json()
             except httpx.RequestError as e:
+                print(f"Failed to end trip for url: {url}")
                 raise httpx.RequestError(f"Failed to end trip: {e}") from e
 
 class Bikes:
@@ -68,7 +67,7 @@ class Bikes:
         self.headers = headers
 
     async def move(self, bike_id: int, position_or_linestring: Union[tuple, List[tuple]]):
-        url = _url(self.hivemind_url, f"/v1/move?bike_id={bike_id}")
+        url = _url(self.hivemind_url, f"/move?bike_id={bike_id}")
         payload = {
             "position_or_linestring": position_or_linestring
         }
@@ -76,6 +75,8 @@ class Bikes:
             try:
                 response = await client.post(url, headers=self.headers, data=json.dumps(payload), timeout=10.0)
                 response.raise_for_status()
+                print(f"Succesfully moved bike {bike_id}")
                 return response.json()
             except httpx.RequestError as e:
+                print(f"Failed to move bike for url: {url}")
                 raise httpx.RequestError(f"Failed to move bike: {e}") from e

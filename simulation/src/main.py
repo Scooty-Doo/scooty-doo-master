@@ -29,49 +29,94 @@ async def main():
         user_ids = Extract.User.ids(users)
 
         trips = get.trips(save_to_json=False, fallback=False)
-        trip_ids = Extract.Trip.ids(trips)
-        linestrings = Extract.Trip.routes(trips)
-        assert len(trip_ids) == len(linestrings), f"Length of trip_ids: {len(trip_ids)} != Length of trip_linestrings: {len(linestrings)}"
 
         bike_count = len(bike_ids)
         print(f"Number of bikes: {bike_count}")
         user_count = len(user_ids)
         print(f"Number of users: {user_count}")
-        trip_count = len(trip_ids)
+        trip_count = len(trips)
         print(f"Number of trips: {trip_count}")
 
-        def generate_unique_user_bike_linestring_trips(user_ids, bike_ids, linestrings):
-            """Generate unique (user_id, bike_id, linestring) trips where no 'user_id', 'bike_id', or 'linestring' repeats."""
-            max_trips = min(len(user_ids), len(bike_ids), len(linestrings))
+        async def generate_unique_trips(user_ids, bike_ids, trips):
+            """Generate unique (user_id, bike_id, trip_id, linestring) trips where no 'user_id', 'bike_id', or 'trip' repeats."""
+            trip_ids = Extract.Trip.ids(trips)
+            linestrings = Extract.Trip.routes(trips)
+            assert len(trip_ids) == len(linestrings), f"Length of trip_ids: {len(trip_ids)} != Length of trip_linestrings: {len(linestrings)}"
+
+            max_trips = min(len(user_ids), len(bike_ids), len(trip_ids))
             
             for trip_index in range(max_trips):
                 user_id = user_ids[trip_index]
                 bike_id = bike_ids[trip_index]
+                trip_id = trip_ids[trip_index]
                 linestring = linestrings[trip_index]
-                yield (user_id, bike_id, linestring)
+                yield (user_id, bike_id, trip_id, linestring)
         
-        unique_trips = generate_unique_user_bike_linestring_trips(user_ids, bike_ids, linestrings)
+        unique_trips = generate_unique_trips(user_ids, bike_ids, trips)
 
         async def start_trips(unique_trips):
             successful_start_trips = 0
             unsuccessful_start_trips = 0
             started_trips = []
-            for user_id, bike_id, linestring in unique_trips:
+            for user_id, bike_id, trip_id, linestring in unique_trips:
                 print(f"Attempting to start trip for user {user_id} on bike {bike_id}")
                 try: 
                     await outgoing.trips.start_trip(user_id=user_id, bike_id=bike_id)
                     successful_start_trips += 1
-                    started_trips.append((user_id, bike_id, linestring))
+                    started_trips.append((user_id, bike_id, trip_id, linestring))
                 except Exception as e:
                     print(f"Failed to start trip for user {user_id} on bike {bike_id}: {e}")
                     unsuccessful_start_trips += 1
             return successful_start_trips, unsuccessful_start_trips, started_trips
-        
+
         successful_start_trips, unsuccessful_start_trips, started_trips = await start_trips(unique_trips)
         print(f"Successfully started {successful_start_trips} trips.")
         print(f"Failed to start {unsuccessful_start_trips} trips.")
         print(f"Percentage of successful trips: {successful_start_trips / (successful_start_trips + unsuccessful_start_trips) * 100}%")
         assert successful_start_trips > 0, "No trips started successfully."
+
+        async def move_bikes(started_trips):
+            successful_move_bikes = 0
+            unsuccessful_move_bikes = 0
+            moved_trips = []
+            for user_id, bike_id, trip_id, linestring in started_trips:
+                print(f"Attempting to move bike {bike_id} with user {user_id}")
+                try:
+                    await outgoing.bikes.move(bike_id=bike_id, position_or_linestring=linestring)
+                    successful_move_bikes += 1
+                    moved_trips.append((user_id, bike_id, trip_id, linestring))
+                except Exception as e:
+                    print(f"Failed to move bike {bike_id} with user {user_id}: {e}")
+                    unsuccessful_move_bikes += 1
+            return successful_move_bikes, unsuccessful_move_bikes, moved_trips
+
+        successful_move_bikes, unsuccessful_move_bikes, moved_bikes = await move_bikes(started_trips)
+        print(f"Successfully moved {successful_move_bikes} bikes.")
+        print(f"Failed to move {unsuccessful_move_bikes} bikes.")
+        print(f"Percentage of successful bikes moved: {successful_move_bikes / (successful_move_bikes + unsuccessful_move_bikes) * 100}%")
+        assert successful_move_bikes > 0, "No bikes moved successfully."
+
+        async def end_trips(moved_trips):
+            successful_end_trips = 0
+            unsuccessful_end_trips = 0
+            ended_trips = []
+            for user_id, bike_id, trip_id, linestring in moved_trips:
+                print(f"Attempting to end trip for user {user_id} on bike {bike_id}")
+                try:
+                    await outgoing.trips.end_trip(user_id=user_id, bike_id=bike_id, trip_id=trip_id)
+                    successful_end_trips += 1
+                    ended_trips.append((user_id, bike_id, linestring))
+                except Exception as e:
+                    print(f"Failed to end trip for user {user_id} on bike {bike_id}: {e}")
+                    unsuccessful_end_trips += 1
+            return successful_end_trips, unsuccessful_end_trips, ended_trips
+
+        successful_end_trips, unsuccessful_end_trips, ended_trips = await end_trips(started_trips)
+        print(f"Successfully ended {successful_end_trips} trips.")
+        print(f"Failed to end {unsuccessful_end_trips} trips.")
+        print(f"Percentage of successful trips: {successful_end_trips / (successful_end_trips + unsuccessful_end_trips) * 100}%")
+        assert successful_end_trips > 0, "No trips ended successfully."
+
         end_condition = True
         print("End of simulation. End condition met.")
 
