@@ -84,7 +84,7 @@ if __name__ == "__main__":
         use_submodules=False
     )
     main.run(
-        simulation=True,
+        simulation=False,
         open_chrome_tabs=False # NOTE: Can be True if not Windows, but will not open Chrome tabs.
     )
 

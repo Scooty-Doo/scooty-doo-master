@@ -23,6 +23,11 @@ class Extract:
         def ids(users):
             return [user['id'] for user in users]
     
+    class Users:
+        @staticmethod
+        def with_money(users):
+            return [user for user in users if user['attributes']['balance'] > 0.0]
+    
     class Trip:
         @staticmethod
         def ids(trips):

@@ -28,6 +28,9 @@ async def main():
     assert len(bike_ids) == len(positions), f"Length of bike_ids: {len(bike_ids)} != Length of positions: {len(positions)}" + f"example bike: {bikes[0]}"
 
     users = get.users(save_to_json=False, fallback=False)
+    users = Extract.Users.with_money(users)
+    assert len(users) > 0, "No users with money."
+    assert users[0]['attributes']['balance'] > 0.0, "First user has no money."
     user_ids = Extract.User.ids(users)
 
     trips = get.trips(save_to_json=False, fallback=False)
@@ -43,13 +46,27 @@ async def main():
     trip_count = len(trip_ids)
     print(f"Number of trips: {trip_count}")
 
-    print(f"Starting trip for user {user_ids[0]} on bike {bike_ids[0]}")
-    await outgoing.trips.start_trip(user_id=652134919185249768, bike_id=3)
+    # Get one trip_id per user_id:
+    user_trip_map = {}
+    for user_id in user_ids:
+        user_trip_map[user_id] = trip_ids.pop()
+
+    for user_id, trip_id in user_trip_map.items():
+        print(f"Starting trip for user {user_id} on trip {trip_id}")
+        await outgoing.trips.start_trip(user_id=user_id, trip_id=trip_id)
+
+    #print(f"Starting trip for user {user_ids[0]} on bike {bike_ids[0]}")
+    # await outgoing.trips.start_trip(user_id=652134919185249742, bike_id=3)
     # 652134919185249768 (uneligible for trip)
     # 652134919185249742 (eligible for trip)
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+    # NOTE: To run use:
+    # python -m src.main
+    # Make sure simulation is True in the if __name__ == "__main__": block in src/main.py
+
 
     #zones = get.zones(save_to_json=False, fallback=False)
     #zone_types = get.zone_types(save_to_json=False, fallback=False)
