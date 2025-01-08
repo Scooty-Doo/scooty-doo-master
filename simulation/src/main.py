@@ -6,14 +6,14 @@ import asyncio
 async def main():
     print("Welcome to the Matrix.")
     print("Waiting 10 seconds to boot up the simulation.")
-    await asyncio.sleep(5)
+    await asyncio.sleep(25)
 
     get = Get()
     outgoing = Outgoing(token="secret")
 
     is_ready = False
     while not is_ready:
-        await asyncio.sleep(15)
+        await asyncio.sleep(5)
         bikes = get.bikes(save_to_json=False, fallback=False)
         if len(bikes) > 0:
             is_ready = True
