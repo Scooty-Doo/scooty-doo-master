@@ -4,6 +4,7 @@ from ..utils.docker import Docker
 from ..utils.directory import Directory
 
 REPO_DIR = Directory.root()
+FRONTEND_DIR = Directory.Repo.frontend(REPO_DIR)
 DATABASE_CONTAINER = os.getenv("DATABASE_CONTAINER", 'database-db-1')
 DATABASE_ADMINER_CONTAINER = os.getenv("DATABASE_ADMINER_CONTAINER", 'database-adminer-1')
 BACKEND_CONTAINER = os.getenv("BACKEND_CONTAINER", 'api')
@@ -20,6 +21,7 @@ class Master:
 
         @staticmethod
         def build():
+            Docker.Compose.build(FRONTEND_DIR, npm=True, reinstall=True)
             Docker.Compose.build(REPO_DIR)
 
         @staticmethod
