@@ -36,12 +36,13 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://user:pass@db:5432/sddb
       PROJECT_NAME: scooty-doo
-      DEBUG: "true"
+      DEBUG: "false"
       ENVIRONMENT: local
       GITHUB_CLIENT_ID: secretid
       GITHUB_CLIENT_SECRET: secresecret
       GITHUB_REDIRECT_URI: 'http://secret.secret/'
       USE_MOCKED_BIKE_CALL: "false"
+      BIKE_URL: 'http://bike_hivemind:8001/'
     ports:
       - "8000:8000"
     networks:

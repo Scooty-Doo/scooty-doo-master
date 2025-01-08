@@ -89,3 +89,5 @@ if __name__ == "__main__":
     # Need more user/bike/trip data in database.
 
     # ändra ?limit=0 i _outgoing? hör med Martin (users)
+
+    # NOTE: Preset environment variables are changed in docker-compose files and note /env folder.
