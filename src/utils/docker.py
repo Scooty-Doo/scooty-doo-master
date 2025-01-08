@@ -45,7 +45,7 @@ class Docker:
         def up(directory, npm=False):
             Docker.Compose.down(directory)
             if not npm:
-                Command.run(["docker-compose", "up", "-d"], directory=directory)
+                Command.run(["docker-compose", "up", "-d", "--build"], directory=directory)
             if npm:
                 Command.run(["docker-compose", "up", "webclient-prod", "-d"], directory=directory)
 
@@ -66,6 +66,37 @@ class Docker:
         def logs(directory):
             Command.run(["docker-compose", "logs", "-f"], directory=directory, raise_exception=False)
     
+        class Combined:
+            @staticmethod
+            def _combine_into_command(filenames, command):
+                """
+                Combines docker-compose files into a single command.
+                """
+                compose_files = []
+                for filename in filenames:
+                    compose_files.extend(["-f", filename])
+                return ["docker-compose"] + compose_files + command
+
+            @staticmethod
+            def build(directory, filenames):
+                Command.run(Docker.Compose.Combined._combine_into_command(filenames, ["build"]), directory=directory, raise_exception=False)
+            
+            @staticmethod
+            def up(directory, filenames):
+                Command.run(Docker.Compose.Combined._combine_into_command(filenames, ["up", "-d"]), directory=directory, raise_exception=False)
+
+            @staticmethod
+            def down(directory, filenames):
+                Command.run(Docker.Compose.Combined._combine_into_command(filenames, ["down"]), directory=directory, raise_exception=False)
+            
+            @staticmethod
+            def status(directory, filenames):
+                Command.run(Docker.Compose.Combined._combine_into_command(filenames, ["ps"]), directory=directory, raise_exception=False)
+            
+            @staticmethod
+            def logs(directory, filenames):
+                Command.run(Docker.Compose.Combined._combine_into_command(filenames, ["logs", "-f"]), directory=directory, raise_exception=False)
+
     class Container:
         @staticmethod
         def stop(name):
