@@ -24,8 +24,10 @@ class Master:
                 Docker.Container.delete(SIMULATION_CONTAINER)
 
         @staticmethod
-        def build(simulation=False):
-            Docker.Compose.build(FRONTEND_DIR, npm=True, reinstall=True)
+        def build(simulation=False, rebuild=False):
+            Docker.Compose.build(FRONTEND_DIR, npm=True, reinstall=rebuild)
+            if not rebuild:
+                return
             if not simulation:
                 Docker.Compose.build(REPO_DIR)
             if simulation:
@@ -60,20 +62,20 @@ class Master:
                 Docker.Compose.Combined.logs(REPO_DIR, filenames=DOCKER_COMPOSE_FILENAMES)
         
         @staticmethod
-        def restart(simulation=False):
+        def restart(simulation=False, rebuild=False):
             Master.Docker.down(simulation)
             Master.Docker.clear(simulation)
-            Master.Docker.build(simulation)
+            Master.Docker.build(simulation, rebuild)
             Master.Docker.up(simulation)
             Master.Docker.status(simulation)
             Master.Docker.logs(simulation)
 
     @staticmethod
-    def setup(simulation=False, start_docker_desktop=True):
+    def setup(simulation=False, rebuild=False, start_docker_desktop=False):
         if start_docker_desktop:
             Docker.Desktop.start()
         Environment.Files.generate() # TODO: Add environment variable SIMULATION_SPEED that changed Speed.default_speed in all Bike:s in Hivemind.
-        Master.Docker.restart(simulation)
+        Master.Docker.restart(simulation, rebuild)
 
 if __name__ == "__main__":
     Master.setup()

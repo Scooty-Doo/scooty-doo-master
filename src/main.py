@@ -54,8 +54,8 @@ class Main:
         os.environ["REPOSITORIES_DIRECTORY"] = Settings.Directory.local_repositories
         self.repositories.local.get.all(branch='main')
 
-    def _setup_master(self, simulation=False):
-        Setup.master(simulation)
+    def _setup_master(self, simulation=False, rebuild=False):
+        Setup.master(simulation, rebuild)
 
     def _open_chrome_tabs(self, bikes=True, frontend=True): # NOTE: Maybe remove due to OS dependency?
         if not platform.system() == "Windows":
@@ -67,8 +67,8 @@ class Main:
             ports.append(os.getenv("FRONTEND_PORT"))
         Chrome.Open.window(*ports)
 
-    def run(self, simulation=False, open_chrome_tabs=True):
-        self._setup_master(simulation)
+    def run(self, simulation=False, open_chrome_tabs=True, rebuild=False):
+        self._setup_master(simulation, rebuild)
         if open_chrome_tabs:
             self._open_chrome_tabs(bikes=True, frontend=True)
 
@@ -77,14 +77,18 @@ if __name__ == "__main__":
     # NOTE: Run to auto-setup venv in master repository:
     # python -m src.setup._venv
 
+    SETUP_MATER_VENV = False
+
     from .setup._venv import Venv
-    Venv.setup_master_venv()
+    if SETUP_MATER_VENV: 
+        Venv.setup_master_venv()
 
     main = Main(
         use_submodules=False
     )
     main.run(
-        simulation=False,
+        simulation=True,
+        rebuild=False,
         open_chrome_tabs=False # NOTE: Can be True if not Windows, but will not open Chrome tabs.
     )
 

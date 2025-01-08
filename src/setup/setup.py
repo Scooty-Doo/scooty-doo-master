@@ -28,5 +28,5 @@ class Setup:
             Frontend.run()
 
     @staticmethod
-    def master(simulation=False):
-        Master.setup(simulation)
+    def master(simulation=False, rebuild=False):
+        Master.setup(simulation, rebuild)

@@ -13,7 +13,7 @@ async def main():
 
     is_ready = False
     while not is_ready:
-        await asyncio.sleep(60)
+        await asyncio.sleep(15)
         bikes = get.bikes(save_to_json=False, fallback=False)
         if len(bikes) > 0:
             is_ready = True
