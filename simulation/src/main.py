@@ -47,13 +47,15 @@ async def main():
     print(f"Number of trips: {trip_count}")
 
     # Get one trip_id per user_id:
-    user_trip_map = {}
+    user_bike_map = {}
     for user_id in user_ids:
-        user_trip_map[user_id] = trip_ids.pop()
-
-    for user_id, trip_id in user_trip_map.items():
-        print(f"Attempting to start trip for user {user_id} on trip {trip_id}")
-        await outgoing.trips.start_trip(user_id=user_id, trip_id=trip_id)
+        user_bike_map[user_id] = bike_ids.pop(0)
+    
+    # Start trips for each user:
+    for user_id, bike_id in user_bike_map.items():
+        print(f"Attempting to start trip for user {user_id} on bike {bike_id}")
+        await outgoing.trips.start_trip(user_id=user_id, bike_id=bike_id)
+    
 
     #print(f"Starting trip for user {user_ids[0]} on bike {bike_ids[0]}")
     # await outgoing.trips.start_trip(user_id=652134919185249742, bike_id=3)
