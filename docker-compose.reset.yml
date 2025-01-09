@@ -1,0 +1,104 @@
+services:
+  db:
+    image: postgis/postgis
+    container_name: database-db-1
+    networks:
+      - scooty-web
+    restart: always
+    environment:
+      POSTGRES_DB: sddb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # adminer:
+  #   image: adminer
+  #   networks:
+  #     - scooty-web
+  #   container_name: database-adminer-1
+  #   restart: always
+  #   depends_on:
+  #     - db
+  #   ports:
+  #     - "8080:8080"
+
+  api:
+    build:
+      context: ./repositories/backend
+      dockerfile: Dockerfile
+    container_name: api
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+asyncpg://user:pass@db:5432/sddb
+      PROJECT_NAME: scooty-doo
+      DEBUG: "false"
+      ENVIRONMENT: local
+      GITHUB_CLIENT_ID: secretid
+      GITHUB_CLIENT_SECRET: secresecret
+      GITHUB_REDIRECT_URI: 'http://secret.secret/'
+      USE_MOCKED_BIKE_CALL: "false"
+      BIKE_URL: 'http://bike_hivemind:8001/'
+    ports:
+      - "8000:8000"
+    networks:
+      - scooty-web
+    links:
+      - db:db
+  
+  bike_hivemind:
+    build:
+      context: ./repositories/bike
+      dockerfile: Dockerfile
+    container_name: bike_hivemind
+    environment:
+      BACKEND_URL: 'http://api:8000/'
+      TOKEN: 'secret'
+      DEFAULT_SPEED: 20
+    ports:
+      - "8001:8001"
+    networks:
+      - scooty-web
+    restart: unless-stopped
+    depends_on:
+      - db
+      - api
+
+  # webclient-dev:
+  #   build:
+  #     context: ./repositories/frontend
+  #     dockerfile: ./dockerfiles/dev/Dockerfile
+  #   container_name: scooty-web-dev
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./repositories/frontend/src:/app/src
+  #   networks:
+  #     - scooty-web
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - api
+
+  webclient-prod:
+    build:
+      context: ./repositories/frontend
+      dockerfile: ./dockerfiles/prod/Dockerfile
+    container_name: scooty-web-prod
+    ports:
+      - "3000:3000"
+    networks:
+      - scooty-web
+    restart: unless-stopped
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+
+networks:
+  scooty-web:
+    driver: bridge

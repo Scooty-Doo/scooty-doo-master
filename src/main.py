@@ -11,6 +11,9 @@ from .utils.settings import Settings
 from .utils.repositories import Repositories
 from .utils.chrome import Chrome
 from .utils.directory import Directory
+from .utils.docker import Docker
+
+BIKE_SERVICE_NAME = os.getenv("BIKE_CONTAINER")
 
 LOGS_DIR = Directory.logs()
 os.makedirs(LOGS_DIR, exist_ok=True)
@@ -43,7 +46,6 @@ class Main:
         logger.info("Main initialized.")
         logger.debug(f"REPOSITORIES_DIRECTORY: {os.getenv('REPOSITORIES_DIRECTORY')}")
 
-
     def _use_submodules(self, auto_pull=True):
         """Changes the REPOSITORIES_DIRECTORY environment variable to the submodules directory."""
         os.environ["REPOSITORIES_DIRECTORY"] = Settings.Directory.Name.submodules
@@ -69,38 +71,54 @@ class Main:
         if frontend:
             ports.append(os.getenv("FRONTEND_PORT"))
         Chrome.Open.window(*ports)
-
-    def run(self, simulation=False, open_chrome_tabs=True, rebuild=False):
+    
+    def _run(self, simulation=True, simulation_speed_factor=1.0, rebuild=False, open_chrome_tabs=False):
+        if simulation_speed_factor != 1.0:
+            default_speed_kmh = 20.0
+            simulation_speed_kmh = default_speed_kmh * simulation_speed_factor
+            Docker.Compose.Environment.set(BIKE_SERVICE_NAME, "DEFAULT_SPEED", int(simulation_speed_kmh))
+        if simulation_speed_factor == 1.0:
+            Docker.Compose.Environment.reset()
         self._setup_master(simulation, rebuild)
         if open_chrome_tabs:
             self._open_chrome_tabs(bikes=True, frontend=True)
+    
+    def run(self, simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False):
+        self._run(simulation=False, simulation_speed_factor=simulation_speed_factor, rebuild=rebuild, open_chrome_tabs=open_chrome_tabs)
+
+    def simulate(self, simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False):
+        self._run(simulation=True, simulation_speed_factor=simulation_speed_factor, rebuild=rebuild, open_chrome_tabs=open_chrome_tabs)
 
 if __name__ == "__main__":
 
-    # NOTE: Run to auto-setup venv in master repository:
-    # python -m src.setup._venv
-
-    SETUP_MATER_VENV = False
+    SETUP_MASTER_VENV = False
 
     from .setup._venv import Venv
-    if SETUP_MATER_VENV: 
+    if SETUP_MASTER_VENV:
         Venv.setup_master_venv()
 
     main = Main(
         use_submodules=False,
         backend_branch='main',
     )
-    main.run(
-        simulation=True,
-        rebuild=True,
-        open_chrome_tabs=False # NOTE: Can be True if not Windows, but will not open Chrome tabs.
-    )
+
+    options = {
+        "simulation_speed_factor": 1000.0,
+        "rebuild": True,
+        "open_chrome_tabs": False
+        }
+    
+    SIMULATION = True
+
+    if SIMULATION:
+        main.simulate(**options)
+    if not SIMULATION:
+        main.run(**options)
 
 # python -m src.main
 
 
 # python -m pytest --cov=src --cov-report=html 
 # python -m pytest --cov=src --cov-report=term-missing
-# TODO: Include master venv setup i main
 
 # TODO: Bash script to run the program?

@@ -23,7 +23,7 @@ def test_main_init_submodules_true(mock_local, mock_submodules):
 @patch.object(Main, "_open_chrome_tabs")
 def test_main_run(mock_open_chrome, mock_frontend, mock_bikes, mock_backend):
     main = Main(use_submodules=False)
-    main.run(skip_setup=False, bikes=True, frontend=True, open_chrome_tabs=True, docker=True)
+    main.simulate(skip_setup=False, bikes=True, frontend=True, open_chrome_tabs=True, docker=True)
 
     mock_backend.assert_called_once_with(start_server=True, already_setup=False, docker=True)
     mock_bikes.assert_called_once()

@@ -2,7 +2,14 @@ import os
 import platform
 import sys
 import time
+import shutil
+import yaml
 from .command import Command
+from .directory import Directory
+
+ROOT_DIR = Directory.root()
+DOCKER_COMPOSE_FILENAME = "docker-compose.yml"
+DOCKER_COMPOSE_RESET_FILENAME = "docker-compose.reset.yml"
 
 class Docker:
     class Compose:
@@ -96,6 +103,39 @@ class Docker:
             @staticmethod
             def logs(directory, filenames):
                 Command.run(Docker.Compose.Combined._combine_into_command(filenames, ["logs", "-f"]), directory=directory, raise_exception=False)
+        
+        class Environment:
+            @staticmethod
+            def set(service, variable, value):
+                docker_compose_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_FILENAME)
+                backup_file = docker_compose_file + ".backup"
+                if not os.path.exists(docker_compose_file):
+                    raise FileNotFoundError(f"{docker_compose_file} does not exist.")
+                shutil.copyfile(docker_compose_file, backup_file)
+                print(f"Backup created at {backup_file}.")
+                with open(docker_compose_file, 'r') as file:
+                    docker_compose = yaml.safe_load(file)
+                services = docker_compose.get('services', {})
+                if service not in services:
+                    raise ValueError(f"Service '{service}' not found.")
+                service = services[service]
+                environment = service.get('environment', {})
+                if environment is None or isinstance(environment, list):
+                    raise TypeError(f"Environment for service '{service}' must be a key-value dictionary.")
+                environment[variable] = value
+                service['environment'] = environment
+                with open(docker_compose_file, 'w') as file:
+                    yaml.safe_dump(docker_compose, file, default_flow_style=False)
+                print(f"Updated '{variable}' for service '{service}' to '{value}' in {docker_compose_file}.")
+            
+            @staticmethod
+            def reset():
+                docker_compose_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_FILENAME)
+                reset_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_RESET_FILENAME)
+                if not os.path.exists(reset_file):
+                    raise FileNotFoundError(f"{reset_file} does not exist.")
+                shutil.copyfile(reset_file, docker_compose_file)
+                print(f"Reset Docker Compose file to {reset_file}.")
 
     class Container:
         @staticmethod
@@ -209,7 +249,9 @@ class Docker:
                 sys.exit(1)
 
 if __name__ == "__main__":
-    print(f'Docker Desktop is running: {Docker.Desktop.is_running()}')
-    Docker.Desktop.start()
+    #print(f'Docker Desktop is running: {Docker.Desktop.is_running()}')
+    #Docker.Desktop.start()
+
+    Docker.Compose.Environment.set("bike_hivemind", "DEFAULT_SPEED", 1000)
 
     # python -m src.utils.docker
