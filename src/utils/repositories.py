@@ -38,9 +38,11 @@ class _Local:
                     Repository.fetch(repository_path)
                     Repository.checkout(repository_path, branch)
                     Repository.pull(repository_path, force=force, branch=branch)
+                    Repository.Print.commit(repository_path)
                 else:
                     print(f"Pulling latest changes in {name} on the current branch...")
                     Repository.pull(repository_path, force=force)
+                    Repository.Print.commit(repository_path)
             else:
                 print(f"Cloning {name}...")
                 Repository.clone(repository_url, repository_path, branch)
@@ -55,9 +57,16 @@ class _Local:
             self._get_repository("bike", branch)
 
         def all(self, branch=None):
+            def _print_commits():
+                print("Printing commits for all repositories...")
+                for name in self.repositories.keys():
+                    repository_path = os.path.join(LOCAL_REPOSITORIES_DIR, name)
+                    Repository.Print.commit(repository_path)
             self._get_repository("backend", branch)
             self._get_repository("frontend", branch, force=True)
             self._get_repository("bike", branch)
+            _print_commits()
+            
 
 class _Submodules:
     def __init__(self):
@@ -101,7 +110,6 @@ class _Submodules:
 if __name__ == "__main__":
     repositories = Repositories()
     repositories.local.get.all()
-    repositories.local.get.backend(branch='stripe-integration')
     #repositories.submodules.get.all()
     # repositories.submodules.deinitialize.all()
 

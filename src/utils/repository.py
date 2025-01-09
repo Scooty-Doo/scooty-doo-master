@@ -55,3 +55,15 @@ class Repository:
         if branch:
             clone_command.extend(["-b", branch])
         Command.run(clone_command, raise_exception=True)
+    
+    class Print:
+        @staticmethod
+        def commit(repository_path):
+            try:
+                commit_info = Command.run(
+                    ["git", "-C", repository_path, "log", "-1", "--pretty=format:%h - %s"],
+                    raise_exception=True
+                )
+                print(f"Commit after pull in {repository_path}: {commit_info}")
+            except Exception as e:
+                print(f"Error retrieving commit info after pull: {e}")
