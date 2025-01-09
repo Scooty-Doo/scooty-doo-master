@@ -36,7 +36,7 @@ class Trips:
         }
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(url, headers=self.headers, data=json.dumps(payload), timeout=10.0)
+                response = await client.post(url, headers=self.headers, data=json.dumps(payload), timeout=20.0)
                 response.raise_for_status()
                 print(f"Succesfully started trip for user {user_id} on bike {bike_id}")
                 return response.json()

@@ -63,11 +63,14 @@ async def main():
             for user_id, bike_id, trip_id, linestring in unique_trips:
                 print(f"Attempting to start trip for user {user_id} on bike {bike_id}")
                 try: 
-                    await outgoing.trips.start_trip(user_id=user_id, bike_id=bike_id)
+                    response_json = await outgoing.trips.start_trip(user_id=user_id, bike_id=bike_id)
+                    print(response_json)
+                    #response_json = {'data': {'id': 665303446870102746, 'type': 'trips', 'attributes': {'start_position': 'POINT(12.969383 55.586522)', 'end_position': None, 'path_taken': None, 'start_time': '2025-01-09T21:18:22.473747Z', 'end_time': None, 'start_fee': None, 'time_fee': None, 'end_fee': None, 'total_fee': None, 'created_at': '2025-01-09T21:18:22.473747Z', 'updated_at': '2025-01-09T21:18:22.473747Z'}, 'relationships': {'user': {'data': {'type': 'users', 'id': '652134919185249755'}}, 'bike': {'data': {'type': 'bikes', 'id': '66'}}, 'transaction': None}, 'links': {'self': 'http://api:8000/v1/trips/665303446870102746'}}, 'links': {'self': 'http://api:8000/v1/trips/665303446870102746'}}
+                    generated_trip_id = response_json['data']['id']
                     successful_start_trips += 1
-                    started_trips.append((user_id, bike_id, trip_id, linestring))
+                    started_trips.append((user_id, bike_id, generated_trip_id, linestring))
                 except Exception as e:
-                    print(f"Failed to start trip for user {user_id} on bike {bike_id}: {e}")
+                    print(f"Failed to start trip for {user_id} on {bike_id}: {e.response.status_code}, {e.response.text}")
                     unsuccessful_start_trips += 1
             return successful_start_trips, unsuccessful_start_trips, started_trips
 
