@@ -11,7 +11,7 @@ async def main():
     end_condition = False
     while not end_condition:
         print("Welcome to the Matrix.")
-        wait_for_boot = 30
+        wait_for_boot = 60
         print(f"Waiting {wait_for_boot} seconds to boot up the simulation.")
         await asyncio.sleep(wait_for_boot)
 
