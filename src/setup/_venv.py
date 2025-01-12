@@ -55,7 +55,7 @@ class Venv:
         Venv._install_dependencies(venv_dir)
 
     @staticmethod
-    def setup_master_venv():
+    def setup_master():
         """
         Setup the master virtual environment.
         """
@@ -63,6 +63,6 @@ class Venv:
         Venv.setup(venv_dir)
 
 if __name__ == "__main__":
-    Venv.setup_master_venv()
+    Venv.setup_master()
 
     # python -m src.setup._venv

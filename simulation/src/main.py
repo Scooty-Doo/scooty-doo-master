@@ -5,6 +5,8 @@ import asyncio
 from time import time
 from shapely.geometry import Point
 
+# TODO: Make Get class async and await the requests in the main function.
+
 async def main():
     end_condition = False
     while not end_condition:
@@ -53,8 +55,9 @@ async def main():
                 trip_id = trip_ids[trip_index]
                 linestring = linestrings[trip_index]
                 yield (user_id, bike_id, trip_id, linestring)
-        
+
         unique_trips = generate_unique_trips(user_ids, bike_ids, trips)
+        print(f"Number of unique trips: {len(list(unique_trips))}")
 
         async def start_trips(unique_trips):
             successful_start_trips = 0

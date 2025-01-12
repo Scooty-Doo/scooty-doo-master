@@ -95,11 +95,11 @@ if __name__ == "__main__":
 
     from .setup._venv import Venv
     if SETUP_MASTER_VENV:
-        Venv.setup_master_venv()
+        Venv.setup_master()
 
     main = Main(
         use_submodules=False,
-        backend_branch='main',
+        backend_branch='33-mock-data',
     )
 
     options = {

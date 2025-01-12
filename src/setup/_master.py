@@ -8,7 +8,7 @@ FRONTEND_DIR = Directory.Repo.frontend()
 DATABASE_CONTAINER = os.getenv("DATABASE_CONTAINER", 'database-db-1')
 DATABASE_ADMINER_CONTAINER = os.getenv("DATABASE_ADMINER_CONTAINER", 'database-adminer-1')
 BACKEND_CONTAINER = os.getenv("BACKEND_CONTAINER", 'api')
-BIKE_CONTAINER = os.getenv("BIKE_CONTAINER", 'bike_hivemind_app')
+BIKE_CONTAINER = os.getenv("BIKE_CONTAINER", 'bike_hivemind')
 SIMULATION_CONTAINER = os.getenv("SIMULATION_CONTAINER", 'simulation')
 DOCKER_COMPOSE_FILENAMES = ['docker-compose.yml', 'docker-compose.simulation.yml']
 
