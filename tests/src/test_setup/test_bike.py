@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch
 from src.setup._bike import Bike
 
@@ -7,7 +6,7 @@ from src.setup._bike import Bike
 def test_bike_setup(mock_env, mock_docker_build):
     Bike.setup(bikes=[{"id": 101}], docker=True)
     mock_docker_build.assert_called_once()
-    mock_env.assert_called_once_with([{"id": 101}], True)
+    mock_env.assert_called_once_with([{"id": 101}])
 
 @patch("src.setup._bike.Bike.Docker._up")
 @patch("src.setup._bike.Bike.Docker.status")
