@@ -67,13 +67,13 @@ class Bikes:
         self.headers = headers
 
     async def move(self, bike_id: int, position_or_linestring: Union[tuple, List[tuple]]):
-        url = _url(self.hivemind_url, f"/move?bike_id={bike_id}")
+        url = _url(self.hivemind_url, f"/move")
         payload = {
             "position_or_linestring": position_or_linestring
         }
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(url, headers=self.headers, data=json.dumps(payload), timeout=10.0)
+                response = await client.post(url, params={"bike_id": bike_id}, headers=self.headers, data=json.dumps(payload), timeout=10.0)
                 response.raise_for_status()
                 print(f"Succesfully moved bike {bike_id}")
                 return response.json()

@@ -17,7 +17,7 @@ async def main():
 
         get = Get()
         outgoing = Outgoing(token="secret")
-        bikes = await get.bikes(save_to_json=False, fallback=False)
+        bikes = await get.bikes(save_to_json=False)
 
         bikes = Extract.Bikes.available(bikes)
         assert len(bikes) > 0, "No bikes available, after extraction, all are probably false."
@@ -26,13 +26,13 @@ async def main():
 
         assert len(bike_ids) == len(positions), f"Length of bike_ids: {len(bike_ids)} != Length of positions: {len(positions)}" + f"example bike: {bikes[0]}"
 
-        users = get.users(save_to_json=False, fallback=False)
+        users = await get.users(save_to_json=False)
         users = Extract.Users.with_money(users)
         assert len(users) > 0, "No users with money."
         assert users[0]['attributes']['balance'] > 0.0, "First user has no money."
         user_ids = Extract.User.ids(users)
 
-        trips = get.trips(save_to_json=False, fallback=False)
+        trips = await get.trips(save_to_json=False)
 
         bike_count = len(bike_ids)
         print(f"Number of bikes: {bike_count}")
@@ -209,12 +209,6 @@ if __name__ == "__main__":
     # NOTE: To run use:
     # python -m src.main
     # Make sure simulation is True in the if __name__ == "__main__": block in src/main.py
-
-    #zones = get.zones(save_to_json=False, fallback=False)
-    #zone_types = get.zone_types(save_to_json=False, fallback=False)
-    #print(users)
-
-    # Need more user/bike/trip data in database.
 
     # ändra ?limit=0 i _outgoing? hör med Martin (users)
 

@@ -1,3 +1,5 @@
+from .setup._venv import Venv
+Venv.setup_master()
 import os
 import logging
 import platform
@@ -99,7 +101,7 @@ class Main:
 
 if __name__ == "__main__":
 
-    SETUP_MASTER_VENV = False
+    SETUP_MASTER_VENV = True
 
     from .setup._venv import Venv
     if SETUP_MASTER_VENV:
@@ -107,7 +109,7 @@ if __name__ == "__main__":
 
     main = Main(
         use_submodules=False,
-        backend_branch='main',
+        backend_branch='mockdata-filters-bike-trips',
         backend_commit=None,
         frontend_branch='main',
         frontend_commit=None,

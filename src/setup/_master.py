@@ -74,7 +74,7 @@ class Master:
     def setup(simulation=False, rebuild=False, start_docker_desktop=False):
         if start_docker_desktop:
             Docker.Desktop.start()
-        Environment.Files.generate() # TODO: Add environment variable SIMULATION_SPEED that changed Speed.default_speed in all Bike:s in Hivemind.
+        Environment.Files.generate()
         Master.Docker.restart(simulation, rebuild)
 
 if __name__ == "__main__":
