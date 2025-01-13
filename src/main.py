@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     main = Main(
         use_submodules=False,
-        backend_branch='mockdata-filters-bike-trips',
+        backend_branch='main',
         backend_commit=None,
         frontend_branch='main',
         frontend_commit=None,
