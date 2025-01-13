@@ -23,7 +23,7 @@ class Repository:
         Command.run(["git", "-C", repository_path, "checkout", branch], raise_exception=True)
 
     @staticmethod
-    def pull(repository_path, force=False, branch=None):
+    def pull(repository_path, force=False, branch=None, commit=None):
         """
         Pull the latest changes from the remote repository.
         
@@ -31,12 +31,17 @@ class Repository:
             repository_path (str): The path to the local repository.
             force (bool, optional): Whether to force the pull, disregarding any local changes. Defaults to False.
             branch (str, optional): The branch to pull from. Defaults to None, which means "main".
+            commit (str, optional): A specific commit hash to pull and reset to. Defaults to None.
         """
         def _pull():
             Command.run(["git", "-C", repository_path, "pull"], raise_exception=True)
+
         if not force:
             _pull()
-        if force:
+            if commit:
+                print(f"Resetting repository {repository_path} to commit {commit}...")
+                Command.run(["git", "-C", repository_path, "reset", "--hard", commit], raise_exception=True)
+        else:
             # METHOD 1 (HEAVY)
             #Repository.fetch(repository_path)
             #branch = "main" if not branch else branch
@@ -48,6 +53,9 @@ class Repository:
             files_to_checkout = ["package.json", "package-lock.json"]
             Repository.Checkout.files(repository_path, files_to_checkout)
             _pull()
+            if commit:
+                print(f"Resetting repository {repository_path} to commit {commit}...")
+                Command.run(["git", "-C", repository_path, "reset", "--hard", commit], raise_exception=True)
 
     @staticmethod
     def clone(repository_url, repository_path, branch=None):

@@ -35,10 +35,18 @@ def setup_logger():
 logger = setup_logger()
 
 class Main:
-    def __init__(self, use_submodules=False, backend_branch='main'):
+    def __init__(self, use_submodules=False,
+                 backend_branch='main', backend_commit=None,
+                 frontend_branch='main', frontend_commit=None,
+                 bike_branch='main', bike_commit=None):
         self.get = Get()
         self.repositories = Repositories()
         self.backend_branch = backend_branch
+        self.backend_commit = backend_commit
+        self.frontend_branch = frontend_branch
+        self.frontend_commit = frontend_commit
+        self.bike_branch = bike_branch
+        self.bike_commit = bike_commit
         if use_submodules:
             self._use_submodules()
         if not use_submodules:
@@ -55,9 +63,9 @@ class Main:
     def _use_local_repositories(self):
         """Pull repositories to the local repositories folder."""
         os.environ["REPOSITORIES_DIRECTORY"] = Settings.Directory.local_repositories
-        self.repositories.local.get.backend(branch=self.backend_branch)
-        self.repositories.local.get.frontend(branch='main')
-        self.repositories.local.get.bike(branch='main')
+        self.repositories.local.get.backend(branch=self.backend_branch, commit=self.backend_commit)
+        self.repositories.local.get.frontend(branch=self.frontend_branch, commit=self.frontend_commit)
+        self.repositories.local.get.bike(branch=self.bike_branch, commit=self.bike_commit)
 
     def _setup_master(self, simulation=False, rebuild=False):
         Setup.master(simulation, rebuild)
@@ -99,7 +107,12 @@ if __name__ == "__main__":
 
     main = Main(
         use_submodules=False,
-        backend_branch='33-mock-data',
+        backend_branch='main',
+        backend_commit=None,
+        frontend_branch='main',
+        frontend_commit=None,
+        bike_branch='main',
+        bike_commit=None
     )
 
     options = {

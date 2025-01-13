@@ -1,7 +1,6 @@
-import requests
+import httpx
 from ..utils.settings import Settings
 from ..utils.file import File
-from ._fallback import Fallback
 
 def _url(url, endpoint):
     return f'{url.rstrip("/")}/{endpoint.lstrip("/")}'
@@ -20,78 +19,36 @@ class Get:
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.token}',
         }
-
-    def bikes(self, save_to_json=True, fallback=False):
+    
+    async def _get_data(self, url, filename, save_to_json):
+        """Generic method to GET data asynchronously."""
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(url, headers=self.headers, timeout=20.0)
+                response.raise_for_status()
+                result = _extract_data_from_response_json(response.json())
+                if save_to_json:
+                    await File.Save.to_json(data=result, folder=self.data_folder, filename=filename)
+                return result
+            except httpx.RequestError as e:
+                raise httpx.RequestError(f"Failed to request {filename[:-5]}: {e}") from e
+    
+    async def bikes(self, save_to_json=True):
         url = _url(self.url, self.endpoints.Bikes.get_all)
-        try:
-            response = requests.get(url, headers=self.headers, timeout=(5, 10))
-            response.raise_for_status()
-            result = _extract_data_from_response_json(response.json())
-            if save_to_json:
-                File.Save.to_json(data=result, folder=self.data_folder, filename='bikes.json')
-            return result
-        except requests.exceptions.RequestException as e:
-            if fallback:
-                result = Fallback.bikes(save_to_json=save_to_json)
-                return result
-            raise requests.exceptions.RequestException(f"Failed to request bikes: {e}") from e
-
-    def trips(self, save_to_json=True, fallback=False):
+        return await self._get_data(url, 'bikes.json', save_to_json)
+    
+    async def trips(self, save_to_json=True):
         url = _url(self.url, self.endpoints.Trips.get_all)
-        try:
-            response = requests.get(url, headers=self.headers, timeout=(5, 10))
-            response.raise_for_status()
-            result = _extract_data_from_response_json(response.json())
-            if save_to_json:
-                File.Save.to_json(data=result, folder=self.data_folder, filename='trips.json')
-            return result
-        except requests.exceptions.RequestException as e:
-            if fallback:
-                result = Fallback.trips(save_to_json=save_to_json)
-                return result
-            raise requests.exceptions.RequestException(f"Failed to request zones: {e}") from e
-
-    def users(self, save_to_json=True, fallback=False):
+        return await self._get_data(url, 'trips.json', save_to_json)
+    
+    async def users(self, save_to_json=True):
         url = _url(self.url, self.endpoints.Users.get_all)
-        try:
-            response = requests.get(url, headers=self.headers, timeout=(5, 10))
-            response.raise_for_status()
-            result = _extract_data_from_response_json(response.json())
-            if save_to_json:
-                File.Save.to_json(data=result, folder=self.data_folder, filename='users.json')
-            return result
-        except requests.exceptions.RequestException as e:
-            if fallback:
-                result = Fallback.users(save_to_json=save_to_json)
-                return result
-            raise requests.exceptions.RequestException(f"Failed to request zones: {e}") from e
-
-    def zones(self, save_to_json=True, fallback=True):
+        return await self._get_data(url, 'users.json', save_to_json)
+    
+    async def zones(self, save_to_json=True):
         url = _url(self.url, self.endpoints.Zones.get_all)
-        try:
-            response = requests.get(url, headers=self.headers, timeout=(5, 10))
-            response.raise_for_status()
-            result = _extract_data_from_response_json(response.json())
-            if save_to_json:
-                File.Save.to_json(data=result, folder=self.data_folder, filename='zones.json')
-            return result
-        except requests.exceptions.RequestException as e:
-            if fallback:
-                result = Fallback.zones(save_to_json=save_to_json)
-                return result
-            raise requests.exceptions.RequestException(f"Failed to request zones: {e}") from e
-
-    def zone_types(self, save_to_json=True, fallback=True):
+        return await self._get_data(url, 'zones.json', save_to_json)
+    
+    async def zone_types(self, save_to_json=True):
         url = _url(self.url, self.endpoints.Zones.get_types)
-        try:
-            response = requests.get(url, headers=self.headers, timeout=(5, 10))
-            response.raise_for_status()
-            result = _extract_data_from_response_json(response.json())
-            if save_to_json:
-                File.Save.to_json(data=result, folder=self.data_folder, filename='zone_types.json')
-            return result
-        except requests.exceptions.RequestException as e:
-            if fallback:
-                result = Fallback.zone_types(save_to_json=save_to_json)
-                return result
-            raise requests.exceptions.RequestException(f"Failed to request zone types: {e}") from e
+        return await self._get_data(url, 'zone_types.json', save_to_json)

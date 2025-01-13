@@ -26,7 +26,7 @@ class _Local:
         def __init__(self, repositories):
             self.repositories = dict(repositories)
 
-        def _get_repository(self, name, branch=None, force=False):
+        def _get_repository(self, name, branch=None, force=False, commit=None):
             repository_url = self.repositories.get(name)
             repository_path = os.path.join(LOCAL_REPOSITORIES_DIR, name)
             if not repository_url:
@@ -37,24 +37,39 @@ class _Local:
                     print(f"Switching to branch '{branch}' in {name}...")
                     Repository.fetch(repository_path)
                     Repository.checkout(repository_path, branch)
-                    Repository.pull(repository_path, force=force, branch=branch)
+                    if commit:
+                        print(f"Resetting to commit {commit} in {name} on branch '{branch}'...")
+                        Repository.pull(repository_path, force=force, branch=branch, commit=commit)
+                    else:
+                        Repository.pull(repository_path, force=force, branch=branch)
                     Repository.Print.commit(repository_path)
                 else:
-                    print(f"Pulling latest changes in {name} on the current branch...")
-                    Repository.pull(repository_path, force=force)
+                    if commit:
+                        print(f"Resetting to commit {commit} in {name} on the current branch...")
+                        Repository.pull(repository_path, force=force, commit=commit)
+                    else:
+                        print(f"Pulling latest changes in {name} on the current branch...")
+                        Repository.pull(repository_path, force=force)
                     Repository.Print.commit(repository_path)
             else:
                 print(f"Cloning {name}...")
                 Repository.clone(repository_url, repository_path, branch)
+                if branch:
+                    print(f"Switching to branch '{branch}' in {name}...")
+                    Repository.checkout(repository_path, branch)
+                if commit:
+                    print(f"Resetting to commit {commit} in {name}...")
+                    Repository.pull(repository_path, commit=commit)
+                Repository.Print.commit(repository_path)
 
-        def backend(self, branch=None):
-            self._get_repository("backend", branch)
+        def backend(self, branch=None, commit=None):
+            self._get_repository("backend", branch=branch, commit=commit)
 
-        def frontend(self, branch=None):
-            self._get_repository("frontend", branch, force=True)
+        def frontend(self, branch=None, commit=None):
+            self._get_repository("frontend", branch=branch, force=True, commit=commit)
 
-        def bike(self, branch=None):
-            self._get_repository("bike", branch)
+        def bike(self, branch=None, commit=None):
+            self._get_repository("bike", branch=branch, commit=commit)
 
         def all(self, branch=None):
             def _print_commits():

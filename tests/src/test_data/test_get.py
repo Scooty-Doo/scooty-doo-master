@@ -7,7 +7,7 @@ from src.utils.settings import Settings
 @patch.object(Settings.Endpoints, 'backend_url', 'http://localhost:8000/')
 @patch.object(Settings.Endpoints, 'token', 'test_token')
 @patch("src.data.get.requests.get")
-def test_get_bikes_success(mock_get):
+async def test_get_bikes_success(mock_get):
     """
     Should return data from the backend if requests.get succeeds.
     """
@@ -17,17 +17,9 @@ def test_get_bikes_success(mock_get):
     mock_get.return_value = mock_response
 
     get = Get()
-    result = get.bikes(save_to_json=False)
+    result = await get.bikes(save_to_json=False)
     assert result == [{"id": "1"}, {"id": "2"}]
     mock_get.assert_called_once()
-
-@patch.object(Settings.Endpoints, 'backend_url', 'http://localhost:8000/')
-@patch.object(Settings.Endpoints, 'token', 'test_token')
-@patch("src.data.get.requests.get", side_effect=Exception("Connection error"))
-def test_get_bikes_fallback(mock_get):
-    get = Get()
-    with pytest.raises(Exception):
-        get.bikes()
 
 @patch.object(Settings.Endpoints, 'backend_url', 'http://localhost:8000/')
 @patch.object(Settings.Endpoints, 'token', 'test_token')
@@ -66,8 +58,8 @@ def test_get_save_to_json(mock_get, method_name):
 @patch.object(Settings.Endpoints, 'backend_url', 'http://localhost:8000/')
 @patch.object(Settings.Endpoints, 'token', 'test_token')
 @patch("src.data.get.requests.get", side_effect=requests.exceptions.Timeout("Timeout error"))
-def test_get_bikes_timeout(mock_get):
+async def test_get_bikes_timeout(mock_get):
     get = Get()
     with pytest.raises(requests.exceptions.RequestException) as exc:
-        get.bikes()
+        await get.bikes()
     assert "Timeout error" in str(exc.value)

@@ -17,7 +17,7 @@ async def main():
 
         get = Get()
         outgoing = Outgoing(token="secret")
-        bikes = get.bikes(save_to_json=False, fallback=False)
+        bikes = await get.bikes(save_to_json=False, fallback=False)
 
         bikes = Extract.Bikes.available(bikes)
         assert len(bikes) > 0, "No bikes available, after extraction, all are probably false."
@@ -80,7 +80,10 @@ async def main():
         successful_start_trips, unsuccessful_start_trips, started_trips = await start_trips(unique_trips)
         print(f"Successfully started {successful_start_trips} trips.")
         print(f"Failed to start {unsuccessful_start_trips} trips.")
-        print(f"Percentage of successful trips: {successful_start_trips / (successful_start_trips + unsuccessful_start_trips) * 100}%")
+        if successful_start_trips == 0:
+            print("No trips started successfully.")
+        else:
+            print(f"Percentage of successful trips: {successful_start_trips / (successful_start_trips + unsuccessful_start_trips) * 100}%")
         assert successful_start_trips > 0, "No trips started successfully."
 
         async def move_bikes(started_trips):
