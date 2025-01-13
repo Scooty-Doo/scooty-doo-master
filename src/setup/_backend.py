@@ -52,7 +52,7 @@ class Backend:
         @staticmethod
         def logs():
             Docker.Compose.logs(REPO_DIR)
-        
+
         @staticmethod
         def _clear():
             Docker.Container.delete(DATABASE_CONTAINER)

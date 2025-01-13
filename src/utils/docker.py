@@ -28,7 +28,11 @@ class Docker:
                     raise Exception("NPM is not installed.")
                 if (reinstall or not os.path.exists(os.path.join(directory, 'build'))):
                     try:
-                        Command.run([npm_filename, "install"], directory=directory, inherit_environment=True)
+                        Command.run(
+                            [npm_filename, "install"],
+                            directory=directory,
+                            inherit_environment=True
+                            )
                         print("Running npm install...")
                     except Exception as e:
                         print(f"Failed to run NPM install: {e}")
@@ -36,7 +40,11 @@ class Docker:
                         return
                 try:
                     print("Running npm run build...")
-                    Command.run([npm_filename, "run", "build"], directory=directory, inherit_environment=True)
+                    Command.run(
+                        [npm_filename, "run", "build"],
+                        directory=directory,
+                        inherit_environment=True
+                        )
                 except Exception as e:
                     print(f"Failed to run NPM build: {e}")
                     return
@@ -52,9 +60,15 @@ class Docker:
         def up(directory, npm=False):
             Docker.Compose.down(directory)
             if not npm:
-                Command.run(["docker-compose", "up", "-d", "--build"], directory=directory)
+                Command.run(
+                    ["docker-compose", "up", "-d", "--build"],
+                    directory=directory
+                    )
             if npm:
-                Command.run(["docker-compose", "up", "webclient-prod", "-d"], directory=directory)
+                Command.run(
+                    ["docker-compose", "up", "webclient-prod", "-d"],
+                    directory=directory
+                    )
 
         @staticmethod
         def down(directory):
@@ -71,8 +85,12 @@ class Docker:
 
         @staticmethod
         def logs(directory):
-            Command.run(["docker-compose", "logs", "-f"], directory=directory, raise_exception=False)
-    
+            Command.run(
+                ["docker-compose", "logs", "-f"],
+                directory=directory,
+                raise_exception=False
+                )
+
         class Combined:
             @staticmethod
             def _combine_into_command(filenames, command):
@@ -86,24 +104,29 @@ class Docker:
 
             @staticmethod
             def build(directory, filenames):
-                Command.run(Docker.Compose.Combined._combine_into_command(filenames, ["build"]), directory=directory, raise_exception=False)
-            
+                Command.run(Docker.Compose.Combined._combine_into_command(
+                    filenames, ["build"]), directory=directory, raise_exception=False)
+
             @staticmethod
             def up(directory, filenames):
-                Command.run(Docker.Compose.Combined._combine_into_command(filenames, ["up", "-d"]), directory=directory, raise_exception=False)
+                Command.run(Docker.Compose.Combined._combine_into_command(
+                    filenames, ["up", "-d"]), directory=directory, raise_exception=False)
 
             @staticmethod
             def down(directory, filenames):
-                Command.run(Docker.Compose.Combined._combine_into_command(filenames, ["down"]), directory=directory, raise_exception=False)
-            
+                Command.run(Docker.Compose.Combined._combine_into_command(
+                    filenames, ["down"]), directory=directory, raise_exception=False)
+
             @staticmethod
             def status(directory, filenames):
-                Command.run(Docker.Compose.Combined._combine_into_command(filenames, ["ps"]), directory=directory, raise_exception=False)
-            
+                Command.run(Docker.Compose.Combined._combine_into_command(
+                    filenames, ["ps"]), directory=directory, raise_exception=False)
+
             @staticmethod
             def logs(directory, filenames):
-                Command.run(Docker.Compose.Combined._combine_into_command(filenames, ["logs", "-f"]), directory=directory, raise_exception=False)
-        
+                Command.run(Docker.Compose.Combined._combine_into_command(
+                    filenames, ["logs", "-f"]), directory=directory, raise_exception=False)
+
         class Environment:
             @staticmethod
             def set(service, variable, value):
@@ -127,7 +150,7 @@ class Docker:
                 with open(docker_compose_file, 'w') as file:
                     yaml.safe_dump(docker_compose, file, default_flow_style=False)
                 print(f"Updated '{variable}' for service '{service}' to '{value}' in {docker_compose_file}.")
-            
+
             @staticmethod
             def reset():
                 docker_compose_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_FILENAME)
@@ -141,19 +164,27 @@ class Docker:
         @staticmethod
         def stop(name):
             try:
-                Command.run(["docker", "stop", name], asynchronous=False, raise_exception=False)
+                Command.run(
+                    ["docker", "stop", name],
+                    asynchronous=False,
+                    raise_exception=False
+                    )
                 print(f"Container '{name}' stopped successfully.")
             except Exception as e:
                 print(f"Failed to stop container '{name}': {e}")
-        
+
         @staticmethod
         def delete(name):
             try:
-                Command.run(["docker", "rm", "-f", name], asynchronous=False, raise_exception=False)
+                Command.run(
+                    ["docker", "rm", "-f", name],
+                    asynchronous=False,
+                    raise_exception=False
+                    )
                 print(f"Container '{name}' deleted successfully.")
             except Exception as e:
                 print(f"Failed to delete container '{name}': {e}")
-    
+
     class Network:
         @staticmethod
         def create(name):
@@ -162,7 +193,7 @@ class Docker:
                 print(f"Network '{name}' created successfully.")
             except Exception as e:
                 print(f"Failed to create network '{name}': {e}")
-        
+
         @staticmethod
         def recreate(name):
             Docker.Network.delete(name)
@@ -171,45 +202,69 @@ class Docker:
         @staticmethod
         def connect(network, container):
             try:
-                Command.run(["docker", "network", "connect", network, container], asynchronous=False, raise_exception=False)
+                Command.run(
+                    ["docker", "network", "connect", network, container],
+                    asynchronous=False,
+                    raise_exception=False
+                    )
                 print(f"Container '{container}' connected to network '{network}' successfully.")
             except Exception as e:
                 print(f"Failed to connect container '{container}' to network '{network}': {e}")
-        
+
         @staticmethod
         def delete(name):
             try:
-                Command.run(["docker", "network", "rm", name], asynchronous=False, raise_exception=False)
+                Command.run(
+                    ["docker", "network", "rm", name],
+                    asynchronous=False,
+                    raise_exception=False
+                    )
                 print(f"Network '{name}' deleted successfully.")
             except Exception as e:
                 print(f"Failed to delete network '{name}': {e}")
-        
+
         @staticmethod
         def disconnect(network, container):
             try:
-                Command.run(["docker", "network", "disconnect", network, container], asynchronous=False, raise_exception=False)
+                Command.run(
+                    ["docker", "network", "disconnect", network, container],
+                    asynchronous=False,
+                    raise_exception=False
+                    )
                 print(f"Container '{container}' disconnected from network '{network}' successfully.")
             except Exception as e:
                 print(f"Failed to disconnect container '{container}' from network '{network}': {e}")
-        
+
         @staticmethod
         def inspect(name):
             try:
-                Command.run(["docker", "network", "inspect", name], asynchronous=False, raise_exception=False)
+                Command.run(
+                    ["docker", "network", "inspect", name],
+                    asynchronous=False,
+                    raise_exception=False
+                    )
             except Exception as e:
                 print(f"Failed to inspect network '{name}': {e}")
-        
+
         @staticmethod
         def show():
             try:
-                Command.run(["docker", "network", "ls"], asynchronous=False, raise_exception=False)
+                Command.run(
+                    ["docker", "network", "ls"],
+                    asynchronous=False,
+                    raise_exception=False
+                    )
             except Exception as e:
                 print(f"Failed to display networks: {e}")
-        
+
         @staticmethod
         def prune():
             try:
-                Command.run(["docker", "network", "prune", "-f"], asynchronous=False, raise_exception=False)
+                Command.run(
+                    ["docker", "network", "prune", "-f"],
+                    asynchronous=False,
+                    raise_exception=False
+                    )
                 print("Pruned all unused networks successfully.")
             except Exception as e:
                 print(f"Failed to prune unused networks: {e}")
@@ -221,7 +276,11 @@ class Docker:
             Check if Docker Desktop is running by attempting to retrieve Docker information.
             """
             try:
-                Command.run(["docker", "info"], asynchronous=False, kwargs={"verbose": False})
+                Command.run(
+                    ["docker", "info"],
+                    asynchronous=False,
+                    kwargs={"verbose": False}
+                    )
                 print("Docker Desktop is running.")
                 return True
             except Exception:

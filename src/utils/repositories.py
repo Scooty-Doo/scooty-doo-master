@@ -81,7 +81,7 @@ class _Local:
             self._get_repository("frontend", branch, force=True)
             self._get_repository("bike", branch)
             _print_commits()
-            
+
 
 class _Submodules:
     def __init__(self):

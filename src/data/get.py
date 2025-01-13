@@ -19,7 +19,7 @@ class Get:
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.token}',
         }
-    
+
     async def _get_data(self, url, filename, save_to_json):
         """Generic method to GET data asynchronously."""
         async with httpx.AsyncClient() as client:
@@ -32,23 +32,23 @@ class Get:
                 return result
             except httpx.RequestError as e:
                 raise httpx.RequestError(f"Failed to request {filename[:-5]}: {e}") from e
-    
+
     async def bikes(self, save_to_json=True):
         url = _url(self.url, self.endpoints.Bikes.get_all)
         return await self._get_data(url, 'bikes.json', save_to_json)
-    
+
     async def trips(self, save_to_json=True):
         url = _url(self.url, self.endpoints.Trips.get_all)
         return await self._get_data(url, 'trips.json', save_to_json)
-    
+
     async def users(self, save_to_json=True):
         url = _url(self.url, self.endpoints.Users.get_all)
         return await self._get_data(url, 'users.json', save_to_json)
-    
+
     async def zones(self, save_to_json=True):
         url = _url(self.url, self.endpoints.Zones.get_all)
         return await self._get_data(url, 'zones.json', save_to_json)
-    
+
     async def zone_types(self, save_to_json=True):
         url = _url(self.url, self.endpoints.Zones.get_types)
         return await self._get_data(url, 'zone_types.json', save_to_json)

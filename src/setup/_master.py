@@ -39,14 +39,14 @@ class Master:
                 Docker.Compose.up(REPO_DIR)
             if simulation:
                 Docker.Compose.Combined.up(REPO_DIR, filenames=DOCKER_COMPOSE_FILENAMES)
-        
+
         @staticmethod
         def down(simulation=False):
             if not simulation:
                 Docker.Compose.down(REPO_DIR)
             if simulation:
                 Docker.Compose.Combined.down(REPO_DIR, filenames=DOCKER_COMPOSE_FILENAMES)
-        
+
         @staticmethod
         def status(simulation):
             if not simulation:
@@ -60,7 +60,7 @@ class Master:
                 Docker.Compose.logs(REPO_DIR)
             if simulation:
                 Docker.Compose.Combined.logs(REPO_DIR, filenames=DOCKER_COMPOSE_FILENAMES)
-        
+
         @staticmethod
         def restart(simulation=False, rebuild=False):
             Master.Docker.down(simulation)

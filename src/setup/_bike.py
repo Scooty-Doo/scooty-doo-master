@@ -60,10 +60,10 @@ class Bike:
         Venv.setup(VENV_DIR)
 
     @staticmethod
-    def _env(bikes, master_docker_compose_file):
+    def _env(bikes):
         if not bikes:
             print("No bikes provided to generate .env file for.")
-        Environment.Files.generate(bikes=bikes, master_docker_compose_file=master_docker_compose_file)
+        Environment.Files.generate(bikes=bikes)
 
     @staticmethod
     def _start_server(docker=True):
@@ -89,12 +89,12 @@ class Bike:
             sys.exit(1)
 
     @staticmethod
-    def setup(bikes, docker=True, master_docker_compose_file=True):
+    def setup(bikes, docker=True):
         if not docker:
             Bike._venv()
         if docker:
             Bike.Docker._build()
-        Bike._env(bikes, master_docker_compose_file)
+        Bike._env(bikes)
 
     @staticmethod
     def run():

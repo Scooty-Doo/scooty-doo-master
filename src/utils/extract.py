@@ -12,22 +12,22 @@ class Extract:
                 point = point.replace("POINT(", "").replace(")", "")
                 return tuple(map(float, point.split()))
             return [_point_to_tuple(bike['attributes']['last_position']) for bike in bikes]
-        
+
     class Bikes:
         @staticmethod
         def available(bikes):
             return [bike for bike in bikes if bike['attributes']['is_available']]
-    
+
     class User:
         @staticmethod
         def ids(users):
             return [user['id'] for user in users]
-    
+
     class Users:
         @staticmethod
         def with_money(users):
             return [user for user in users if user['attributes']['balance'] > 0.0]
-    
+
     class Trip:
         @staticmethod
         def ids(trips):

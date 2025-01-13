@@ -17,7 +17,7 @@ class Directory:
     @staticmethod
     def env():
         return os.path.join(Settings.Directory.env)
-    
+
     @staticmethod
     def logs():
         return os.path.join(Directory.root(), Settings.Directory.logs)

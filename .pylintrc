@@ -448,6 +448,8 @@ disable=raw-checker-failed,
         R0917,  # Too many positional arguments
         R0903,  # Too few public methods
         W0212,  # Access to a protected member
+        W0718,  # Catching too general exception Exception (broad-exception-caught)
+        W0719   # Raising too general exception: Exception (broad-exception-raised)
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

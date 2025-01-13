@@ -81,7 +81,7 @@ class Main:
         if frontend:
             ports.append(os.getenv("FRONTEND_PORT"))
         Chrome.Open.window(*ports)
-    
+
     def _run(self, simulation=True, simulation_speed_factor=1.0, rebuild=False, open_chrome_tabs=False):
         if simulation_speed_factor != 1.0:
             default_speed_kmh = 20.0
@@ -92,7 +92,7 @@ class Main:
         self._setup_master(simulation, rebuild)
         if open_chrome_tabs:
             self._open_chrome_tabs(bikes=True, frontend=True)
-    
+
     def run(self, simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False):
         self._run(simulation=False, simulation_speed_factor=simulation_speed_factor, rebuild=rebuild, open_chrome_tabs=open_chrome_tabs)
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
         "rebuild": True,
         "open_chrome_tabs": False
         }
-    
+
     SIMULATION = True
 
     if SIMULATION:
@@ -133,7 +133,7 @@ if __name__ == "__main__":
 # python -m src.main
 
 
-# python -m pytest --cov=src --cov-report=html 
+# python -m pytest --cov=src --cov-report=html
 # python -m pytest --cov=src --cov-report=term-missing
 
 # TODO: Bash script to run the program?
