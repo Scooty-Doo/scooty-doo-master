@@ -32,4 +32,4 @@ def test_bike_setup_no_docker(mock_env, mock_venv, mock_build):
     # _build should NOT be called
     mock_build.assert_not_called()
     # _env should be called with provided bikes
-    mock_env.assert_called_once_with(bikes, False)
+    mock_env.assert_called_once_with(bikes)
