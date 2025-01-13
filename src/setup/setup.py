@@ -12,11 +12,11 @@ class Setup:
         Backend.run()
 
     @staticmethod
-    def bike(start_server=True, bikes=None, already_setup=False, docker=True, master_docker_compose=True):
+    def bike(start_server=True, bikes=None, already_setup=False, docker=True):
         if not already_setup:
             if not bikes:
                 print("No bikes provided to generate .env file for.")
-            Bike.setup(bikes, docker=docker, master_docker_compose_file=master_docker_compose)
+            Bike.setup(bikes, docker=docker)
         if start_server:
             Bike.run()
 

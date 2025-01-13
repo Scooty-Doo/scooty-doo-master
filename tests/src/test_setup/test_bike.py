@@ -5,7 +5,7 @@ from src.setup._bike import Bike
 @patch("src.setup._bike.Bike.Docker._build")
 @patch("src.setup._bike.Bike._env")
 def test_bike_setup(mock_env, mock_docker_build):
-    Bike.setup(bikes=[{"id": 101}], docker=True, master_docker_compose_file=True)
+    Bike.setup(bikes=[{"id": 101}], docker=True)
     mock_docker_build.assert_called_once()
     mock_env.assert_called_once_with([{"id": 101}], True)
 
@@ -26,7 +26,7 @@ def test_bike_setup_no_docker(mock_env, mock_venv, mock_build):
     If docker=False, Bike.setup should call _venv() but not ._build().
     """
     bikes = [{"id": 111}]
-    Bike.setup(bikes=bikes, docker=False, master_docker_compose_file=False)
+    Bike.setup(bikes=bikes, docker=False)
 
     # _venv should be called
     mock_venv.assert_called_once()
