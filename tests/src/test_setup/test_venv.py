@@ -1,6 +1,6 @@
-import pytest
 import subprocess
 from unittest.mock import patch
+import pytest
 from src.setup._venv import Venv
 
 @patch("src.setup._venv.os.path.exists", return_value=False)

@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import patch
+import pytest
 from src.utils.repository import Repository
 
 @patch("src.utils.command.Command.run")
@@ -10,7 +10,9 @@ def test_repository_fetch(mock_run):
 @patch("src.utils.command.Command.run")
 def test_repository_checkout(mock_run):
     Repository.checkout("/path/to/repo", "development")
-    mock_run.assert_called_once_with(["git", "-C", "/path/to/repo", "checkout", "development"], raise_exception=True)
+    mock_run.assert_called_once_with(
+        ["git", "-C", "/path/to/repo", "checkout", "development"],
+        raise_exception=True)
 
 @patch("src.utils.command.Command.run")
 def test_repository_pull_no_force(mock_run):
