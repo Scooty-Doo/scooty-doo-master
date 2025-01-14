@@ -5,67 +5,114 @@
 # scooty-doo-master
 ### ***Master repository for the Scooty-Doo application.***
 
-#### *Managing Local Repository and Submodules Locally and Remotely:*
+#### *Setup:*
+```python
+python -m src.setup._venv
+```
 
-- **Clone repository with submodule references but without pulling submodule contents to local repository:**  
+This will setup a virtual environment and install dependencies.
+You can also run:
 
-    git clone --recurse-submodules https://github.com/Scooty-Doo/scooty-doo-master
+```python
+python -m src.main
+```
 
-NOTE: All further instructions related to managing submodules can be ignored because Main runs the appropriate commands automatically.
-
-- **Initialize submodules in local repository, i.e. pull submodule contents to /submodules:**  
-
-    git submodule update --init --recursive
-
-- **Deinitialize submodules in local repository, i.e. keep submodule references but no longer keep submodule contents in local repository:**  
-
-    git submodule deinit -f submodules/backend  
-    git submodule deinit -f submodules/frontend  
-    git submodule deinit -f submodules/bike
-
-    **or...** 
-
-    git submodule deinit -f --all  
-
-- **Reinitialize (reset) submodules in local repository:**  
-
-    git submodule deinit -f --all  
-    git submodule update --init --recursive
-
-- **Update submodule references to their latest commit:**  
-
-
-    1. **Without pulling submodule contents to local repository or updating existing local submodule contents in /submodules:**  
-
-        git submodule update --remote --no-fetch
-
-    2. **By pulling submodules contents to local repository:**  
-
-        2.1. ***Pull latest commit:***  
-        git submodule update --remote --merge  
-
-        **or...**
-
-        git submodule foreach --recursive git pull origin main  
-
-        **or if you want to update a specific submodule...**  
-
-        git -C submodules/backend pull origin main  
-        git -C submodules/bike pull origin main  
-        git -C submodules/frontend pull origin main  
-
-        2.2. ***Update remote master repository submodule references:***  
-        git add submodules/*  
-        git commit -m "Updated submodule references to latest commits"  
-        git push origin main  
-
-
+...and setup will happen automatically.
 
 #### *Running the master application:*
 
-- **Run the main application.**  
-python -m src.main  
- 
-    In src.main.py under the "if __name__ == "__ main __"" block you can change Main(use_submodules) to True if you prefer using the /submodules folder instead of the /repositories folder.  
-    
-    You can also change main.run(skip_setup) to True if you want to skip setting up backend and bike (hivemind server), e.g. because you have already done so. This saves time when restarting the Main application.
+- **Run using the main module.**  
+    When we run using the main module we can select which branch (and commit hash) we want to use for each repository.
+
+    We can also select a simulation speed factor. If the simulation speed factor is set at 1000 then the bikes will travel at 2 000 km/h (since the default speed is 20 km/h). 
+
+    We can also choose if we want to rebuild when we run the system. If rebuild is True then we will pull the latest changes for each repo, though branch and commit hash settings will still apply. The frontend will also rebuild (npm install + npm build).
+
+    At the bottom we set SIMULATION to True or False depending if we want to run the simulation along with the regular services (database, api, frontend, bike). 
+
+    ```python
+    python -m src.main
+    ```
+
+    ```python
+    # src/main.py
+
+    if __name__ == "__main__":
+        main = Main(
+            use_submodules=False,
+            backend_branch='main',
+            backend_commit=None,
+            frontend_branch='main',
+            frontend_commit=None,
+            bike_branch='main',
+            bike_commit=None
+        )
+
+        options = {
+            "simulation_speed_factor": 1000.0,
+            "rebuild": True,
+            "open_chrome_tabs": False
+            }
+
+        SIMULATION = True
+
+        if SIMULATION:
+            main.simulate(**options)
+        if not SIMULATION:
+            main.run(**options)
+
+    # python -m src.main
+    ```
+
+- **Run using the Makefile commands.**  
+    This option only works if you already have setup the master environment setup. If not then you can use:
+
+    ```python
+    python -m src.setup._venv
+    ```
+
+    This essentially creates a virtual environment and installs dependencies for the master repository.
+
+    Makefile commands are just abbreviated docker-compose commands. The up commands are:
+
+    ```python
+    # Running in separate terminals
+    make db
+    make api
+    make bike
+    make frontend
+    make simulation
+
+    # Running in one terminal
+    make main # db, api, bike, frontend
+    make all  # db, api, bike, frontend, simulation
+    ```
+
+    If you want to down a given container or group of containers you add "-down" behind the up-command. For example:
+
+
+    ```python
+    # Running in separate terminals
+    make db-down
+    make api-down
+    make bike-down
+    make frontend-down
+    make simulation-down
+
+    # Running in one terminal
+    make main-down # db, api, bike, frontend
+    make all-down  # db, api, bike, frontend, simulation
+    ```
+    You can also do "-logs" for example (make db-logs) if you want to show logs.
+
+    NOTE: Make is included on Linux and Mac systems. If you are using Windows you can install Make first or use the docker-compose commands specified in the Makefile in the root of the master repository.
+    ```python
+    # Makefile
+
+    # e.g.
+    up:
+        docker-compose -f docker-compose.yml up --build db
+        # copy the above line
+    ```
+
+    If you want to change simulation speed factor when running the system using Makefile commands you need to manually change the DEFAULT_SPEED environment of the *bike_hivemind* service in *docker-compose.yml*. Keep in mind that the DEFAULT_SPEED environment variable in docker-compose.yml will update whenever you run the main module (so any manual changes will be overwritten).

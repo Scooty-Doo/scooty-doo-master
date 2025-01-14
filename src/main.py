@@ -101,11 +101,12 @@ class Main:
 
 if __name__ == "__main__":
 
-    SETUP_MASTER_VENV = True
-
-    from .setup._venv import Venv
-    if SETUP_MASTER_VENV:
-        Venv.setup_master()
+# NOTE: Master setup happens automatically every time (see top of this module).
+#    SETUP_MASTER_VENV = True
+#
+#    from .setup._venv import Venv
+#    if SETUP_MASTER_VENV:
+#        Venv.setup_master()
 
     main = Main(
         use_submodules=False,
