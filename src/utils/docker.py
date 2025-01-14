@@ -10,6 +10,7 @@ from .directory import Directory
 ROOT_DIR = Directory.root()
 DOCKER_COMPOSE_FILENAME = "docker-compose.yml"
 DOCKER_COMPOSE_RESET_FILENAME = "docker-compose.reset.yml"
+DOCKER_COMPOSE_SIMULATION_FILENAME = "docker-compose.simulation.yml"
 
 class Docker:
     class Compose:
@@ -130,7 +131,10 @@ class Docker:
         class Environment:
             @staticmethod
             def set(service, variable, value):
-                docker_compose_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_FILENAME)
+                if service == "simulation":
+                    docker_compose_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_SIMULATION_FILENAME)
+                else:
+                    docker_compose_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_FILENAME)
                 backup_file = docker_compose_file + ".backup"
                 if not os.path.exists(docker_compose_file):
                     raise FileNotFoundError(f"{docker_compose_file} does not exist.")
@@ -152,13 +156,21 @@ class Docker:
                 print(f"Updated '{variable}' for service '{service}' to '{value}' in {docker_compose_file}.")
 
             @staticmethod
-            def reset():
-                docker_compose_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_FILENAME)
-                reset_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_RESET_FILENAME)
-                if not os.path.exists(reset_file):
-                    raise FileNotFoundError(f"{reset_file} does not exist.")
-                shutil.copyfile(reset_file, docker_compose_file)
-                print(f"Reset Docker Compose file to {reset_file}.")
+            def reset(simulation=False):
+                if not simulation:
+                    docker_compose_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_FILENAME)
+                    reset_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_RESET_FILENAME)
+                    if not os.path.exists(reset_file):
+                        raise FileNotFoundError(f"{reset_file} does not exist.")
+                    shutil.copyfile(reset_file, docker_compose_file)
+                    print(f"Reset Docker Compose file to {reset_file}.")
+                if simulation:
+                    docker_compose_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_SIMULATION_FILENAME)
+                    reset_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_RESET_FILENAME)
+                    if not os.path.exists(reset_file):
+                        raise FileNotFoundError(f"{reset_file} does not exist.")
+                    shutil.copyfile(reset_file, docker_compose_file)
+                    print(f"Reset Docker Compose file to {reset_file}.")
 
     class Container:
         @staticmethod

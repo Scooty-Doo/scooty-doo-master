@@ -20,11 +20,11 @@ class Get:
             'Authorization': f'Bearer {self.token}',
         }
 
-    async def _get_data(self, url, filename, save_to_json):
+    async def _get_data(self, url, filename, save_to_json, limit=9999):
         """Generic method to GET data asynchronously."""
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.get(url, headers=self.headers, timeout=20.0)
+                response = await client.get(url, params={"limit": limit}, headers=self.headers, timeout=20.0)
                 response.raise_for_status()
                 result = _extract_data_from_response_json(response.json())
                 if save_to_json:
@@ -33,22 +33,22 @@ class Get:
             except httpx.RequestError as e:
                 raise httpx.RequestError(f"Failed to request {filename[:-5]}: {e}") from e
 
-    async def bikes(self, save_to_json=True):
+    async def bikes(self, save_to_json=True, limit=9999):
         url = _url(self.url, self.endpoints.Bikes.get_all)
-        return await self._get_data(url, 'bikes.json', save_to_json)
+        return await self._get_data(url, 'bikes.json', save_to_json, limit)
 
-    async def trips(self, save_to_json=True):
+    async def trips(self, save_to_json=True, limit=9999):
         url = _url(self.url, self.endpoints.Trips.get_all)
-        return await self._get_data(url, 'trips.json', save_to_json)
+        return await self._get_data(url, 'trips.json', save_to_json, limit)
 
-    async def users(self, save_to_json=True):
+    async def users(self, save_to_json=True, limit=9999):
         url = _url(self.url, self.endpoints.Users.get_all)
-        return await self._get_data(url, 'users.json', save_to_json)
+        return await self._get_data(url, 'users.json', save_to_json, limit)
 
-    async def zones(self, save_to_json=True):
+    async def zones(self, save_to_json=True, limit=9999):
         url = _url(self.url, self.endpoints.Zones.get_all)
-        return await self._get_data(url, 'zones.json', save_to_json)
+        return await self._get_data(url, 'zones.json', save_to_json, limit)
 
-    async def zone_types(self, save_to_json=True):
+    async def zone_types(self, save_to_json=True, limit=9999):
         url = _url(self.url, self.endpoints.Zones.get_types)
-        return await self._get_data(url, 'zone_types.json', save_to_json)
+        return await self._get_data(url, 'zone_types.json', save_to_json, limit)

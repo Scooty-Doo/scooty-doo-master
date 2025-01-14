@@ -9,6 +9,7 @@ from shapely.geometry import Point
 # TODO: Make Get class async and await the requests in the main function.
 
 TOKEN = os.getenv("TOKEN")
+LIMIT = os.getenv("BIKE_LIMIT")
 
 async def main():
     end_condition = False
@@ -20,7 +21,7 @@ async def main():
 
         get = Get()
         outgoing = Outgoing(token=TOKEN)
-        bikes = await get.bikes(save_to_json=False)
+        bikes = await get.bikes(save_to_json=False, limit=LIMIT)
 
         bikes = Extract.Bikes.available(bikes)
         assert len(bikes) > 0, "No bikes available, after extraction, all are probably false."
@@ -29,13 +30,13 @@ async def main():
 
         assert len(bike_ids) == len(positions), f"Length of bike_ids: {len(bike_ids)} != Length of positions: {len(positions)}" + f"example bike: {bikes[0]}"
 
-        users = await get.users(save_to_json=False)
+        users = await get.users(save_to_json=False, limit=LIMIT)
         users = Extract.Users.with_money(users)
         assert len(users) > 0, "No users with money."
         assert users[0]['attributes']['balance'] > 0.0, "First user has no money."
         user_ids = Extract.User.ids(users)
 
-        trips = await get.trips(save_to_json=False)
+        trips = await get.trips(save_to_json=False, limit=LIMIT)
 
         bike_count = len(bike_ids)
         print(f"Number of bikes: {bike_count}")

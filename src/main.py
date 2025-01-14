@@ -16,6 +16,7 @@ from .utils.directory import Directory
 from .utils.docker import Docker
 
 BIKE_SERVICE_NAME = os.getenv("BIKE_CONTAINER")
+SIMULATION_SERVICE_NAME = os.getenv("SIMULATION_CONTAINER")
 
 LOGS_DIR = Directory.logs()
 os.makedirs(LOGS_DIR, exist_ok=True)
@@ -82,22 +83,29 @@ class Main:
             ports.append(os.getenv("FRONTEND_PORT"))
         Chrome.Open.window(*ports)
 
-    def _run(self, simulation=True, simulation_speed_factor=1.0, rebuild=False, open_chrome_tabs=False):
+    def _run(self, simulation=True, simulation_speed_factor=1.0, rebuild=False, open_chrome_tabs=False, bike_limit=9999):
+        if simulation_speed_factor == 1.0 or (bike_limit == 9999 or bike_limit is None):
+            Docker.Compose.Environment.reset(simulation=False)
+        if bike_limit == 9999 or bike_limit is None:
+            Docker.Compose.Environment.reset(simulation=True)
         if simulation_speed_factor != 1.0:
             default_speed_kmh = 20.0
             simulation_speed_kmh = default_speed_kmh * simulation_speed_factor
             Docker.Compose.Environment.set(BIKE_SERVICE_NAME, "DEFAULT_SPEED", int(simulation_speed_kmh))
-        if simulation_speed_factor == 1.0:
-            Docker.Compose.Environment.reset()
+        if bike_limit != 9999 and bike_limit is not None:
+            Docker.Compose.Environment.set(BIKE_SERVICE_NAME, "BIKE_LIMIT", bike_limit)
+            Docker.Compose.Environment.set(SIMULATION_SERVICE_NAME, "BIKE_LIMIT", bike_limit)
+
         self._setup_master(simulation, rebuild)
+
         if open_chrome_tabs:
             self._open_chrome_tabs(bikes=True, frontend=True)
 
-    def run(self, simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False):
-        self._run(simulation=False, simulation_speed_factor=simulation_speed_factor, rebuild=rebuild, open_chrome_tabs=open_chrome_tabs)
+    def run(self, simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False, bike_limit=9999):
+        self._run(simulation=False, simulation_speed_factor=simulation_speed_factor, rebuild=rebuild, open_chrome_tabs=open_chrome_tabs, bike_limit=bike_limit)
 
-    def simulate(self, simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False):
-        self._run(simulation=True, simulation_speed_factor=simulation_speed_factor, rebuild=rebuild, open_chrome_tabs=open_chrome_tabs)
+    def simulate(self, simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False, bike_limit=9999):
+        self._run(simulation=True, simulation_speed_factor=simulation_speed_factor, rebuild=rebuild, open_chrome_tabs=open_chrome_tabs, bike_limit=bike_limit)
 
 if __name__ == "__main__":
 
@@ -120,6 +128,7 @@ if __name__ == "__main__":
 
     options = {
         "simulation_speed_factor": 1000.0,
+        "bike_limit": 9999, # 9999 or None for no limit
         "rebuild": True,
         "open_chrome_tabs": False
         }

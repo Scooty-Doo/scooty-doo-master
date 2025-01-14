@@ -59,6 +59,8 @@ services:
       BACKEND_URL: 'http://api:8000/'
       TOKEN: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMCIsInNjb3BlcyI6WyJhZG1pbiJdfQ.ARAUHRnbeLFiTxpg9_xv5iPWtaA-u_o9GXHRwx3zlGs'
       DEFAULT_SPEED: 20
+      INIT_BIKES_REMOTELY: "true"
+      BIKE_LIMIT: 9999
     ports:
       - "8001:8001"
     networks:
