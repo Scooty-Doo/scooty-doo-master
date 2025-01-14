@@ -2,10 +2,13 @@ from src.data.get import Get
 from src.utils.extract import Extract
 from ._outgoing import Outgoing
 import asyncio
+import os
 from time import time
 from shapely.geometry import Point
 
 # TODO: Make Get class async and await the requests in the main function.
+
+TOKEN = os.getenv("TOKEN")
 
 async def main():
     end_condition = False
@@ -16,7 +19,7 @@ async def main():
         await asyncio.sleep(wait_for_boot)
 
         get = Get()
-        outgoing = Outgoing(token="secret")
+        outgoing = Outgoing(token=TOKEN)
         bikes = await get.bikes(save_to_json=False)
 
         bikes = Extract.Bikes.available(bikes)

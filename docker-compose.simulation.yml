@@ -6,7 +6,7 @@ services:
     container_name: simulation_app
     environment:
       - BACKEND_URL=http://api:8000/
-      - TOKEN=${TOKEN}
+      - TOKEN='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMCIsInNjb3BlcyI6WyJhZG1pbiJdfQ.ARAUHRnbeLFiTxpg9_xv5iPWtaA-u_o9GXHRwx3zlGs'
     networks:
       - scooty-web
     depends_on:

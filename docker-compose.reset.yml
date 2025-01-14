@@ -57,7 +57,7 @@ services:
     container_name: bike_hivemind
     environment:
       BACKEND_URL: 'http://api:8000/'
-      TOKEN: 'secret'
+      TOKEN: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMCIsInNjb3BlcyI6WyJhZG1pbiJdfQ.ARAUHRnbeLFiTxpg9_xv5iPWtaA-u_o9GXHRwx3zlGs'
       DEFAULT_SPEED: 20
     ports:
       - "8001:8001"
