@@ -36,8 +36,10 @@ services:
     - api
     environment:
       BACKEND_URL: http://api:8000/
+      BIKE_LIMIT: 100
       DEFAULT_SPEED: 20000
-      TOKEN: secret
+      INIT_BIKES_REMOTELY: 'true'
+      TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMCIsInNjb3BlcyI6WyJhZG1pbiJdfQ.ARAUHRnbeLFiTxpg9_xv5iPWtaA-u_o9GXHRwx3zlGs
     networks:
     - scooty-web
     ports:
