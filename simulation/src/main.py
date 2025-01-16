@@ -3,6 +3,7 @@ from src.utils.extract import Extract
 from ._outgoing import Outgoing
 import asyncio
 import os
+import jwt
 from time import time
 from shapely.geometry import Point
 
@@ -10,6 +11,7 @@ from shapely.geometry import Point
 
 TOKEN = os.getenv("TOKEN")
 LIMIT = os.getenv("BIKE_LIMIT")
+JWT_SECRET = os.getenv("JWT_SECRET")
 
 async def main():
     end_condition = False
@@ -52,29 +54,30 @@ async def main():
             
             trips = []
             for trip_index in range(max_trips):
+                token = jwt.encode({"sub": user_ids[trip_index], "scopes": ["user"]}, JWT_SECRET, "HS256")
                 user_id = user_ids[trip_index]
                 bike_id = bike_ids[trip_index]
                 trip_id = trip_ids[trip_index]
                 linestring = linestrings[trip_index]
-                trips.append((user_id, bike_id, trip_id, linestring))
+                trips.append((user_id, token, bike_id, trip_id, linestring))
             return trips
 
         unique_trips = generate_unique_trips(user_ids, bike_ids, trips)
         print(f"Number of unique trips: {len(list(unique_trips))}")
 
+            
         async def start_trips(unique_trips):
             successful_start_trips = 0
             unsuccessful_start_trips = 0
             started_trips = []
-            for user_id, bike_id, trip_id, linestring in unique_trips:
+            for user_id, token, bike_id, trip_id, linestring in unique_trips:
                 print(f"Attempting to start trip for user {user_id} on bike {bike_id}")
-                try: 
-                    response_json = await outgoing.trips.start_trip(user_id=user_id, bike_id=bike_id)
-                    #print(response_json)
+                try:
+                    response_json = await outgoing.trips.start_trip(token=token, bike_id=bike_id, user_id=user_id)
                     #response_json = {'data': {'id': 665303446870102746, 'type': 'trips', 'attributes': {'start_position': 'POINT(12.969383 55.586522)', 'end_position': None, 'path_taken': None, 'start_time': '2025-01-09T21:18:22.473747Z', 'end_time': None, 'start_fee': None, 'time_fee': None, 'end_fee': None, 'total_fee': None, 'created_at': '2025-01-09T21:18:22.473747Z', 'updated_at': '2025-01-09T21:18:22.473747Z'}, 'relationships': {'user': {'data': {'type': 'users', 'id': '652134919185249755'}}, 'bike': {'data': {'type': 'bikes', 'id': '66'}}, 'transaction': None}, 'links': {'self': 'http://api:8000/v1/trips/665303446870102746'}}, 'links': {'self': 'http://api:8000/v1/trips/665303446870102746'}}
                     generated_trip_id = response_json['data']['id']
                     successful_start_trips += 1
-                    started_trips.append((user_id, bike_id, generated_trip_id, linestring))
+                    started_trips.append((user_id, token, bike_id, generated_trip_id, linestring))
                 except Exception as e:
                     print(f"Failed to start trip for {user_id} on {bike_id}: {e.response.status_code}, {e.response.text}")
                     unsuccessful_start_trips += 1
@@ -92,12 +95,12 @@ async def main():
             successful_move_bikes = 0
             unsuccessful_move_bikes = 0
             moved_trips = []
-            for user_id, bike_id, trip_id, linestring in started_trips:
+            for user_id, token, bike_id, trip_id, linestring in started_trips:
                 print(f"Attempting to move bike {bike_id} with user {user_id}")
                 try:
                     await outgoing.bikes.move(bike_id=bike_id, position_or_linestring=linestring)
                     successful_move_bikes += 1
-                    moved_trips.append((user_id, bike_id, trip_id, linestring))
+                    moved_trips.append((user_id, token, bike_id, trip_id, linestring))
                 except Exception as e:
                     print(f"Failed to move bike {bike_id} with user {user_id}: {e}")
                     unsuccessful_move_bikes += 1
@@ -125,11 +128,11 @@ async def main():
                 return sorted(trips_with_duration, key=lambda x: x[-1])
 
             moved_trips_with_duration = []
-            for user_id, bike_id, trip_id, linestring in moved_trips:
+            for user_id, token, bike_id, trip_id, linestring in moved_trips:
                 distance_in_km = _get_distance_in_km(linestring)
                 speed_in_kmh = 1000
                 duration_in_seconds = _get_duration_in_seconds(distance_in_km, speed_in_kmh)
-                moved_trips_with_duration.append((user_id, bike_id, trip_id, linestring, duration_in_seconds))
+                moved_trips_with_duration.append((user_id, token, bike_id, trip_id, linestring, duration_in_seconds))
             return _sort_trips_by_ascending_duration(moved_trips_with_duration)
         
         sorted_moved_trips = get_moved_trips_with_duration(moved_trips)
@@ -138,10 +141,10 @@ async def main():
             successful_end_trips = 0
             unsuccessful_end_trips = 0
             ended_trips = []
-            for user_id, bike_id, trip_id, linestring, duration in moved_trips:
+            for user_id, token, bike_id, trip_id, linestring, duration in moved_trips:
                 print(f"Attempting to end trip for user {user_id} on bike {bike_id}")
                 try:
-                    await outgoing.trips.end_trip(user_id=user_id, bike_id=bike_id, trip_id=trip_id)
+                    await outgoing.trips.end_trip(user_id=user_id, bike_id=bike_id, trip_id=trip_id, token=token)
                     successful_end_trips += 1
                     ended_trips.append((user_id, bike_id, trip_id, linestring))
                 except Exception as e:
@@ -169,7 +172,7 @@ async def main():
                 elapsed_seconds = int(time() - start_time)
                 print(f"Elapsed time: {elapsed_seconds} seconds.")
 
-                moved_trips_with_margin = [(user_id, bike_id, trip_id, linestring, duration + margin_of_error) for user_id, bike_id, trip_id, linestring, duration in moved_trips]
+                moved_trips_with_margin = [(user_id, token, bike_id, trip_id, linestring, duration + margin_of_error) for user_id, token, bike_id, trip_id, linestring, duration in moved_trips]
                 moved_trips_with_margin.extend(failed_trips)
                 failed_trips = []
                 trips_to_end_now, remaining_trips = _filter_trips_by_duration(moved_trips_with_margin, elapsed_seconds)

@@ -2,3 +2,4 @@ requests
 httpx
 asyncio
 shapely==2.0.6
+pyjwt==2.10.1
