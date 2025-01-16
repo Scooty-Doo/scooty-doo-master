@@ -30,9 +30,6 @@ async def main():
         assert len(bike_ids) == len(positions), f"Length of bike_ids: {len(bike_ids)} != Length of positions: {len(positions)}" + f"example bike: {bikes[0]}"
 
         users = await get.users(save_to_json=False, limit=LIMIT)
-        users = Extract.Users.with_money(users)
-        assert len(users) > 0, "No users with money."
-        assert users[0]['attributes']['balance'] > 0.0, "First user has no money."
         user_ids = Extract.User.ids(users)
 
         trips = await get.trips(save_to_json=False, limit=LIMIT)
@@ -79,7 +76,7 @@ async def main():
                     successful_start_trips += 1
                     started_trips.append((user_id, token, bike_id, generated_trip_id, linestring))
                 except Exception as e:
-                    print(f"Failed to start trip for {user_id} on {bike_id}: {e.response.status_code}, {e.response.text}")
+                    print(f"Failed to start trip for {user_id} on {bike_id}: {e}")
                     unsuccessful_start_trips += 1
             return successful_start_trips, unsuccessful_start_trips, started_trips
 
