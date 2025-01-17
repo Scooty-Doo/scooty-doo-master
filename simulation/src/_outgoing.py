@@ -38,7 +38,7 @@ class Trips:
                 response = await client.post(url, headers={
                             'Content-Type': 'application/json',
                             'Authorization': f'Bearer {token}',
-                }, data=json.dumps(payload), timeout=20.0)
+                }, data=json.dumps(payload))
                 response.raise_for_status()
                 print(f"Succesfully started trip for user {user_id} on bike {bike_id}")
                 return response.json()
@@ -56,7 +56,7 @@ class Trips:
                 response = await client.patch(url, headers={
                             'Content-Type': 'application/json',
                             'Authorization': f'Bearer {token}',
-                }, data=json.dumps(payload), timeout=10.0)
+                }, data=json.dumps(payload))
                 response.raise_for_status()
                 print(f"Succesfully ended trip for user {user_id} on bike {bike_id}")
                 return response.json()
@@ -77,7 +77,7 @@ class Bikes:
         }
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(url, params={"bike_id": bike_id}, headers=self.headers, data=json.dumps(payload), timeout=10.0)
+                response = await client.post(url, params={"bike_id": bike_id}, headers=self.headers, data=json.dumps(payload))
                 response.raise_for_status()
                 print(f"Succesfully moved bike {bike_id}")
                 return response.json()
