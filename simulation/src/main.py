@@ -12,6 +12,7 @@ from shapely.geometry import Point
 TOKEN = os.getenv("TOKEN")
 LIMIT = os.getenv("BIKE_LIMIT")
 JWT_SECRET = os.getenv("JWT_SECRET")
+TRIPS_LIMIT = int(os.getenv("TRIPS_LIMIT"))
 
 async def main():
     end_condition = False
@@ -62,7 +63,9 @@ async def main():
         unique_trips = generate_unique_trips(user_ids, bike_ids, trips)
         print(f"Number of unique trips: {len(list(unique_trips))}")
 
-            
+        print(f"Simulating: {TRIPS_LIMIT} trips")
+        unique_trips = unique_trips[:TRIPS_LIMIT]
+
         async def start_trips(unique_trips):
             successful_start_trips = 0
             unsuccessful_start_trips = 0
@@ -75,6 +78,7 @@ async def main():
                     generated_trip_id = response_json['data']['id']
                     successful_start_trips += 1
                     started_trips.append((user_id, token, bike_id, generated_trip_id, linestring))
+                    await asyncio.sleep(0.001)
                 except Exception as e:
                     print(f"Failed to start trip for {user_id} on {bike_id}: {e}")
                     unsuccessful_start_trips += 1
@@ -98,6 +102,7 @@ async def main():
                     await outgoing.bikes.move(bike_id=bike_id, position_or_linestring=linestring)
                     successful_move_bikes += 1
                     moved_trips.append((user_id, token, bike_id, trip_id, linestring))
+                    await asyncio.sleep(0.001)
                 except Exception as e:
                     print(f"Failed to move bike {bike_id} with user {user_id}: {e}")
                     unsuccessful_move_bikes += 1
@@ -144,6 +149,7 @@ async def main():
                     await outgoing.trips.end_trip(user_id=user_id, bike_id=bike_id, trip_id=trip_id, token=token)
                     successful_end_trips += 1
                     ended_trips.append((user_id, bike_id, trip_id, linestring))
+                    await asyncio.sleep(0.001)
                 except Exception as e:
                     print(f"Failed to end trip for user {user_id} on bike {bike_id}: {e}")
                     unsuccessful_end_trips += 1
