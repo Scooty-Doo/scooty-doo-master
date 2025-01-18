@@ -9,16 +9,7 @@ services:
     container_name: api
     depends_on:
     - db
-    environment:
-      BIKE_URL: http://bike_hivemind:8001/
-      DATABASE_URL: postgresql+asyncpg://user:pass@db:5432/sddb
-      DEBUG: 'false'
-      ENVIRONMENT: local
-      GITHUB_CLIENT_ID: secretid
-      GITHUB_CLIENT_SECRET: secresecret
-      GITHUB_REDIRECT_URI: http://secret.secret/
-      PROJECT_NAME: scooty-doo
-      USE_MOCKED_BIKE_CALL: 'false'
+    env_file: .env
     links:
     - db:db
     networks:
@@ -34,12 +25,7 @@ services:
     depends_on:
     - db
     - api
-    environment:
-      BACKEND_URL: http://api:8000/
-      BIKE_LIMIT: 100
-      DEFAULT_SPEED: 20000
-      INIT_BIKES_REMOTELY: 'true'
-      TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMCIsInNjb3BlcyI6WyJhZG1pbiJdfQ.ARAUHRnbeLFiTxpg9_xv5iPWtaA-u_o9GXHRwx3zlGs
+    env_file: .env
     networks:
     - scooty-web
     ports:
@@ -47,23 +33,19 @@ services:
     restart: unless-stopped
   db:
     container_name: database-db-1
-    environment:
-      POSTGRES_DB: sddb
-      POSTGRES_PASSWORD: pass
-      POSTGRES_USER: user
+    env_file: .env
     image: postgis/postgis
     networks:
     - scooty-web
     ports:
     - 5432:5432
     restart: always
-    volumes:
-    - pgdata:/var/lib/postgresql/data
   webclient-prod:
     build:
       context: ./repositories/frontend
       dockerfile: ./dockerfiles/prod/Dockerfile
     container_name: scooty-web-prod
+    env_file: .env
     depends_on:
     - api
     networks:
@@ -71,5 +53,14 @@ services:
     ports:
     - 3000:3000
     restart: unless-stopped
-volumes:
-  pgdata: null
+
+  adminer:
+     image: adminer
+     networks:
+       - scooty-web
+     container_name: database-adminer-1
+     restart: always
+     depends_on:
+       - db
+     ports:
+       - "8080:8080"

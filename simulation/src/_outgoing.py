@@ -28,15 +28,17 @@ class Trips:
         self.backend_url = backend_url
         self.headers = headers
 
-    async def start_trip(self, user_id: int, bike_id: int):
+    async def start_trip(self, user_id: int, bike_id: int, token: str):
         url = _url(self.backend_url, "/v1/trips/")
         payload = {
-            "user_id": user_id,
             "bike_id": bike_id
         }
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(url, headers=self.headers, data=json.dumps(payload), timeout=20.0)
+                response = await client.post(url, headers={
+                            'Content-Type': 'application/json',
+                            'Authorization': f'Bearer {token}',
+                }, data=json.dumps(payload))
                 response.raise_for_status()
                 print(f"Succesfully started trip for user {user_id} on bike {bike_id}")
                 return response.json()
@@ -44,15 +46,17 @@ class Trips:
                 print(f"Failed to start trip for url: {url}")
                 raise httpx.RequestError(f"Failed to start trip: {e}") from e
 
-    async def end_trip(self, user_id: int, bike_id: int, trip_id: int):
+    async def end_trip(self, user_id: int, bike_id: int, trip_id: int, token: str):
         url = _url(self.backend_url, f"/v1/trips/{trip_id}")
         payload = {
-            "user_id": user_id,
             "bike_id": bike_id
         }
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.patch(url, headers=self.headers, data=json.dumps(payload), timeout=10.0)
+                response = await client.patch(url, headers={
+                            'Content-Type': 'application/json',
+                            'Authorization': f'Bearer {token}',
+                }, data=json.dumps(payload))
                 response.raise_for_status()
                 print(f"Succesfully ended trip for user {user_id} on bike {bike_id}")
                 return response.json()
@@ -73,7 +77,7 @@ class Bikes:
         }
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(url, params={"bike_id": bike_id}, headers=self.headers, data=json.dumps(payload), timeout=10.0)
+                response = await client.post(url, params={"bike_id": bike_id}, headers=self.headers, data=json.dumps(payload))
                 response.raise_for_status()
                 print(f"Succesfully moved bike {bike_id}")
                 return response.json()
