@@ -129,7 +129,7 @@ if __name__ == "__main__":
     options = {
         "simulation_speed_factor": 1000.0,
         "bike_limit": 100, # 9999 or None for no limit
-        "rebuild": False,
+        "rebuild": True,
         "open_chrome_tabs": False
         }
 
