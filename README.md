@@ -124,3 +124,13 @@ python -m src.main
     - **docker-compose.reset.yml** is the source of truth and is whatever docker-compose.yml is reset to whenever the main module is run with **simulation_speed_factor = 1.0**.
     - **docker-compose.yml** is dynamically updated each time the main module is run. Specifically the DEFAULT_SPEED environment variable for the bike_hivemind service is updated in order to allow the user to set simulation speed factor.
     - **docker-compose.simulation.yml** contains the simulation service. This is used whenever SIMULATION is set to True in the main block of the main module.
+
+# Working order of commands:
+
+```
+docker compose up db
+make api
+make bike
+make frontend
+docker-compose -f docker-compose.yml -f docker-compose.simulation.yml up --build --no-deps simulation
+```

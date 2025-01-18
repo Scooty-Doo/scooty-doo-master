@@ -43,7 +43,16 @@ class Get:
 
     async def users(self, save_to_json=True, limit=9999):
         url = _url(self.url, self.endpoints.Users.get_all)
-        return await self._get_data(url, 'users.json', save_to_json, limit)
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(url, params={"limit": limit, "is_eligable": True}, headers=self.headers, timeout=20.0)
+                response.raise_for_status()
+                result = _extract_data_from_response_json(response.json())
+                if save_to_json:
+                    await File.Save.to_json(data=result, folder=self.data_folder, filename="users.json")
+                return result
+            except httpx.RequestError as e:
+                raise httpx.RequestError(f"Failed to request: {e}") from e
 
     async def zones(self, save_to_json=True, limit=9999):
         url = _url(self.url, self.endpoints.Zones.get_all)
