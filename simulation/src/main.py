@@ -14,11 +14,15 @@ TOKEN = os.getenv("TOKEN")
 LIMIT = os.getenv("BIKE_LIMIT")
 JWT_SECRET = os.getenv("JWT_SECRET")
 TRIPS_LIMIT = int(os.getenv("TRIPS_LIMIT"))
+BATCH_SIZE = int(os.getenv("BATCH_SIZE", "500"))
 
 async def main():
     """Main function to simulate the full application."""
     end_condition = False
     while not end_condition:
+
+        ### SIMULATION SETUP ###
+
         print("Welcome to the Matrix.")
         sim_start_time = int(time())
 
@@ -47,6 +51,8 @@ async def main():
         trip_count = len(trips)
         print(f"Number of trips: {trip_count}")
 
+        ### SIMULATION FUNCTIONS ###
+
         def generate_unique_trips(user_ids, bike_ids, trips):
             """
             Generate unique (user_id, bike_id, trip_id, linestring) trips 
@@ -70,7 +76,8 @@ async def main():
             return trips
 
         unique_trips = generate_unique_trips(user_ids, bike_ids, trips)
-        print(f"Number of unique trips: {len(list(unique_trips))}")
+        total_unique_trips = len(unique_trips)
+        print(f"Number of unique trips: {total_unique_trips}")
 
         print(f"Simulating: {TRIPS_LIMIT} trips")
         unique_trips = unique_trips[:TRIPS_LIMIT]
@@ -93,17 +100,6 @@ async def main():
                     unsuccessful_start_trips += 1
             return successful_start_trips, unsuccessful_start_trips, started_trips
 
-        successful_start_trips, unsuccessful_start_trips, started_trips = await start_trips(unique_trips)
-        print(f"Successfully started {successful_start_trips} trips.")
-        print(f"Failed to start {unsuccessful_start_trips} trips.")
-        if successful_start_trips == 0:
-            print("No trips started successfully.")
-        else:
-            print(
-                f"Percentage of successful trips: "
-                    f"{successful_start_trips / (successful_start_trips + unsuccessful_start_trips) * 100}%")
-        assert successful_start_trips > 0, "No trips started successfully."
-
         async def move_bikes(started_trips):
             """Move bikes along linestrings."""
             successful_move_bikes = 0
@@ -120,14 +116,6 @@ async def main():
                     print(f"Failed to move bike {bike_id} with user {user_id}: {e}")
                     unsuccessful_move_bikes += 1
             return successful_move_bikes, unsuccessful_move_bikes, moved_trips
-
-        successful_move_bikes, unsuccessful_move_bikes, moved_trips = await move_bikes(started_trips)
-        print(f"Successfully moved {successful_move_bikes} bikes.")
-        print(f"Failed to move {unsuccessful_move_bikes} bikes.")
-        print(
-            f"Percentage of successful bikes moved: "
-                f"{successful_move_bikes / (successful_move_bikes + unsuccessful_move_bikes) * 100}%")
-        assert successful_move_bikes > 0, "No bikes moved successfully."
 
         def get_moved_trips_with_duration(moved_trips):
             """Get moved trips with duration in seconds."""
@@ -152,13 +140,11 @@ async def main():
             moved_trips_with_duration = []
             for user_id, token, bike_id, trip_id, linestring in moved_trips:
                 distance_in_km = _get_distance_in_km(linestring)
-                speed_in_kmh = 1000
+                speed_in_kmh = 1000 # NOTE: We are hardcoding here? xD
                 duration_in_seconds = _get_duration_in_seconds(distance_in_km, speed_in_kmh)
                 moved_trips_with_duration.append(
                     (user_id, token, bike_id, trip_id, linestring, duration_in_seconds))
             return _sort_trips_by_ascending_duration(moved_trips_with_duration)
-
-        sorted_moved_trips = get_moved_trips_with_duration(moved_trips)
 
         async def end_trips(moved_trips):
             """End trips for users on bikes."""
@@ -170,7 +156,7 @@ async def main():
                 try:
                     await outgoing.trips.end_trip(user_id=user_id, bike_id=bike_id, trip_id=trip_id, token=token)
                     successful_end_trips += 1
-                    ended_trips.append((user_id, bike_id, trip_id, linestring))
+                    ended_trips.append((user_id, token, bike_id, trip_id, linestring, duration))
                     await asyncio.sleep(0.001)
                 except Exception as e:
                     print(f"Failed to end trip for user {user_id} on bike {bike_id}: {e}")
@@ -236,7 +222,43 @@ async def main():
             print(f"Ended {ended_trip_count} trips successfully after "
                   f"{total_time} seconds and {total_attempts} attempts.")
 
-        await manage_trip_endings(sorted_moved_trips)
+        ### SIMULATION LOOP ###
+
+        num_trips = len(unique_trips)
+        for start_idx in range(0, num_trips, BATCH_SIZE):
+
+            ### BATCH TRIPS ###
+
+            batch_trips = unique_trips[start_idx : start_idx + BATCH_SIZE]
+            print(f"Processing a batch of {len(batch_trips)} trips.")
+
+            ### START TRIPS ###
+
+            successful_start_trips, unsuccessful_start_trips, started_trips = await start_trips(batch_trips)
+            print(f"Successfully started {successful_start_trips} trips.")
+            print(f"Failed to start {unsuccessful_start_trips} trips.")
+            if successful_start_trips == 0:
+                print("No trips started successfully.")
+            else:
+                print(
+                    f"Percentage of successful trips: "
+                        f"{successful_start_trips / (successful_start_trips + unsuccessful_start_trips) * 100}%")
+            assert successful_start_trips > 0, "No trips started successfully."
+
+            ### MOVE BIKES ###
+
+            successful_move_bikes, unsuccessful_move_bikes, moved_trips = await move_bikes(started_trips)
+            print(f"Successfully moved {successful_move_bikes} bikes.")
+            print(f"Failed to move {unsuccessful_move_bikes} bikes.")
+            print(
+                f"Percentage of successful bikes moved: "
+                    f"{successful_move_bikes / (successful_move_bikes + unsuccessful_move_bikes) * 100}%")
+            assert successful_move_bikes > 0, "No bikes moved successfully."
+
+            ### END TRIPS ###
+
+            sorted_moved_trips = get_moved_trips_with_duration(moved_trips)
+            await manage_trip_endings(sorted_moved_trips)
 
         end_condition = True
         sim_elapsed_time = int(time() - sim_start_time)
