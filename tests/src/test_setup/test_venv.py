@@ -1,3 +1,5 @@
+# pylint: disable=protected-access
+
 import subprocess
 import os
 from unittest.mock import patch

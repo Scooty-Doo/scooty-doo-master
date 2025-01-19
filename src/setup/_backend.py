@@ -1,3 +1,5 @@
+# pylint: disable=protected-access
+
 import sys
 import os
 from ..utils.docker import Docker

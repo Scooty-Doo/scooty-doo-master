@@ -1,3 +1,5 @@
+# pylint: disable=protected-access
+
 import sys
 from ._environment import Environment
 from ..utils.directory import Directory

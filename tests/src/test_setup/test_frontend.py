@@ -1,3 +1,5 @@
+# pylint: disable=protected-access
+
 from unittest.mock import patch
 import pytest
 from src.setup._frontend import Frontend

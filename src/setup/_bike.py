@@ -1,3 +1,5 @@
+# pylint: disable=protected-access
+
 import sys
 from ._venv import Venv
 from ._environment import Environment

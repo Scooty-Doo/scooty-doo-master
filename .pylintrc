@@ -447,7 +447,7 @@ disable=raw-checker-failed,
         R0913,  # Too many arguments
         R0917,  # Too many positional arguments
         R0903,  # Too few public methods
-        W0212,  # Access to a protected member
+        # W0212,  # Access to a protected member
         W0718,  # Catching too general exception Exception (broad-exception-caught)
         W0719   # Raising too general exception: Exception (broad-exception-raised)
 
