@@ -118,6 +118,7 @@ class TestUseSubmodules:
 @pytest.mark.usefixtures("clean_environ")
 class TestRunMethod:
     """Tests for the _run method."""
+
     @pytest.fixture(autouse=True)
     def setup_env(self):
         """Fixture to set the environment variables."""
@@ -130,8 +131,7 @@ class TestRunMethod:
     @patch("src.main.Docker.Compose.Environment.reset")
     @patch("src.main.Docker.Compose.Environment.set")
     def test_run_default(
-        self, mock_env_set, mock_env_reset, mock_open_tabs, mock_setup_master
-    ):
+        self, mock_env_set, mock_env_reset, mock_open_tabs, mock_setup_master):
         """Test running the system with default parameters."""
         main = Main(use_submodules=False)
         main._run()
@@ -142,12 +142,14 @@ class TestRunMethod:
         mock_setup_master.assert_called_once_with(True, False)
         mock_open_tabs.assert_not_called()
 
+    @patch("src.main.BIKE_SERVICE_NAME", "bike_hivemind")
+    @patch("src.main.SIMULATION_SERVICE_NAME", "simulation")
     @patch("src.main.Main._setup_master")
     @patch("src.main.Main._open_chrome_tabs")
     @patch("src.main.Docker.Compose.Environment.reset")
     @patch("src.main.Docker.Compose.Environment.set")
     def test_run_custom_speed_and_bike_limit(
-        self, mock_env_set, mock_env_reset, mock_open_tabs, mock_setup_master):
+        self, mock_env_set, mock_env_reset, mock_open_tabs, mock_setup_master, *_):
         """Test running the system with custom speed and bike limit."""
         main = Main(use_submodules=False)
         main._run(simulation_speed_factor=2.0, bike_limit=100)
@@ -155,8 +157,7 @@ class TestRunMethod:
         expected_calls = [
             call("bike_hivemind", "DEFAULT_SPEED", 40),
             call("bike_hivemind", "BIKE_LIMIT", 100),
-            call("simulation", "BIKE_LIMIT", 100),
-        ]
+            call("simulation", "BIKE_LIMIT", 100),]
         assert mock_env_set.call_count == 3
         mock_env_set.assert_has_calls(expected_calls, any_order=True)
         mock_setup_master.assert_called_once_with(True, False)
