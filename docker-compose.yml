@@ -2,13 +2,31 @@ networks:
   scooty-web:
     driver: bridge
 services:
+  adminer:
+    container_name: database-adminer-1
+    depends_on:
+      db:
+        condition: service_healthy
+    image: adminer
+    networks:
+    - scooty-web
+    ports:
+    - 8080:8080
+    restart: always
   api:
     build:
       context: ./repositories/backend
       dockerfile: Dockerfile
     container_name: api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     depends_on:
-    - db
+      db:
+        condition: service_healthy
     env_file: .env
     links:
     - db:db
@@ -23,8 +41,10 @@ services:
       dockerfile: Dockerfile
     container_name: bike_hivemind
     depends_on:
-    - db
-    - api
+      db:
+        condition: service_healthy
+      api:
+        condition: service_healthy
     env_file: .env
     networks:
     - scooty-web
@@ -34,6 +54,12 @@ services:
   db:
     container_name: database-db-1
     env_file: .env
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user", "-d", "sddb", "-h", "127.0.0.1"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     image: postgis/postgis
     networks:
     - scooty-web
@@ -45,22 +71,11 @@ services:
       context: ./repositories/frontend
       dockerfile: ./dockerfiles/prod/Dockerfile
     container_name: scooty-web-prod
-    env_file: .env
     depends_on:
     - api
+    env_file: .env
     networks:
     - scooty-web
     ports:
     - 3000:3000
     restart: unless-stopped
-
-  adminer:
-     image: adminer
-     networks:
-       - scooty-web
-     container_name: database-adminer-1
-     restart: always
-     depends_on:
-       - db
-     ports:
-       - "8080:8080"
