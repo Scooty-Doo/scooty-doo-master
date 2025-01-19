@@ -1,12 +1,12 @@
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, too-many-locals, too-many-statements, import-error, no-name-in-module, disable=unused-variable
 
 import asyncio
 import os
 from time import time
-import jwt # pylint: disable=import-error
-from shapely.geometry import Point # pylint: disable=import-error
-from src.data.get import Get # pylint: disable=import-error, no-name-in-module
-from src.utils.extract import Extract # pylint: disable=import-error, no-name-in-module
+import jwt
+from shapely.geometry import Point
+from src.data.get import Get
+from src.utils.extract import Extract
 from ._outgoing import Outgoing
 
 TOKEN = os.getenv("TOKEN")
@@ -14,7 +14,7 @@ LIMIT = os.getenv("BIKE_LIMIT")
 JWT_SECRET = os.getenv("JWT_SECRET")
 TRIPS_LIMIT = int(os.getenv("TRIPS_LIMIT"))
 
-async def main(): # pylint: disable=too-many-locals, too-many-statements
+async def main():
     end_condition = False
     while not end_condition:
         print("Welcome to the Matrix.")
@@ -75,7 +75,7 @@ async def main(): # pylint: disable=too-many-locals, too-many-statements
             successful_start_trips = 0
             unsuccessful_start_trips = 0
             started_trips = []
-            for user_id, token, bike_id, trip_id, linestring in unique_trips: # pylint: disable=unused-variable
+            for user_id, token, bike_id, trip_id, linestring in unique_trips:
                 print(f"Attempting to start trip for user {user_id} on bike {bike_id}")
                 try:
                     response_json = await outgoing.trips.start_trip(token=token, bike_id=bike_id, user_id=user_id)
@@ -152,7 +152,7 @@ async def main(): # pylint: disable=too-many-locals, too-many-statements
             successful_end_trips = 0
             unsuccessful_end_trips = 0
             ended_trips = []
-            for user_id, token, bike_id, trip_id, linestring, duration in moved_trips: # pylint: disable=unused-variable
+            for user_id, token, bike_id, trip_id, linestring, duration in moved_trips:
                 print(f"Attempting to end trip for user {user_id} on bike {bike_id}")
                 try:
                     await outgoing.trips.end_trip(user_id=user_id, bike_id=bike_id, trip_id=trip_id, token=token)
@@ -169,7 +169,7 @@ async def main(): # pylint: disable=too-many-locals, too-many-statements
             remaining_trips = [trip for trip in moved_trips if trip[-1] > elapsed_seconds]
             return trips_to_end_now, remaining_trips
 
-        async def manage_trip_endings(moved_trips): # pylint: disable=too-many-locals
+        async def manage_trip_endings(moved_trips):
             start_time = time()
             active_trip_count = len(moved_trips)
             ended_trip_count = 0

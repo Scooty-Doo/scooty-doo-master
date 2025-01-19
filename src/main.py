@@ -1,3 +1,5 @@
+# pylint: disable=wrong-import-position
+
 import os
 import logging
 import platform
@@ -5,13 +7,13 @@ import platform
 from dotenv import load_dotenv
 load_dotenv()
 
-from .setup.setup import Setup # pylint: disable=wrong-import-position
-from .data.get import Get # pylint: disable=wrong-import-position
-from .utils.settings import Settings # pylint: disable=wrong-import-position
-from .utils.repositories import Repositories # pylint: disable=wrong-import-position
-from .utils.chrome import Chrome # pylint: disable=wrong-import-position
-from .utils.directory import Directory # pylint: disable=wrong-import-position
-from .utils.docker import Docker # pylint: disable=wrong-import-position
+from .setup.setup import Setup
+from .data.get import Get
+from .utils.settings import Settings
+from .utils.repositories import Repositories
+from .utils.chrome import Chrome
+from .utils.directory import Directory
+from .utils.docker import Docker
 
 BIKE_SERVICE_NAME = os.getenv("BIKE_CONTAINER")
 SIMULATION_SERVICE_NAME = os.getenv("SIMULATION_CONTAINER")
@@ -156,4 +158,5 @@ if __name__ == "__main__": # pragma: no cover
 # python -m pytest --cov=src --cov-report=html
 # python -m pytest --cov=src --cov-report=term-missing
 
-# NOTE: repositories/backend/start.sh may need to be "LF" line endings for Docker to run the script.
+# NOTE: repositories/backend/start.sh may need to be "LF"
+# line endings for Docker to run the script.
