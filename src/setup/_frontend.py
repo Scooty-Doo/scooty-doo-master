@@ -53,11 +53,3 @@ class Frontend:
         Frontend.Docker.status()
         Frontend.Docker.logs()
         print("Hivemind Bike server started.")
-
-if __name__ == "__main__":
-    frontend = Frontend()
-    frontend.setup()
-    frontend.run()
-    frontend.Docker.status()
-
-# python -m src.setup._frontend

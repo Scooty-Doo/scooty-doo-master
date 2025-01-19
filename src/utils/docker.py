@@ -148,12 +148,15 @@ class Docker:
                 service = services[service]
                 environment = service.get('environment', {})
                 if environment is None or isinstance(environment, list):
-                    raise TypeError(f"Environment for service '{service}' must be a key-value dictionary.")
+                    raise TypeError(
+                        f"Environment for service '{service}' must be a key-value dictionary.")
                 environment[variable] = value
                 service['environment'] = environment
                 with open(docker_compose_file, 'w') as file:
                     yaml.safe_dump(docker_compose, file, default_flow_style=False)
-                print(f"Updated '{variable}' for service '{service}' to '{value}' in {docker_compose_file}.")
+                print(
+                    f"Updated '{variable}' for service '{service}' to \
+                        '{value}' in {docker_compose_file}.")
 
             @staticmethod
             def reset(simulation=False):
@@ -201,7 +204,9 @@ class Docker:
         @staticmethod
         def create(name):
             try:
-                Command.run(["docker", "network", "create", name], asynchronous=False, raise_exception=False)
+                Command.run(
+                    ["docker", "network", "create", name],
+                    asynchronous=False, raise_exception=False)
                 print(f"Network '{name}' created successfully.")
             except Exception as e:
                 print(f"Failed to create network '{name}': {e}")
@@ -243,9 +248,11 @@ class Docker:
                     asynchronous=False,
                     raise_exception=False
                     )
-                print(f"Container '{container}' disconnected from network '{network}' successfully.")
+                print(
+                    f"Container '{container}' disconnected from network '{network}' successfully.")
             except Exception as e:
-                print(f"Failed to disconnect container '{container}' from network '{network}': {e}")
+                print(
+                    f"Failed to disconnect container '{container}' from network '{network}': {e}")
 
         @staticmethod
         def inspect(name):
@@ -319,7 +326,7 @@ class Docker:
                 print(f"Failed to start the Docker Desktop application: {e}")
                 sys.exit(1)
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     #print(f'Docker Desktop is running: {Docker.Desktop.is_running()}')
     #Docker.Desktop.start()
 

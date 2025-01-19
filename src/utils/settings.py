@@ -30,7 +30,7 @@ class Settings:
         token = os.getenv("TOKEN")
         #bike_id = os.getenv("BIKE_ID")
 
-        # TODO: Endpoints need to get the values through parameters
+        # NOTE: Endpoints need to get the values through parameters
         # (convert attribute to method) or environment (if BIKE_ID).
 
         class Bikes:

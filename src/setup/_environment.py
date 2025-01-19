@@ -1,9 +1,6 @@
 import os
 import shutil
-from ..utils.extract import Extract
 from ..utils.directory import Directory
-from ..utils.file import File
-from ..utils.serialize import Serialize
 
 ROOT_DIR = Directory.root()
 ENV_EXAMPLE_DIR = Directory.env_example()
@@ -24,7 +21,8 @@ class Environment:
                     example_env_path = os.path.join(ROOT_DIR, '.env.example')
                     env_path = os.path.join(ROOT_DIR, '.env')
                     if not os.path.exists(example_env_path):
-                        raise FileNotFoundError(f"Example .env file '{example_env_path}' does not exist.")
+                        raise FileNotFoundError(
+                            f"Example .env file '{example_env_path}' does not exist.")
                     if not os.path.exists(env_path):
                         shutil.copyfile(example_env_path, env_path)
 
@@ -35,7 +33,8 @@ class Environment:
                         env_path = os.path.join(ENV_DIR, env_example_file.replace('.example', ''))
                         if not os.path.exists(env_path):
                             shutil.copyfile(env_example_path, env_path)
-                            print(f"Copied '{env_example_path}' to '{env_path}' (replaced if existed).")
+                            print(
+                                f"Copied '{env_example_path}' to '{env_path}' (replaced if existed).")
                         else:
                             print(f"File '{env_path}' already exists. Skipping.")
             _root_env()
@@ -87,8 +86,3 @@ class Environment:
             raise FileNotFoundError(f"Target directory '{target_dir}' does not exist.")
         shutil.copyfile(env_source_path, env_target_path)
         print(f"Copied '{env_source_path}' to '{env_target_path}' (replaced if existed).")
-
-if __name__ == "__main__":
-    Environment.Files._setup()
-
-    # python -m src.setup._environment

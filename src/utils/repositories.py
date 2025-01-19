@@ -100,14 +100,18 @@ class _Submodules:
                 Submodules update to their latest commit in the master repository.
                 """
                 print("Initializing all submodules...")
-                Command.run(["git", "submodule", "update", "--init", "--recursive"], raise_exception=True)
+                Command.run(
+                    ["git", "submodule", "update", "--init", "--recursive"],
+                    raise_exception=True)
 
             def _update_local_submodules():
                 """
                 Updates all submodules to the latest commit on the main branch of each submodule.
                 """
                 print("Updating (pulling) all submodules...")
-                Command.run(["git", "submodule", "foreach", "--recursive", "git", "pull", "origin", "main"], raise_exception=True)
+                Command.run(
+                    ["git", "submodule", "foreach", "--recursive", "git",
+                     "pull", "origin", "main"], raise_exception=True)
 
             _initialize_submodules()
             _update_local_submodules()
@@ -116,13 +120,14 @@ class _Submodules:
         def all(self):
             """
             Deinitialize all submodules.
-            Submodule references (and folders) are kept but their contents are removed from local repository.
+            Submodule references (and folders) are kept but their contents
+            are removed from local repository.
             Remote repositories are not affected.
             """
             print("Deinitializing all submodules...")
             Command.run(["git", "submodule", "deinit", "-f", "--all", ], raise_exception=True)
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     repositories = Repositories()
     repositories.local.get.all()
     #repositories.submodules.get.all()

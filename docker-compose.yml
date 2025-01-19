@@ -2,14 +2,36 @@ networks:
   scooty-web:
     driver: bridge
 services:
+  adminer:
+    container_name: database-adminer-1
+    depends_on:
+      db:
+        condition: service_healthy
+    image: adminer
+    networks:
+    - scooty-web
+    ports:
+    - 8080:8080
+    restart: always
   api:
     build:
       context: ./repositories/backend
       dockerfile: Dockerfile
     container_name: api
     depends_on:
-    - db
+      db:
+        condition: service_healthy
     env_file: .env
+    healthcheck:
+      interval: 5s
+      retries: 3
+      start_period: 10s
+      test:
+      - CMD
+      - curl
+      - -f
+      - http://localhost:8000
+      timeout: 10s
     links:
     - db:db
     networks:
@@ -23,9 +45,14 @@ services:
       dockerfile: Dockerfile
     container_name: bike_hivemind
     depends_on:
-    - db
-    - api
+      api:
+        condition: service_healthy
+      db:
+        condition: service_healthy
     env_file: .env
+    environment:
+      BIKE_LIMIT: 100
+      DEFAULT_SPEED: 20000
     networks:
     - scooty-web
     ports:
@@ -34,6 +61,20 @@ services:
   db:
     container_name: database-db-1
     env_file: .env
+    healthcheck:
+      interval: 5s
+      retries: 3
+      start_period: 10s
+      test:
+      - CMD
+      - pg_isready
+      - -U
+      - user
+      - -d
+      - sddb
+      - -h
+      - 127.0.0.1
+      timeout: 10s
     image: postgis/postgis
     networks:
     - scooty-web
@@ -45,22 +86,13 @@ services:
       context: ./repositories/frontend
       dockerfile: ./dockerfiles/prod/Dockerfile
     container_name: scooty-web-prod
-    env_file: .env
     depends_on:
     - api
+    environment:
+    - REACT_APP_GITHUB_CLIENT_DEV="Ov23liXtZ2oPJjPTkI0E"
+    - REACT_APP_GITHUB_CLIENT="Ov23liXtZ2oPJjPTkI0E"
     networks:
     - scooty-web
     ports:
     - 3000:3000
     restart: unless-stopped
-
-  adminer:
-     image: adminer
-     networks:
-       - scooty-web
-     container_name: database-adminer-1
-     restart: always
-     depends_on:
-       - db
-     ports:
-       - "8080:8080"

@@ -50,7 +50,7 @@ def test_checkout_files_success(mock_run, capfd):
     assert "Successfully checked out files: ['file1.txt', 'file2.txt']" in captured.out
 
 @patch("src.utils.command.Command.run", side_effect=Exception("Checkout error"))
-def test_checkout_files_exception(mock_run, capfd):
+def test_checkout_files_exception(_mock_run, capfd):
     """
     If Command.run raises an exception, it should catch it, print the error, and re-raise.
     """
@@ -59,3 +59,56 @@ def test_checkout_files_exception(mock_run, capfd):
     captured = capfd.readouterr()
     assert "Error checking out files ['some_file.txt']:" in captured.out
     assert "Checkout error" in str(exc.value)
+
+@patch("src.utils.command.Command.run")
+def test_repository_pull_with_commit(mock_run, capfd):
+    Repository.pull("/path/to/repo", force=False, commit="abc123")
+    assert mock_run.call_count == 2
+    args_pull = mock_run.call_args_list[0][0][0]
+    args_reset = mock_run.call_args_list[1][0][0]
+    assert args_pull == ["git", "-C", "/path/to/repo", "pull"]
+    assert args_reset == ["git", "-C", "/path/to/repo", "reset", "--hard", "abc123"]
+    captured = capfd.readouterr()
+    assert "Resetting repository /path/to/repo to commit abc123..." in captured.out
+
+@patch("src.utils.command.Command.run")
+def test_repository_pull_with_force(mock_run):
+    Repository.pull("/path/to/repo", force=True)
+    assert mock_run.call_count == 2
+    args_checkout = mock_run.call_args_list[0][0][0]
+    args_pull = mock_run.call_args_list[1][0][0]
+    assert args_checkout == ["git", "-C", "/path/to/repo",
+                             "checkout", "--",
+                             "package.json", "package-lock.json"]
+    assert args_pull == ["git", "-C", "/path/to/repo", "pull"]
+
+@patch("src.utils.command.Command.run")
+def test_repository_pull_with_force_and_commit(mock_run, capfd):
+    Repository.pull("/path/to/repo", force=True, commit="xyz789")
+    assert mock_run.call_count == 3
+    args_checkout = mock_run.call_args_list[0][0][0]
+    args_pull = mock_run.call_args_list[1][0][0]
+    args_reset = mock_run.call_args_list[2][0][0]
+    assert args_checkout == ["git", "-C", "/path/to/repo",
+                             "checkout", "--", "package.json",
+                             "package-lock.json"]
+    assert args_pull == ["git", "-C", "/path/to/repo", "pull"]
+    assert args_reset == ["git", "-C", "/path/to/repo", "reset", "--hard", "xyz789"]
+    captured = capfd.readouterr()
+    assert "Resetting repository /path/to/repo to commit xyz789..." in captured.out
+
+@patch("src.utils.command.Command.run")
+def test_repository_print_commit_success(mock_run, capfd):
+    mock_run.return_value = "a1b2c3 - Fixing bug"
+    Repository.Print.commit("/path/to/repo")
+    mock_run.assert_called_once_with([
+        "git", "-C", "/path/to/repo", "log", "-1", "--pretty=format:%h - %s"
+    ], raise_exception=True)
+    captured = capfd.readouterr()
+    assert "Commit after pull in /path/to/repo: a1b2c3 - Fixing bug" in captured.out
+
+@patch("src.utils.command.Command.run", side_effect=Exception("Log error"))
+def test_repository_print_commit_exception(_mock_run, capfd):
+    Repository.Print.commit("/path/to/repo")
+    captured = capfd.readouterr()
+    assert "Error retrieving commit info after pull: Log error" in captured.out

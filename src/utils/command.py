@@ -48,14 +48,21 @@ class Command:
                 stderr = subprocess.PIPE
 
             if asynchronous and raise_exception:
-                subprocess.check_call(command, cwd=directory, stdout=stdout, stderr=stderr, env=env, **kwargs)
+                subprocess.check_call(
+                    command, cwd=directory, stdout=stdout, stderr=stderr, env=env, **kwargs)
             if asynchronous and not raise_exception:
-                subprocess.Popen(command, cwd=directory, stdout=stdout, stderr=stderr, env=env, **kwargs)
+                subprocess.Popen(
+                    command, cwd=directory, stdout=stdout, stderr=stderr, env=env, **kwargs)
             if not asynchronous and not raise_exception:
-                subprocess.run(command, cwd=directory, check=raise_exception, stdout=stdout, stderr=stderr, env=env, **kwargs)
+                subprocess.run(
+                    command, cwd=directory, check=raise_exception, stdout=stdout,
+                    stderr=stderr, env=env, **kwargs)
             if not asynchronous and raise_exception:
-                subprocess.run(command, cwd=directory, check=raise_exception, stdout=stdout, stderr=stderr, env=env, **kwargs)
+                subprocess.run(
+                    command, cwd=directory, check=raise_exception, stdout=stdout,
+                    stderr=stderr, env=env, **kwargs)
             print("Command executed successfully.\n")
         except subprocess.CalledProcessError as e:
             print(f"Error: Command '{' '.join(command)}' failed with exit code {e.returncode}")
-            sys.exit(1)
+            if raise_exception:
+                sys.exit(1)

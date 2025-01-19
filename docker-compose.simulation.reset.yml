@@ -4,18 +4,14 @@ services:
       context: ./simulation
       dockerfile: Dockerfile
     container_name: simulation_app
-    environment:
-      BACKEND_URL: http://api:8000/
-      TOKEN: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMCIsInNjb3BlcyI6WyJhZG1pbiJdfQ.ARAUHRnbeLFiTxpg9_xv5iPWtaA-u_o9GXHRwx3zlGs'
-      BIKE_LIMIT: 9999
-    networks:
-      - scooty-web
     depends_on:
-      - bike_hivemind
-      - api
-      - db
-    restart: "no" #unless-stopped # on-failure
-    # Volumes for live code changes during development
+    - bike_hivemind
+    - api
+    - db
+    env_file: .env
+    networks:
+    - scooty-web
+    restart: 'no'
     volumes:
-      - ./simulation/src:/app/simulation/src
-      - ./src:/app/src
+    - ./simulation/src:/app/simulation/src
+    - ./src:/app/src

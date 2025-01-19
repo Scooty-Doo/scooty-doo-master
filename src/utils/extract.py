@@ -35,7 +35,10 @@ class Extract:
 
         @staticmethod
         def routes(trips):
-            """Extracts the route e.g. "LINESTRING(13.06782 55.57786,13.06787 55.57785)" and converts to list of tuples."""
+            """
+            Extracts the route e.g. "LINESTRING(13.06782 55.57786,13.06787 55.57785)"
+            and converts to list of tuples.
+            """
             def _linestring_to_list(linestring):
                 linestring = linestring.replace("LINESTRING(", "").replace(")", "")
                 return [tuple(map(float, point.split())) for point in linestring.split(",")]

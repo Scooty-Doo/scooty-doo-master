@@ -11,13 +11,32 @@ python -m src.setup._venv
 ```
 
 This will setup a virtual environment and install dependencies.
+
+```python
+python -m src.utils.repositories
+```
+
+This will fetch the latest version of all the repositories (backend, frontend, bike) to the /repositories folder.
+
+```python
+python -m src.setup._venv
+```
+
+This will setup the virtual environment for the master repository and install dependencies.
+
+You then activate the venv by running (if using Git Bash for example):
+
+```python
+python -m venv/Scripts/activate
+```
+
 You can also run:
 
 ```python
 python -m src.main
 ```
 
-...and setup will happen automatically.
+...and the three setup steps will happen automatically.
 
 #### *Running the master application:*
 

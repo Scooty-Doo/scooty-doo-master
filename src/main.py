@@ -1,10 +1,7 @@
-from .setup._venv import Venv
-Venv.setup_master()
 import os
 import logging
 import platform
 from dotenv import load_dotenv
-
 load_dotenv()
 
 from .setup.setup import Setup
@@ -66,14 +63,18 @@ class Main:
     def _use_local_repositories(self):
         """Pull repositories to the local repositories folder."""
         os.environ["REPOSITORIES_DIRECTORY"] = Settings.Directory.local_repositories
-        self.repositories.local.get.backend(branch=self.backend_branch, commit=self.backend_commit)
-        self.repositories.local.get.frontend(branch=self.frontend_branch, commit=self.frontend_commit)
-        self.repositories.local.get.bike(branch=self.bike_branch, commit=self.bike_commit)
+        self.repositories.local.get.backend(
+            branch=self.backend_branch, commit=self.backend_commit)
+        self.repositories.local.get.frontend(
+            branch=self.frontend_branch, commit=self.frontend_commit)
+        self.repositories.local.get.bike(
+            branch=self.bike_branch, commit=self.bike_commit)
 
     def _setup_master(self, simulation=False, rebuild=False):
         Setup.master(simulation, rebuild)
 
-    def _open_chrome_tabs(self, bikes=True, frontend=True): # NOTE: Maybe remove due to OS dependency?
+    # NOTE: Maybe remove due to OS dependency?
+    def _open_chrome_tabs(self, bikes=True, frontend=True):
         if not platform.system() == "Windows":
             return
         ports = [os.getenv("BACKEND_PORT") + "/docs"]
@@ -83,7 +84,8 @@ class Main:
             ports.append(os.getenv("FRONTEND_PORT"))
         Chrome.Open.window(*ports)
 
-    def _run(self, simulation=True, simulation_speed_factor=1.0, rebuild=False, open_chrome_tabs=False, bike_limit=9999):
+    def _run(self, simulation=True, simulation_speed_factor=1.0,
+             rebuild=False, open_chrome_tabs=False, bike_limit=9999):
         if simulation_speed_factor == 1.0 or (bike_limit == 9999 or bike_limit is None):
             Docker.Compose.Environment.reset(simulation=False)
         if bike_limit == 9999 or bike_limit is None:
@@ -91,7 +93,9 @@ class Main:
         if simulation_speed_factor != 1.0:
             default_speed_kmh = 20.0
             simulation_speed_kmh = default_speed_kmh * simulation_speed_factor
-            Docker.Compose.Environment.set(BIKE_SERVICE_NAME, "DEFAULT_SPEED", int(simulation_speed_kmh))
+            Docker.Compose.Environment.set(
+                BIKE_SERVICE_NAME, "DEFAULT_SPEED",
+                int(simulation_speed_kmh))
         if bike_limit != 9999 and bike_limit is not None:
             Docker.Compose.Environment.set(BIKE_SERVICE_NAME, "BIKE_LIMIT", bike_limit)
             Docker.Compose.Environment.set(SIMULATION_SERVICE_NAME, "BIKE_LIMIT", bike_limit)
@@ -102,12 +106,16 @@ class Main:
             self._open_chrome_tabs(bikes=True, frontend=True)
 
     def run(self, simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False, bike_limit=9999):
-        self._run(simulation=False, simulation_speed_factor=simulation_speed_factor, rebuild=rebuild, open_chrome_tabs=open_chrome_tabs, bike_limit=bike_limit)
+        self._run(
+            simulation=False, simulation_speed_factor=simulation_speed_factor,
+            rebuild=rebuild, open_chrome_tabs=open_chrome_tabs, bike_limit=bike_limit)
 
     def simulate(self, simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False, bike_limit=9999):
-        self._run(simulation=True, simulation_speed_factor=simulation_speed_factor, rebuild=rebuild, open_chrome_tabs=open_chrome_tabs, bike_limit=bike_limit)
+        self._run(
+            simulation=True, simulation_speed_factor=simulation_speed_factor,
+            rebuild=rebuild, open_chrome_tabs=open_chrome_tabs, bike_limit=bike_limit)
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
 
 # NOTE: Master setup happens automatically every time (see top of this module).
 #    SETUP_MASTER_VENV = True
@@ -147,3 +155,4 @@ if __name__ == "__main__":
 # python -m pytest --cov=src --cov-report=term-missing
 
 # TODO: Bash script to run the program?
+# NOTE: repositories/backend/start.sh needs to be "LF" line endings for Docker to run the script.

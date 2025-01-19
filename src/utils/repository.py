@@ -46,6 +46,8 @@ class Repository:
         def _pull():
             Command.run(["git", "-C", repository_path, "pull"], raise_exception=True)
 
+        _ = branch # NOTE: Unused variable.
+
         if not force:
             _pull()
             if commit:

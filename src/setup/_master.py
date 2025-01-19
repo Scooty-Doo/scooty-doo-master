@@ -77,7 +77,8 @@ class Master:
         Environment.Files.generate()
         Master.Docker.restart(simulation, rebuild)
 
-if __name__ == "__main__":
+# NOTE: Commented out as to not affect coverage.
+if __name__ == "__main__": # pragma: no cover
     Master.setup()
 
     # python -m src.setup._master

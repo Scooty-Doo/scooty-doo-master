@@ -71,17 +71,3 @@ class Backend:
     @staticmethod
     def run():
         Backend._setup()
-
-if __name__ == "__main__":
-    backend = Backend()
-    backend.run()
-    #backend.Docker._down()
-    #backend.Docker._clear()
-
-    # Optional: Uncomment the following line to run tests after setting up the backend
-    #backend.run_tests()
-
-# python -m src.setup._backend
-# NOTE: You need to start Docker Desktop for it to work.
-# TODO: Start Docker Desktop automatically with subprocess if not running?
-# NOTE: .env in repos/backend/.env need to be setup with the correct values (see env/examples folder).

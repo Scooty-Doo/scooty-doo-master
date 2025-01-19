@@ -20,3 +20,17 @@ def test_repo_backend():
     expected = os.path.join(os.getcwd(), \
         Settings.Directory.repositories, Settings.Directory.Name.backend)
     assert Directory.Repo.backend() == expected, "Should build the correct path to the backend repo"
+
+def test_database_path():
+    expected = os.path.join(os.getcwd(),
+                            Settings.Directory.repositories,
+                            Settings.Directory.Name.backend,
+                            Settings.Directory.Name.database)
+    assert Directory.database() == \
+        expected, "Should build the correct path to the database directory"
+
+def test_docker_compose_path():
+    repo_dir = os.path.join(os.getcwd(), 'sample_repo')
+    expected = os.path.join(repo_dir, 'docker-compose.yml')
+    assert Directory.docker_compose(repo_dir) == \
+        expected, "Should build the correct path to docker-compose.yml file"

@@ -62,7 +62,8 @@ class Venv:
         venv_dir = os.path.join(Directory.root(), "venv")
         Venv.setup(venv_dir)
 
-if __name__ == "__main__":
-    Venv.setup_master()
+# NOTE: Commented out as to not affect test coverage.
+# if __name__ == "__main__":
+#     Venv.setup_master()
 
     # python -m src.setup._venv

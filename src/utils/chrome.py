@@ -17,11 +17,3 @@ class Chrome:
                     Command.run([CHROME_EXECUTABLE])
             else:
                 print("If not on Windows, please open Chrome window manually.")
-
-if __name__ == "__main__":
-    import os
-    ports = [os.getenv("BACKEND_PORT"), os.getenv("BIKES_PORT"), os.getenv("FRONTEND_PORT")]
-    print(f"Ports: {ports}")
-    Chrome.Open.window(*ports)
-
-# python -m src.utils.chrome

@@ -2,23 +2,36 @@ networks:
   scooty-web:
     driver: bridge
 services:
+  adminer:
+    container_name: database-adminer-1
+    depends_on:
+      db:
+        condition: service_healthy
+    image: adminer
+    networks:
+    - scooty-web
+    ports:
+    - 8080:8080
+    restart: always
   api:
     build:
       context: ./repositories/backend
       dockerfile: Dockerfile
     container_name: api
     depends_on:
-    - db
-    environment:
-      BIKE_URL: http://bike_hivemind:8001/
-      DATABASE_URL: postgresql+asyncpg://user:pass@db:5432/sddb
-      DEBUG: 'false'
-      ENVIRONMENT: local
-      GITHUB_CLIENT_ID: secretid
-      GITHUB_CLIENT_SECRET: secresecret
-      GITHUB_REDIRECT_URI: http://secret.secret/
-      PROJECT_NAME: scooty-doo
-      USE_MOCKED_BIKE_CALL: 'false'
+      db:
+        condition: service_healthy
+    env_file: .env
+    healthcheck:
+      interval: 5s
+      retries: 3
+      start_period: 10s
+      test:
+      - CMD
+      - curl
+      - -f
+      - http://localhost:8000
+      timeout: 10s
     links:
     - db:db
     networks:
@@ -32,14 +45,14 @@ services:
       dockerfile: Dockerfile
     container_name: bike_hivemind
     depends_on:
-    - db
-    - api
+      api:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    env_file: .env
     environment:
-      BACKEND_URL: http://api:8000/
       BIKE_LIMIT: 100
       DEFAULT_SPEED: 20000
-      INIT_BIKES_REMOTELY: 'true'
-      TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMCIsInNjb3BlcyI6WyJhZG1pbiJdfQ.ARAUHRnbeLFiTxpg9_xv5iPWtaA-u_o9GXHRwx3zlGs
     networks:
     - scooty-web
     ports:
@@ -47,18 +60,27 @@ services:
     restart: unless-stopped
   db:
     container_name: database-db-1
-    environment:
-      POSTGRES_DB: sddb
-      POSTGRES_PASSWORD: pass
-      POSTGRES_USER: user
+    env_file: .env
+    healthcheck:
+      interval: 5s
+      retries: 3
+      start_period: 10s
+      test:
+      - CMD
+      - pg_isready
+      - -U
+      - user
+      - -d
+      - sddb
+      - -h
+      - 127.0.0.1
+      timeout: 10s
     image: postgis/postgis
     networks:
     - scooty-web
     ports:
     - 5432:5432
     restart: always
-    volumes:
-    - pgdata:/var/lib/postgresql/data
   webclient-prod:
     build:
       context: ./repositories/frontend
@@ -66,10 +88,11 @@ services:
     container_name: scooty-web-prod
     depends_on:
     - api
+    environment:
+    - REACT_APP_GITHUB_CLIENT_DEV="Ov23liXtZ2oPJjPTkI0E"
+    - REACT_APP_GITHUB_CLIENT="Ov23liXtZ2oPJjPTkI0E"
     networks:
     - scooty-web
     ports:
     - 3000:3000
     restart: unless-stopped
-volumes:
-  pgdata: null

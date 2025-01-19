@@ -1,7 +1,7 @@
+import subprocess
 from unittest.mock import patch
 import pytest
 from src.utils.dependencies import Dependencies
-import subprocess
 
 @patch("src.utils.dependencies.Command.run")
 def test_dependencies_install_no_upgrade(mock_run):
@@ -10,7 +10,7 @@ def test_dependencies_install_no_upgrade(mock_run):
 
 @patch("src.utils.dependencies.Command.run", \
        side_effect=subprocess.CalledProcessError(1, "pip upgrade"))
-def test_dependencies_upgrade_fail(mock_run):
+def test_dependencies_upgrade_fail(_mock_run):
     """
     coverage for exception in Dependencies.Pip.upgrade
     """
