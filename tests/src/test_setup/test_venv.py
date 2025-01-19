@@ -41,7 +41,7 @@ def test_install_dependencies(mock_install):
        side_effect=subprocess.CalledProcessError(1, "pip install"))
 def test_install_dependencies_fail(_mock_install):
     """
-    coverage for an exception in _install_dependencies
+    Test that _install_dependencies raises SystemExit if Dependencies.install fails.
     """
     with pytest.raises(SystemExit) as exc_info:
         Venv._install_dependencies("/fake/venv")
@@ -55,6 +55,28 @@ def test_get_python_executable_non_windows():
         venv_path = "/fake/venv"
         expected_path = os.path.join(venv_path, "bin", "python")
         assert Venv.get_python_executable(venv_path) == expected_path
+
+@patch("src.setup._venv.Venv._build_venv")
+@patch("src.setup._venv.Venv._install_dependencies")
+def test_setup(mock_install_dependencies, mock_build_venv):
+    """
+    Test the setup method.
+    """
+    venv_path = "/fake/venv"
+    Venv.setup(venv_path)
+    mock_build_venv.assert_called_once_with(venv_path)
+    mock_install_dependencies.assert_called_once_with(venv_path)
+
+@patch("src.setup._venv.Venv.setup")
+@patch("src.setup._venv.Directory.root", return_value="/fake/repo")
+def test_setup_master(mock_directory_root, mock_setup):
+    """
+    Test the setup_master method.
+    """
+    Venv.setup_master()
+    expected_venv_path = os.path.join("/fake/repo", "venv")
+    mock_setup.assert_called_once_with(expected_venv_path)
+    mock_directory_root.assert_called_once()
 
 if __name__ == "__main__": # pragma: no cover
     Venv.setup_master()
