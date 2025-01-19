@@ -1,3 +1,6 @@
+# pylint: disable=protected-access, broad-exception-caught
+"""Module to manage the setup of the frontend server."""
+
 import sys
 from ._environment import Environment
 from ..utils.directory import Directory
@@ -12,11 +15,14 @@ class Frontend:
     """
     @staticmethod
     def _env():
+        """Setup the environment files."""
         Environment.Files.generate(frontend=True)
 
     class Docker:
+        """Class to manage the Docker setup of the frontend server."""
         @staticmethod
         def _build():
+            """Build the frontend Docker image."""
             print("Building the frontend Docker image...")
             try:
                 Docker.Compose.build(REPO_DIR, npm=True, reinstall=True)
@@ -27,6 +33,7 @@ class Frontend:
 
         @staticmethod
         def _start():
+            """Start the frontend Docker container."""
             try:
                 Docker.Compose.up(REPO_DIR, npm=True)
                 print("Frontend Docker container restarted successfully.")
@@ -36,28 +43,24 @@ class Frontend:
 
         @staticmethod
         def status():
+            """Get the status of the frontend Docker container."""
             Docker.Compose.status(REPO_DIR)
 
         @staticmethod
         def logs():
+            """Get the logs of the frontend Docker container."""
             Docker.Compose.logs(REPO_DIR)
 
     @staticmethod
     def setup():
+        """Setup the frontend server."""
         Frontend._env()
         Frontend.Docker._build()
 
     @staticmethod
     def run():
+        """Run the frontend server."""
         Frontend.Docker._start()
         Frontend.Docker.status()
         Frontend.Docker.logs()
         print("Hivemind Bike server started.")
-
-if __name__ == "__main__":
-    frontend = Frontend()
-    frontend.setup()
-    frontend.run()
-    frontend.Docker.status()
-
-# python -m src.setup._frontend

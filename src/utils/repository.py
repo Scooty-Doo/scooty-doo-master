@@ -1,9 +1,15 @@
+# pylint: disable=too-few-public-methods, broad-exception-caught
+"""Module to manage the repository."""
+
 from ..utils.command import Command
 
 class Repository:
+    """Class to manage the repository."""
     class Checkout:
+        """Class to manage the checkout of the repository."""
         @staticmethod
         def files(repository_path, files: list):
+            """Method to checkout specific files in the repository."""
             if not files:
                 print("No files to checkout.")
                 return
@@ -18,12 +24,14 @@ class Repository:
 
     @staticmethod
     def fetch(repository_path):
+        """Fetch the latest changes from the remote repository."""
         Command.run(
             ["git", "-C", repository_path, "fetch"],
             raise_exception=True)
 
     @staticmethod
     def checkout(repository_path, branch):
+        """Checkout the specified branch in the repository."""
         Command.run(
             ["git", "-C", repository_path, "checkout", branch],
             raise_exception=True)
@@ -44,7 +52,10 @@ class Repository:
                 A specific commit hash to pull and reset to. Defaults to None.
         """
         def _pull():
+            """Pull the latest changes from the remote repository."""
             Command.run(["git", "-C", repository_path, "pull"], raise_exception=True)
+
+        _ = branch # NOTE: Unused variable.
 
         if not force:
             _pull()
@@ -73,14 +84,17 @@ class Repository:
 
     @staticmethod
     def clone(repository_url, repository_path, branch=None):
+        """Clone the repository from the specified URL."""
         clone_command = ["git", "clone", repository_url, repository_path]
         if branch:
             clone_command.extend(["-b", branch])
         Command.run(clone_command, raise_exception=True)
 
     class Print:
+        """Class to manage the printing of the repository."""
         @staticmethod
         def commit(repository_path):
+            """Print the commit info of the repository."""
             try:
                 commit_info = Command.run(
                     ["git", "-C", repository_path, "log", "-1", "--pretty=format:%h - %s"],

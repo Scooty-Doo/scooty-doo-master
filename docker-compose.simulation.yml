@@ -9,6 +9,8 @@ services:
     - api
     - db
     env_file: .env
+    environment:
+      BIKE_LIMIT: 100
     networks:
     - scooty-web
     restart: 'no'

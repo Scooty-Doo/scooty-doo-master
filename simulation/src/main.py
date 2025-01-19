@@ -1,13 +1,14 @@
+# pylint: disable=line-too-long, too-many-locals, too-many-statements, import-error, no-name-in-module, disable=unused-variable, broad-exception-caught
+"""Main module for the simulation of the full application."""
+
+import asyncio
+import os
+from time import time
+import jwt
+from shapely.geometry import Point
 from src.data.get import Get
 from src.utils.extract import Extract
 from ._outgoing import Outgoing
-import asyncio
-import os
-import jwt
-from time import time
-from shapely.geometry import Point
-
-# TODO: Make Get class async and await the requests in the main function.
 
 TOKEN = os.getenv("TOKEN")
 LIMIT = os.getenv("BIKE_LIMIT")
@@ -15,6 +16,7 @@ JWT_SECRET = os.getenv("JWT_SECRET")
 TRIPS_LIMIT = int(os.getenv("TRIPS_LIMIT"))
 
 async def main():
+    """Main function to simulate the full application."""
     end_condition = False
     while not end_condition:
         print("Welcome to the Matrix.")
@@ -29,7 +31,9 @@ async def main():
         bike_ids = Extract.Bike.ids(bikes)
         positions = Extract.Bike.positions(bikes)
 
-        assert len(bike_ids) == len(positions), f"Length of bike_ids: {len(bike_ids)} != Length of positions: {len(positions)}" + f"example bike: {bikes[0]}"
+        assert len(bike_ids) == len(positions), \
+            f"Length of bike_ids: {len(bike_ids)} != Length of positions: {len(positions)}" + \
+                f"example bike: {bikes[0]}"
 
         users = await get.users(save_to_json=False, limit=LIMIT)
         user_ids = Extract.User.ids(users)
@@ -44,13 +48,17 @@ async def main():
         print(f"Number of trips: {trip_count}")
 
         def generate_unique_trips(user_ids, bike_ids, trips):
-            """Generate unique (user_id, bike_id, trip_id, linestring) trips where no 'user_id', 'bike_id', or 'trip' repeats."""
+            """
+            Generate unique (user_id, bike_id, trip_id, linestring) trips 
+            where no 'user_id', 'bike_id', or 'trip' repeats.
+            """
             trip_ids = Extract.Trip.ids(trips)
             linestrings = Extract.Trip.routes(trips)
-            assert len(trip_ids) == len(linestrings), f"Length of trip_ids: {len(trip_ids)} != Length of trip_linestrings: {len(linestrings)}"
+            assert len(trip_ids) == len(linestrings), \
+                f"Length of trip_ids: {len(trip_ids)} != Length of trip_linestrings: {len(linestrings)}"
 
             max_trips = min(len(user_ids), len(bike_ids), len(trip_ids))
-            
+
             trips = []
             for trip_index in range(max_trips):
                 token = jwt.encode({"sub": user_ids[trip_index], "scopes": ["user"]}, JWT_SECRET, "HS256")
@@ -68,6 +76,7 @@ async def main():
         unique_trips = unique_trips[:TRIPS_LIMIT]
 
         async def start_trips(unique_trips):
+            """Start trips for users on bikes."""
             successful_start_trips = 0
             unsuccessful_start_trips = 0
             started_trips = []
@@ -75,7 +84,6 @@ async def main():
                 print(f"Attempting to start trip for user {user_id} on bike {bike_id}")
                 try:
                     response_json = await outgoing.trips.start_trip(token=token, bike_id=bike_id, user_id=user_id)
-                    #response_json = {'data': {'id': 665303446870102746, 'type': 'trips', 'attributes': {'start_position': 'POINT(12.969383 55.586522)', 'end_position': None, 'path_taken': None, 'start_time': '2025-01-09T21:18:22.473747Z', 'end_time': None, 'start_fee': None, 'time_fee': None, 'end_fee': None, 'total_fee': None, 'created_at': '2025-01-09T21:18:22.473747Z', 'updated_at': '2025-01-09T21:18:22.473747Z'}, 'relationships': {'user': {'data': {'type': 'users', 'id': '652134919185249755'}}, 'bike': {'data': {'type': 'bikes', 'id': '66'}}, 'transaction': None}, 'links': {'self': 'http://api:8000/v1/trips/665303446870102746'}}, 'links': {'self': 'http://api:8000/v1/trips/665303446870102746'}}
                     generated_trip_id = response_json['data']['id']
                     successful_start_trips += 1
                     started_trips.append((user_id, token, bike_id, generated_trip_id, linestring))
@@ -91,9 +99,13 @@ async def main():
         if successful_start_trips == 0:
             print("No trips started successfully.")
         else:
-            print(f"Percentage of successful trips: {successful_start_trips / (successful_start_trips + unsuccessful_start_trips) * 100}%")
+            print(
+                f"Percentage of successful trips: "
+                    f"{successful_start_trips / (successful_start_trips + unsuccessful_start_trips) * 100}%")
         assert successful_start_trips > 0, "No trips started successfully."
+
         async def move_bikes(started_trips):
+            """Move bikes along linestrings."""
             successful_move_bikes = 0
             unsuccessful_move_bikes = 0
             moved_trips = []
@@ -112,22 +124,29 @@ async def main():
         successful_move_bikes, unsuccessful_move_bikes, moved_trips = await move_bikes(started_trips)
         print(f"Successfully moved {successful_move_bikes} bikes.")
         print(f"Failed to move {unsuccessful_move_bikes} bikes.")
-        print(f"Percentage of successful bikes moved: {successful_move_bikes / (successful_move_bikes + unsuccessful_move_bikes) * 100}%")
+        print(
+            f"Percentage of successful bikes moved: "
+                f"{successful_move_bikes / (successful_move_bikes + unsuccessful_move_bikes) * 100}%")
         assert successful_move_bikes > 0, "No bikes moved successfully."
 
         def get_moved_trips_with_duration(moved_trips):
+            """Get moved trips with duration in seconds."""
             def _get_distance_in_km(linestring):
+                """Get distance in kilometers from linestring."""
                 def _convert_to_kilometers(distance):
+                    """Convert distance to kilometers."""
                     return distance / 1000
                 start_point = Point(linestring[0])
                 end_point = Point(linestring[-1])
                 distance = start_point.distance(end_point)
                 return _convert_to_kilometers(distance)
-            
+
             def _get_duration_in_seconds(distance_in_km, speed_in_kmh):
+                """Get duration in seconds."""
                 return (distance_in_km / speed_in_kmh) * 3600
-            
+
             def _sort_trips_by_ascending_duration(trips_with_duration):
+                """Sort trips by ascending duration."""
                 return sorted(trips_with_duration, key=lambda x: x[-1])
 
             moved_trips_with_duration = []
@@ -135,12 +154,14 @@ async def main():
                 distance_in_km = _get_distance_in_km(linestring)
                 speed_in_kmh = 1000
                 duration_in_seconds = _get_duration_in_seconds(distance_in_km, speed_in_kmh)
-                moved_trips_with_duration.append((user_id, token, bike_id, trip_id, linestring, duration_in_seconds))
+                moved_trips_with_duration.append(
+                    (user_id, token, bike_id, trip_id, linestring, duration_in_seconds))
             return _sort_trips_by_ascending_duration(moved_trips_with_duration)
-        
+
         sorted_moved_trips = get_moved_trips_with_duration(moved_trips)
 
         async def end_trips(moved_trips):
+            """End trips for users on bikes."""
             successful_end_trips = 0
             unsuccessful_end_trips = 0
             ended_trips = []
@@ -157,11 +178,13 @@ async def main():
             return successful_end_trips, unsuccessful_end_trips, ended_trips
 
         def _filter_trips_by_duration(moved_trips, elapsed_seconds):
+            """Filter trips by duration."""
             trips_to_end_now = [trip for trip in moved_trips if trip[-1] <= elapsed_seconds]
             remaining_trips = [trip for trip in moved_trips if trip[-1] > elapsed_seconds]
             return trips_to_end_now, remaining_trips
 
         async def manage_trip_endings(moved_trips):
+            """Manage the ending of trips."""
             start_time = time()
             active_trip_count = len(moved_trips)
             ended_trip_count = 0
@@ -176,7 +199,9 @@ async def main():
                 elapsed_seconds = int(time() - start_time)
                 print(f"Elapsed time: {elapsed_seconds} seconds.")
 
-                moved_trips_with_margin = [(user_id, token, bike_id, trip_id, linestring, duration + margin_of_error) for user_id, token, bike_id, trip_id, linestring, duration in moved_trips]
+                moved_trips_with_margin = [
+                    (user_id, token, bike_id, trip_id, linestring, duration + margin_of_error) \
+                        for user_id, token, bike_id, trip_id, linestring, duration in moved_trips]
                 moved_trips_with_margin.extend(failed_trips)
                 failed_trips = []
                 trips_to_end_now, remaining_trips = _filter_trips_by_duration(moved_trips_with_margin, elapsed_seconds)
@@ -188,23 +213,29 @@ async def main():
                     print(f"Successfully ended {successful_end_trips} trips.")
                     print(f"Failed to end {unsuccessful_end_trips} trips.")
                     ended_trip_count += successful_end_trips
-                    print(f"Percentage of successful trips: {successful_end_trips / (successful_end_trips + unsuccessful_end_trips) * 100}%")
+                    print(
+                        f"Percentage of successful trips: "
+                            f"{successful_end_trips / (successful_end_trips + unsuccessful_end_trips) * 100}%")
                     failed_trips.extend([trip for trip in trips_to_end_now if trip not in ended_trips])
 
                 allowed_attempts -= 1
                 total_attempts += 1
 
                 if remaining_trips or failed_trips:
-                    print(f"Remaining trips: {len(remaining_trips) + len(failed_trips)}. Waiting {sleep_period} seconds for next attempt.")
+                    print(
+                        f"Remaining trips: "
+                            f"{len(remaining_trips) + len(failed_trips)}. Waiting {sleep_period} seconds for next attempt.")
                     await asyncio.sleep(sleep_period)
                 else:
                     print("All trips have been ended.")
                     break
 
             total_time = sleep_period * total_attempts
-            assert ended_trip_count > 0, f"No trips ended successfully after {total_time} seconds and {total_attempts} attempts."
-            print(f"Ended {ended_trip_count} trips successfully after {total_time} seconds and {total_attempts} attempts.")
-        
+            assert ended_trip_count > 0, \
+                f"No trips ended successfully after {total_time} seconds and {total_attempts} attempts."
+            print(f"Ended {ended_trip_count} trips successfully after "
+                  f"{total_time} seconds and {total_attempts} attempts.")
+
         await manage_trip_endings(sorted_moved_trips)
 
         end_condition = True
@@ -212,15 +243,5 @@ async def main():
         print(f"Simulation took {sim_elapsed_time} seconds.")
         print("End of simulation. End condition met.")
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     asyncio.run(main())
-
-    # TODO: ändra default_speed till en environment variable för cykeln! I nuläget har jag ställt den till 1000 kmh i cykeln och här i simulation.src.main
-
-    # NOTE: To run use:
-    # python -m src.main
-    # Make sure simulation is True in the if __name__ == "__main__": block in src/main.py
-
-    # ändra ?limit=0 i _outgoing? hör med Martin (users)
-
-    # NOTE: Preset environment variables are changed in docker-compose files and note /env folder.

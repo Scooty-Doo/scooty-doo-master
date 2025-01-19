@@ -1,3 +1,5 @@
+"""Module to manage the setup of the virtual environment."""
+
 import os
 import platform
 import subprocess
@@ -9,7 +11,7 @@ from ..utils.directory import Directory
 IS_WINDOWS = platform.system() == "Windows"
 
 class Venv:
-
+    """Class to manage the setup of the virtual environment."""
     @staticmethod
     def get_python_executable(venv_dir):
         """
@@ -17,8 +19,7 @@ class Venv:
         """
         if IS_WINDOWS:
             return os.path.join(venv_dir, "Scripts", "python.exe")
-        else:
-            return os.path.join(venv_dir, "bin", "python")
+        return os.path.join(venv_dir, "bin", "python")
 
     @staticmethod
     def _build_venv(venv_dir):
@@ -51,6 +52,7 @@ class Venv:
 
     @staticmethod
     def setup(venv_dir):
+        """Setup the virtual environment."""
         Venv._build_venv(venv_dir)
         Venv._install_dependencies(venv_dir)
 
@@ -62,7 +64,8 @@ class Venv:
         venv_dir = os.path.join(Directory.root(), "venv")
         Venv.setup(venv_dir)
 
-if __name__ == "__main__":
-    Venv.setup_master()
+# NOTE: Commented out as to not affect test coverage.
+# if __name__ == "__main__":
+#     Venv.setup_master()
 
     # python -m src.setup._venv

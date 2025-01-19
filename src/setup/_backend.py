@@ -1,3 +1,6 @@
+# pylint: disable=protected-access, broad-exception-caught, too-few-public-methods
+"""Module to manage the setup of the backend server."""
+
 import sys
 import os
 from ..utils.docker import Docker
@@ -13,8 +16,10 @@ class Backend:
     Backend class to manage the setup of the backend server.
     """
     class Docker:
+        """Class to manage the Docker setup of the backend server."""
         @staticmethod
         def _build():
+            """Build the backend Docker image."""
             try:
                 print("Building the backend Docker image...")
                 Docker.Compose.build(REPO_DIR)
@@ -24,6 +29,7 @@ class Backend:
 
         @staticmethod
         def _up():
+            """Start the backend Docker container."""
             try:
                 print("Starting the backend Docker container...")
                 Docker.Compose.up(REPO_DIR)
@@ -33,6 +39,7 @@ class Backend:
 
         @staticmethod
         def _down():
+            """Stop the backend Docker container."""
             try:
                 print("Stopping the backend Docker container...")
                 Docker.Compose.down(REPO_DIR)
@@ -42,25 +49,30 @@ class Backend:
 
         @staticmethod
         def _restart():
+            """Restart the backend Docker container."""
             Backend.Docker._down()
             Backend.Docker._up()
 
         @staticmethod
         def status():
+            """Get the status of the backend Docker container."""
             Docker.Compose.status(REPO_DIR)
 
         @staticmethod
         def logs():
+            """Get the logs of the backend Docker container."""
             Docker.Compose.logs(REPO_DIR)
 
         @staticmethod
         def _clear():
+            """Clear the backend Docker container."""
             Docker.Container.delete(DATABASE_CONTAINER)
             Docker.Container.delete(DATABASE_ADMINER_CONTAINER)
             Docker.Container.delete(BACKEND_CONTAINER)
 
     @staticmethod
     def _setup():
+        """Setup the backend server."""
         Backend.Docker._down()
         Backend.Docker._clear()
         Backend.Docker._build()
@@ -70,18 +82,5 @@ class Backend:
 
     @staticmethod
     def run():
+        """Run the backend server."""
         Backend._setup()
-
-if __name__ == "__main__":
-    backend = Backend()
-    backend.run()
-    #backend.Docker._down()
-    #backend.Docker._clear()
-
-    # Optional: Uncomment the following line to run tests after setting up the backend
-    #backend.run_tests()
-
-# python -m src.setup._backend
-# NOTE: You need to start Docker Desktop for it to work.
-# TODO: Start Docker Desktop automatically with subprocess if not running?
-# NOTE: .env in repos/backend/.env need to be setup with the correct values (see env/examples folder).

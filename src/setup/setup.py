@@ -1,3 +1,5 @@
+"""Module to manage the setup of the system."""
+
 from ._backend import Backend
 from ._bike import Bike
 from ._frontend import Frontend
@@ -9,10 +11,12 @@ class Setup:
     """
     @staticmethod
     def backend():
+        """Setup the backend server."""
         Backend.run()
 
     @staticmethod
     def bike(start_server=True, bikes=None, already_setup=False, docker=True):
+        """Setup the bike hivemind."""
         if not already_setup:
             if not bikes:
                 print("No bikes provided to generate .env file for.")
@@ -22,6 +26,7 @@ class Setup:
 
     @staticmethod
     def frontend(start_server=True, already_setup=False):
+        """Setup the frontend server."""
         if not already_setup:
             Frontend.setup()
         if start_server:
@@ -29,4 +34,5 @@ class Setup:
 
     @staticmethod
     def master(simulation=False, rebuild=False):
+        """Setup the master repository."""
         Master.setup(simulation, rebuild)
