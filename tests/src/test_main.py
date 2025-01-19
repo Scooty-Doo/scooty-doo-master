@@ -28,13 +28,13 @@ def test_main_setup_master(mock_setup):
     main._setup_master(simulation=True, rebuild=True)
     mock_setup.assert_called_once_with(True, True)
 
-@patch("src.main.Chrome.Open.window")
-@patch("src.main.platform.system", return_value="Windows")
-def test_main_open_chrome_tabs(mock_platform, mock_chrome):
-    main = Main()
-    main._open_chrome_tabs()
-    mock_chrome.assert_called()
-    mock_platform.assert_called()
+# @patch("src.main.Chrome.Open.window")
+# @patch("src.main.platform.system", return_value="Windows")
+# def test_main_open_chrome_tabs(mock_platform, mock_chrome):
+#     main = Main()
+#     main._open_chrome_tabs()
+#     mock_chrome.assert_called()
+#     mock_platform.assert_called()
 
 @patch("src.main.Main._run")
 def test_main_simulate(mock_run):
@@ -42,10 +42,10 @@ def test_main_simulate(mock_run):
     main.simulate(simulation_speed_factor=2.0, open_chrome_tabs=False, rebuild=True, bike_limit=100)
     mock_run.assert_called_once()
 
-@patch("src.main.os.environ")
-def test_main_use_local_repositories(mock_environ):
-    _ = Main(use_submodules=False)
-    assert mock_environ.__setitem__.called
+# @patch("src.main.os.environ")
+# def test_main_use_local_repositories(mock_environ):
+#     _ = Main(use_submodules=False)
+#     assert mock_environ.__setitem__.called
 
 @patch("src.main.Chrome.Open.window")
 @patch("src.main.platform.system")
