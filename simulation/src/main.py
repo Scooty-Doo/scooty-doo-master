@@ -18,7 +18,8 @@ async def main():
     end_condition = False
     while not end_condition:
         print("Welcome to the Matrix.")
-
+        sim_start_time = int(time())
+        
         get = Get()
         outgoing = Outgoing(token=TOKEN)
         bikes = await get.bikes(save_to_json=False, limit=LIMIT)
@@ -207,6 +208,8 @@ async def main():
         await manage_trip_endings(sorted_moved_trips)
 
         end_condition = True
+        sim_elapsed_time = int(time() - sim_start_time)
+        print(f"Simulation took {sim_elapsed_time} seconds.")
         print("End of simulation. End condition met.")
 
 if __name__ == "__main__":
