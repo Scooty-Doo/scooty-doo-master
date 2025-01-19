@@ -170,7 +170,9 @@ async def main():
                 try:
                     await outgoing.trips.end_trip(user_id=user_id, bike_id=bike_id, trip_id=trip_id, token=token)
                     successful_end_trips += 1
-                    ended_trips.append((user_id, bike_id, trip_id, linestring))
+                    ended_trips.append((user_id, token, bike_id, trip_id, linestring, duration))
+                    # NOTE: ended_trips.append((user_id, bike_id, trip_id, linestring))
+                    # NOTE: I changed this line, if something breaks, it could be this.
                     await asyncio.sleep(0.001)
                 except Exception as e:
                     print(f"Failed to end trip for user {user_id} on bike {bike_id}: {e}")
