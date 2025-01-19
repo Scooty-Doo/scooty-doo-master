@@ -1,4 +1,4 @@
-# pylint: disable=protected-access
+# pylint: disable=protected-access, undefined-variable
 """Module to test the setup of the environment files."""
 
 from unittest.mock import patch
