@@ -152,7 +152,7 @@ async def main():
             moved_trips_with_duration = []
             for user_id, token, bike_id, trip_id, linestring in moved_trips:
                 distance_in_km = _get_distance_in_km(linestring)
-                speed_in_kmh = 1000
+                speed_in_kmh = 1000 # NOTE: We are hardcoding this? xD
                 duration_in_seconds = _get_duration_in_seconds(distance_in_km, speed_in_kmh)
                 moved_trips_with_duration.append(
                     (user_id, token, bike_id, trip_id, linestring, duration_in_seconds))
