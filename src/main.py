@@ -1,16 +1,17 @@
 import os
 import logging
 import platform
+
 from dotenv import load_dotenv
 load_dotenv()
 
-from .setup.setup import Setup
-from .data.get import Get
-from .utils.settings import Settings
-from .utils.repositories import Repositories
-from .utils.chrome import Chrome
-from .utils.directory import Directory
-from .utils.docker import Docker
+from .setup.setup import Setup # pylint: disable=wrong-import-position
+from .data.get import Get # pylint: disable=wrong-import-position
+from .utils.settings import Settings # pylint: disable=wrong-import-position
+from .utils.repositories import Repositories # pylint: disable=wrong-import-position
+from .utils.chrome import Chrome # pylint: disable=wrong-import-position
+from .utils.directory import Directory # pylint: disable=wrong-import-position
+from .utils.docker import Docker # pylint: disable=wrong-import-position
 
 BIKE_SERVICE_NAME = os.getenv("BIKE_CONTAINER")
 SIMULATION_SERVICE_NAME = os.getenv("SIMULATION_CONTAINER")
@@ -18,21 +19,18 @@ SIMULATION_SERVICE_NAME = os.getenv("SIMULATION_CONTAINER")
 LOGS_DIR = Directory.logs()
 os.makedirs(LOGS_DIR, exist_ok=True)
 
-def setup_logger():
-    logger = logging.getLogger('master')
-    logger.setLevel(logging.DEBUG)
-    log_file = os.path.join(LOGS_DIR, 'master.log')
-    fh = logging.FileHandler(log_file)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    fh.setFormatter(formatter)
-    ch.setFormatter(formatter)
-    logger.addHandler(fh)
-    logger.addHandler(ch)
-    return logger
+def get_logger():
+    log = logging.getLogger(__name__)
+    if not log.handlers:
+        log.setLevel(logging.DEBUG)
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        console_handler.setFormatter(formatter)
+        log.addHandler(console_handler)
+    return log
 
-logger = setup_logger()
+logger = get_logger()
 
 class Main:
     def __init__(self, use_submodules=False,
@@ -52,7 +50,7 @@ class Main:
         if not use_submodules:
             self._use_local_repositories()
         logger.info("Main initialized.")
-        logger.debug(f"REPOSITORIES_DIRECTORY: {os.getenv('REPOSITORIES_DIRECTORY')}")
+        logger.debug("REPOSITORIES_DIRECTORY: %s", os.getenv("REPOSITORIES_DIRECTORY"))
 
     def _use_submodules(self, auto_pull=True):
         """Changes the REPOSITORIES_DIRECTORY environment variable to the submodules directory."""
@@ -105,12 +103,16 @@ class Main:
         if open_chrome_tabs:
             self._open_chrome_tabs(bikes=True, frontend=True)
 
-    def run(self, simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False, bike_limit=9999):
+    def run(
+            self, simulation_speed_factor=1.0, open_chrome_tabs=True,
+            rebuild=False, bike_limit=9999):
         self._run(
             simulation=False, simulation_speed_factor=simulation_speed_factor,
             rebuild=rebuild, open_chrome_tabs=open_chrome_tabs, bike_limit=bike_limit)
 
-    def simulate(self, simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False, bike_limit=9999):
+    def simulate(
+            self, simulation_speed_factor=1.0, open_chrome_tabs=True,
+            rebuild=False, bike_limit=9999):
         self._run(
             simulation=True, simulation_speed_factor=simulation_speed_factor,
             rebuild=rebuild, open_chrome_tabs=open_chrome_tabs, bike_limit=bike_limit)
@@ -154,5 +156,4 @@ if __name__ == "__main__": # pragma: no cover
 # python -m pytest --cov=src --cov-report=html
 # python -m pytest --cov=src --cov-report=term-missing
 
-# TODO: Bash script to run the program?
-# NOTE: repositories/backend/start.sh needs to be "LF" line endings for Docker to run the script.
+# NOTE: repositories/backend/start.sh may need to be "LF" line endings for Docker to run the script.

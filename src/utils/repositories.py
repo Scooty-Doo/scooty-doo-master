@@ -17,13 +17,13 @@ class Repositories:
         self.submodules = _Submodules()
 
 class _Local:
-    def __init__(self, repositories):
+    def __init__(self, repositories): # pylint: disable=redefined-outer-name
         self.repositories = dict(repositories)
         os.makedirs(LOCAL_REPOSITORIES_DIR, exist_ok=True)
         self.get = self._Get(repositories=self.repositories)
 
     class _Get:
-        def __init__(self, repositories):
+        def __init__(self, repositories): # pylint: disable=redefined-outer-name
             self.repositories = dict(repositories)
 
         def _get_repository(self, name, branch=None, force=False, commit=None):

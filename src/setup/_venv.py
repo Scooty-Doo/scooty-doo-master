@@ -17,8 +17,7 @@ class Venv:
         """
         if IS_WINDOWS:
             return os.path.join(venv_dir, "Scripts", "python.exe")
-        else:
-            return os.path.join(venv_dir, "bin", "python")
+        return os.path.join(venv_dir, "bin", "python")
 
     @staticmethod
     def _build_venv(venv_dir):

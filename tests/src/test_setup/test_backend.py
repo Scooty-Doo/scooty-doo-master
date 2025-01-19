@@ -55,12 +55,12 @@ def test_backend_docker_restart(mock_up, mock_down):
 @patch("src.setup._backend.Backend.Docker.logs")
 def test_backend_setup(mock_logs, mock_status, mock_up, mock_build, mock_clear, mock_down):
     Backend._setup()
-    mock_down.assert_called_once()
-    mock_clear.assert_called_once()
-    mock_build.assert_called_once()
-    mock_up.assert_called_once()
-    mock_status.assert_called_once()
-    mock_logs.assert_called_once()
+    mock_down.assert_called_once() # pylint: disable=duplicate-code
+    mock_clear.assert_called_once() # pylint: disable=duplicate-code
+    mock_build.assert_called_once() # pylint: disable=duplicate-code
+    mock_up.assert_called_once() # pylint: disable=duplicate-code
+    mock_status.assert_called_once() # pylint: disable=duplicate-code
+    mock_logs.assert_called_once() # pylint: disable=duplicate-code
 
 @patch("src.setup._backend.Backend._setup")
 def test_backend_run(mock_setup):

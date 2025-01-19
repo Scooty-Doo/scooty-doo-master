@@ -82,5 +82,3 @@ if __name__ == "__main__": # pragma: no cover
     Master.setup()
 
     # python -m src.setup._master
-
-    # NOTE: repositories/backend/start.sh needs to be "LF" line endings for Docker to run the script.

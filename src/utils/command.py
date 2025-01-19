@@ -36,7 +36,7 @@ class Command:
             print(f"Running command: {' '.join(command)}")
             env = None
             if inherit_environment:
-                #env = os.environ.copy() # TODO: Can probably be refactored away.
+                #env = os.environ.copy() # NOTE: Can probably be refactored away.
                 env = None
             stdout = None
             stderr = None
@@ -51,7 +51,7 @@ class Command:
                 subprocess.check_call(
                     command, cwd=directory, stdout=stdout, stderr=stderr, env=env, **kwargs)
             if asynchronous and not raise_exception:
-                subprocess.Popen(
+                subprocess.Popen( # pylint: disable=consider-using-with
                     command, cwd=directory, stdout=stdout, stderr=stderr, env=env, **kwargs)
             if not asynchronous and not raise_exception:
                 subprocess.run(

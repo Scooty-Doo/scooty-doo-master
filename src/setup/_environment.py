@@ -34,7 +34,8 @@ class Environment:
                         if not os.path.exists(env_path):
                             shutil.copyfile(env_example_path, env_path)
                             print(
-                                f"Copied '{env_example_path}' to '{env_path}' (replaced if existed).")
+                                f"Copied '{env_example_path}' \
+                                    to '{env_path}' (replaced if existed).")
                         else:
                             print(f"File '{env_path}' already exists. Skipping.")
             _root_env()

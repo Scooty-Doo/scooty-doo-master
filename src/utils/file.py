@@ -41,9 +41,9 @@ class File:
 
     class Read:
         @staticmethod
-        def lines(file):
-            if os.path.exists(file):
-                with open(file=file, mode='r', encoding='utf-8') as file:
+        def lines(filepath):
+            if os.path.exists(filepath):
+                with open(filepath, mode='r', encoding='utf-8') as file:
                     return file.readlines()
             else:
                 print("File does not exist.")
@@ -51,6 +51,6 @@ class File:
 
     class Write:
         @staticmethod
-        def lines(file, lines):
-            with open(file=file, mode='w', encoding='utf-8') as file:
+        def lines(filepath, lines):
+            with open(filepath, mode='w', encoding='utf-8') as file:
                 file.writelines('\n'.join(lines) + '\n')

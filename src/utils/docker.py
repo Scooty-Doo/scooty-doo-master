@@ -140,7 +140,7 @@ class Docker:
                     raise FileNotFoundError(f"{docker_compose_file} does not exist.")
                 shutil.copyfile(docker_compose_file, backup_file)
                 print(f"Backup created at {backup_file}.")
-                with open(docker_compose_file, 'r') as file:
+                with open(docker_compose_file, 'r', encoding='utf-8') as file:
                     docker_compose = yaml.safe_load(file)
                 services = docker_compose.get('services', {})
                 if service not in services:
@@ -152,7 +152,7 @@ class Docker:
                         f"Environment for service '{service}' must be a key-value dictionary.")
                 environment[variable] = value
                 service['environment'] = environment
-                with open(docker_compose_file, 'w') as file:
+                with open(docker_compose_file, 'w', encoding='utf-8') as file:
                     yaml.safe_dump(docker_compose, file, default_flow_style=False)
                 print(
                     f"Updated '{variable}' for service '{service}' to \
