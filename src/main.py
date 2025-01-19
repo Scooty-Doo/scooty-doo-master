@@ -1,4 +1,5 @@
 # pylint: disable=wrong-import-position, too-many-instance-attributes, too-many-arguments, too-many-positional-arguments
+"""The main module of the master repository."""
 
 import os
 import logging
@@ -22,6 +23,7 @@ LOGS_DIR = Directory.logs()
 os.makedirs(LOGS_DIR, exist_ok=True)
 
 def get_logger():
+    """Get the logger for the main module."""
     log = logging.getLogger(__name__)
     if not log.handlers:
         log.setLevel(logging.DEBUG)
@@ -35,6 +37,7 @@ def get_logger():
 logger = get_logger()
 
 class Main:
+    """Class to manage the main module of the master repository."""
     def __init__(self, use_submodules=False,
                  backend_branch='main', backend_commit=None,
                  frontend_branch='main', frontend_commit=None,
@@ -71,10 +74,12 @@ class Main:
             branch=self.bike_branch, commit=self.bike_commit)
 
     def _setup_master(self, simulation=False, rebuild=False):
+        """Setup the master repository."""
         Setup.master(simulation, rebuild)
 
     # NOTE: Maybe remove due to OS dependency?
     def _open_chrome_tabs(self, bikes=True, frontend=True):
+        """Open Chrome tabs for the backend, bikes, and frontend."""
         if not platform.system() == "Windows":
             return
         ports = [os.getenv("BACKEND_PORT") + "/docs"]
@@ -85,7 +90,9 @@ class Main:
         Chrome.Open.window(*ports)
 
     def _run(self, simulation=True, simulation_speed_factor=1.0,
-             rebuild=False, open_chrome_tabs=False, bike_limit=9999):
+             rebuild=False, open_chrome_tabs=False, bike_limit=9999
+             ):
+        """Helper method for running the master repository."""
         if simulation_speed_factor == 1.0 or (bike_limit == 9999 or bike_limit is None):
             Docker.Compose.Environment.reset(simulation=False)
         if bike_limit == 9999 or bike_limit is None:
@@ -105,19 +112,18 @@ class Main:
         if open_chrome_tabs:
             self._open_chrome_tabs(bikes=True, frontend=True)
 
-    def run(
-            self, simulation_speed_factor=1.0, open_chrome_tabs=True,
+    def run(self, simulation_speed_factor=1.0, open_chrome_tabs=True,
             rebuild=False, bike_limit=9999):
+        """Run the master repository."""
         self._run(
             simulation=False, simulation_speed_factor=simulation_speed_factor,
             rebuild=rebuild, open_chrome_tabs=open_chrome_tabs, bike_limit=bike_limit)
 
-    def simulate(
-            self, simulation_speed_factor=1.0, open_chrome_tabs=True,
-            rebuild=False, bike_limit=9999):
-        self._run(
-            simulation=True, simulation_speed_factor=simulation_speed_factor,
-            rebuild=rebuild, open_chrome_tabs=open_chrome_tabs, bike_limit=bike_limit)
+    def simulate(self, simulation_speed_factor=1.0, open_chrome_tabs=True,
+                 rebuild=False, bike_limit=9999):
+        """Simulate the master repository."""
+        self._run(simulation=True, simulation_speed_factor=simulation_speed_factor,
+                  rebuild=rebuild, open_chrome_tabs=open_chrome_tabs, bike_limit=bike_limit)
 
 if __name__ == "__main__": # pragma: no cover
 

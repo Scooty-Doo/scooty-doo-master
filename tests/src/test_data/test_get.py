@@ -1,3 +1,5 @@
+"""Tests for the Get class"""
+
 from unittest.mock import AsyncMock, Mock, patch
 import pytest
 import httpx
@@ -5,8 +7,10 @@ from src.data.get import Get
 
 @pytest.mark.asyncio
 class TestGet:
+    """Tests for the Get class"""
     @pytest.fixture
     def _mock_settings(self):
+        """Mock the Settings class."""
         with patch('src.data.get.Settings') as mock_settings:
             mock_endpoints = Mock()
             mock_endpoints.backend_url = 'https://api.example.com'
@@ -22,11 +26,13 @@ class TestGet:
 
     @pytest.fixture
     def _mock_file(self):
+        """Mock the File.Save class."""
         with patch('src.data.get.File.Save.to_json', new_callable=AsyncMock) as mock_save:
             yield mock_save
 
     @pytest.fixture
     def mock_httpx(self):
+        """Mock the httpx.AsyncClient class."""
         with patch('src.data.get.httpx.AsyncClient') as mock_client:
             mock_instance = mock_client.return_value.__aenter__.return_value
             mock_instance.get = AsyncMock()
@@ -42,9 +48,11 @@ class TestGet:
         ('zones', 'zones.json', 'zones'),
         ('zone_types', 'zone_types.json', 'zone_types')
     ])
+
     async def test_get_methods(
         self, _mock_settings, _mock_file, mock_httpx, method,
         filename, endpoint):
+        """Test the get methods."""
         get_instance = Get()
         get_method = getattr(get_instance, method)
         result = await get_method()
@@ -66,12 +74,14 @@ class TestGet:
         assert result == [{'id': 1, 'name': 'test'}]
 
     async def test_get_request_error(self, _mock_settings, _mock_file, mock_httpx):
+        """Test the get method with a request error."""
         mock_httpx.get.side_effect = httpx.RequestError("Request failed")
         get_instance = Get()
         with pytest.raises(httpx.RequestError):
             await get_instance.bikes()
 
     async def test_users_request_error(self, _mock_settings, _mock_file, mock_httpx):
+        """Test the users method with a request error."""
         mock_httpx.get.side_effect = httpx.RequestError("Request failed")
         get_instance = Get()
         with pytest.raises(httpx.RequestError) as exc_info:

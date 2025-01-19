@@ -1,4 +1,7 @@
+"""Module for serializing data for storage in environment file."""
+
 class Serialize:
+    """Class to serialize data for storage in environment file."""
     @staticmethod
     def positions(positions: list[tuple[float, float]]) -> list[str]:
         """

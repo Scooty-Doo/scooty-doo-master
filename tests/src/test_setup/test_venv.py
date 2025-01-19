@@ -1,4 +1,5 @@
 # pylint: disable=protected-access
+"""Module to test the setup of the virtual environment."""
 
 import subprocess
 import os

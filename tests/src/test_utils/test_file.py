@@ -1,9 +1,12 @@
+"""Tests for the File class."""
+
 import os
 import json
 from tempfile import TemporaryDirectory
 from src.utils.file import File
 
 def test_csv_to_json():
+    """Test converting CSV data to JSON."""
     csv_data = "id,name\n1,The Lord\n2,Aragorn"
     result = File.Convert.csv_to_json(csv_data)
     expected = [
@@ -13,14 +16,17 @@ def test_csv_to_json():
     assert result == expected, "Should correctly parse CSV data into a list of dicts"
 
 def test_file_change_extension():
+    """Test changing file extension."""
     new_filename = File.Change.extension("data.txt", ".json")
     assert new_filename == "data.json", "Should replace .txt with .json"
 
 def test_file_change_name():
+    """Test changing file name."""
     new_filename = File.Change.name("data.csv", "new_data")
     assert new_filename == "new_data.csv", "Should rename file while preserving extension"
 
 def test_save_to_json():
+    """Test saving data to a JSON file."""
     with TemporaryDirectory() as tmpdir:
         data = {"key": "value"}
         filename = "test_output.json"
@@ -32,6 +38,7 @@ def test_save_to_json():
         assert loaded_data == data, "JSON file contents should match data"
 
 def test_read_lines_empty_file():
+    """Test reading lines from an empty file."""
     with TemporaryDirectory() as tmpdir:
         file_path = os.path.join(tmpdir, "empty_file.txt")
         with open(file=file_path, mode="w", encoding='utf-8') as f:
@@ -40,6 +47,7 @@ def test_read_lines_empty_file():
         assert lines == [], "Should return an empty list for empty file"
 
 def test_load_from_csv():
+    """Test loading data from a CSV file."""
     with TemporaryDirectory() as tmpdir:
         filename = "test_data.csv"
         file_path = os.path.join(tmpdir, filename)
@@ -50,12 +58,14 @@ def test_load_from_csv():
         assert loaded_data == csv_content, "Should correctly load CSV content as a string"
 
 def test_read_lines_non_existent_file():
+    """Test reading lines from a non-existent file."""
     with TemporaryDirectory() as tmpdir:
         file_path = os.path.join(tmpdir, "non_existent_file.txt")
         lines = File.Read.lines(file_path)
         assert lines == [], "Should return an empty list when file does not exist"
 
 def test_write_lines():
+    """Test writing lines to a file."""
     with TemporaryDirectory() as tmpdir:
         file_path = os.path.join(tmpdir, "output.txt")
         lines_to_write = ["first line", "second line", "third line"]

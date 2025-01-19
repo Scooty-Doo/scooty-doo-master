@@ -1,4 +1,5 @@
 # pylint: disable=protected-access, too-few-public-methods
+"""Module to manage the setup of the environment."""
 
 import os
 import shutil
@@ -10,7 +11,9 @@ ENV_DIR = Directory.env()
 REPO_DIR = Directory.repositories()
 
 class Environment:
+    """Environment class to manage the setup of the environment."""
     class Files:
+        """Class to manage the setup of the environment files."""
         @staticmethod
         def _setup():
             """
@@ -19,6 +22,7 @@ class Environment:
             Does not overwrite existing files.
             """
             def _root_env():
+                """Copies the root .env file."""
                 if not os.path.exists(os.path.join(ROOT_DIR, '.env')):
                     example_env_path = os.path.join(ROOT_DIR, '.env.example')
                     env_path = os.path.join(ROOT_DIR, '.env')
@@ -29,6 +33,7 @@ class Environment:
                         shutil.copyfile(example_env_path, env_path)
 
             def _repositories_env():
+                """Copies the repository .env files."""
                 for env_example_file in os.listdir(ENV_EXAMPLE_DIR):
                     if env_example_file.endswith('.example'):
                         env_example_path = os.path.join(ENV_EXAMPLE_DIR, env_example_file)
@@ -56,14 +61,17 @@ class Environment:
                 Environment.Files._setup()
 
             def _backend():
+                """Copies the backend .env file."""
                 Environment._copy_env_file(
                     source_env_filename='.env.backend',
                     target_repo=Directory.Repo.backend())
             def _frontend():
+                """Copies the frontend .env file."""
                 Environment._copy_env_file(
                     source_env_filename='.env.frontend',
                     target_repo=Directory.Repo.frontend())
             def _bikes():
+                """Copies the bikes .env file."""
                 Environment._copy_env_file(
                     source_env_filename='.env.bike',
                     target_repo=Directory.Repo.bike()
@@ -80,6 +88,7 @@ class Environment:
 
     @staticmethod
     def _copy_env_file(source_env_filename, target_repo):
+        """Copy the source .env file to the target repository."""
         env_source_path = os.path.join(ENV_DIR, source_env_filename)
         env_target_path = os.path.join(Directory.Repo.get(target_repo), ".env")
         if not os.path.exists(env_source_path):

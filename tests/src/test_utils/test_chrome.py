@@ -1,8 +1,11 @@
+"""Tests for Chrome class."""
+
 from unittest.mock import patch
 from src.utils.chrome import Chrome
 
 @patch("src.utils.command.Command.run")
 def test_chrome_open_no_ports(mock_command_run):
+    """Test opening Chrome with no ports."""
     with patch("src.utils.chrome.IS_WINDOWS", True):
         Chrome.Open.window()
         mock_command_run.assert_called_once()
@@ -10,6 +13,7 @@ def test_chrome_open_no_ports(mock_command_run):
 
 @patch("src.utils.command.Command.run")
 def test_chrome_open_with_ports(mock_command_run):
+    """Test opening Chrome with ports."""
     with patch("src.utils.chrome.IS_WINDOWS", True):
         Chrome.Open.window("8000/docs", "8001/docs")
         assert mock_command_run.call_count == 1
@@ -20,6 +24,7 @@ def test_chrome_open_with_ports(mock_command_run):
 
 @patch("builtins.print")
 def test_chrome_open_non_windows(mock_print):
+    """Test opening Chrome on non-Windows platforms."""
     with patch("src.utils.chrome.IS_WINDOWS", False):
         Chrome.Open.window("8000")
         mock_print.assert_called_once_with("If not on Windows, please open Chrome window manually.")

@@ -1,4 +1,5 @@
 # pylint: disable=line-too-long, too-many-locals, too-many-statements, import-error, no-name-in-module, disable=unused-variable, broad-exception-caught
+"""Main module for the simulation of the full application."""
 
 import asyncio
 import os
@@ -15,6 +16,7 @@ JWT_SECRET = os.getenv("JWT_SECRET")
 TRIPS_LIMIT = int(os.getenv("TRIPS_LIMIT"))
 
 async def main():
+    """Main function to simulate the full application."""
     end_condition = False
     while not end_condition:
         print("Welcome to the Matrix.")
@@ -47,7 +49,8 @@ async def main():
         def generate_unique_trips(user_ids, bike_ids, trips):
             """
             Generate unique (user_id, bike_id, trip_id, linestring) trips 
-            where no 'user_id', 'bike_id', or 'trip' repeats."""
+            where no 'user_id', 'bike_id', or 'trip' repeats.
+            """
             trip_ids = Extract.Trip.ids(trips)
             linestrings = Extract.Trip.routes(trips)
             assert len(trip_ids) == len(linestrings), \
@@ -72,6 +75,7 @@ async def main():
         unique_trips = unique_trips[:TRIPS_LIMIT]
 
         async def start_trips(unique_trips):
+            """Start trips for users on bikes."""
             successful_start_trips = 0
             unsuccessful_start_trips = 0
             started_trips = []
@@ -98,7 +102,9 @@ async def main():
                 f"Percentage of successful trips: "
                     f"{successful_start_trips / (successful_start_trips + unsuccessful_start_trips) * 100}%")
         assert successful_start_trips > 0, "No trips started successfully."
+
         async def move_bikes(started_trips):
+            """Move bikes along linestrings."""
             successful_move_bikes = 0
             unsuccessful_move_bikes = 0
             moved_trips = []
@@ -123,8 +129,11 @@ async def main():
         assert successful_move_bikes > 0, "No bikes moved successfully."
 
         def get_moved_trips_with_duration(moved_trips):
+            """Get moved trips with duration in seconds."""
             def _get_distance_in_km(linestring):
+                """Get distance in kilometers from linestring."""
                 def _convert_to_kilometers(distance):
+                    """Convert distance to kilometers."""
                     return distance / 1000
                 start_point = Point(linestring[0])
                 end_point = Point(linestring[-1])
@@ -132,9 +141,11 @@ async def main():
                 return _convert_to_kilometers(distance)
 
             def _get_duration_in_seconds(distance_in_km, speed_in_kmh):
+                """Get duration in seconds."""
                 return (distance_in_km / speed_in_kmh) * 3600
 
             def _sort_trips_by_ascending_duration(trips_with_duration):
+                """Sort trips by ascending duration."""
                 return sorted(trips_with_duration, key=lambda x: x[-1])
 
             moved_trips_with_duration = []
@@ -149,6 +160,7 @@ async def main():
         sorted_moved_trips = get_moved_trips_with_duration(moved_trips)
 
         async def end_trips(moved_trips):
+            """End trips for users on bikes."""
             successful_end_trips = 0
             unsuccessful_end_trips = 0
             ended_trips = []
@@ -165,11 +177,13 @@ async def main():
             return successful_end_trips, unsuccessful_end_trips, ended_trips
 
         def _filter_trips_by_duration(moved_trips, elapsed_seconds):
+            """Filter trips by duration."""
             trips_to_end_now = [trip for trip in moved_trips if trip[-1] <= elapsed_seconds]
             remaining_trips = [trip for trip in moved_trips if trip[-1] > elapsed_seconds]
             return trips_to_end_now, remaining_trips
 
         async def manage_trip_endings(moved_trips):
+            """Manage the ending of trips."""
             start_time = time()
             active_trip_count = len(moved_trips)
             ended_trip_count = 0

@@ -1,3 +1,5 @@
+"""Module to manage the setup of the virtual environment."""
+
 import os
 import platform
 import subprocess
@@ -9,7 +11,7 @@ from ..utils.directory import Directory
 IS_WINDOWS = platform.system() == "Windows"
 
 class Venv:
-
+    """Class to manage the setup of the virtual environment."""
     @staticmethod
     def get_python_executable(venv_dir):
         """
@@ -50,6 +52,7 @@ class Venv:
 
     @staticmethod
     def setup(venv_dir):
+        """Setup the virtual environment."""
         Venv._build_venv(venv_dir)
         Venv._install_dependencies(venv_dir)
 

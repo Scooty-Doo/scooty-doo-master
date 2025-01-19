@@ -1,4 +1,5 @@
 # pylint: disable=protected-access
+"""Tests for the Main class."""
 
 from unittest.mock import patch
 from src.main import Main # pylint: disable=no-name-in-module
@@ -6,6 +7,7 @@ from src.main import Main # pylint: disable=no-name-in-module
 @patch.object(Main, "_use_submodules")
 @patch.object(Main, "_use_local_repositories")
 def test_main_init_submodules_false(mock_local, mock_submodules):
+    """Test initializing Main with use_submodules=False."""
     _ = Main(use_submodules=False)
     mock_local.assert_called_once()
     mock_submodules.assert_not_called()
@@ -13,6 +15,7 @@ def test_main_init_submodules_false(mock_local, mock_submodules):
 @patch.object(Main, "_use_submodules")
 @patch.object(Main, "_use_local_repositories")
 def test_main_init_submodules_true(mock_local, mock_submodules):
+    """Test initializing Main with use_submodules=True."""
     _ = Main(use_submodules=True)
     mock_submodules.assert_called_once()
     mock_local.assert_not_called()
@@ -20,12 +23,14 @@ def test_main_init_submodules_true(mock_local, mock_submodules):
 @patch("src.main.Get")
 @patch("src.main.Repositories")
 def test_main_init(mock_repositories, mock_get):
+    """Test initializing Main."""
     _ = Main(use_submodules=False)
     mock_get.assert_called_once()
     mock_repositories.assert_called_once()
 
 @patch("src.main.Setup.master")
 def test_main_setup_master(mock_setup):
+    """Test setting up the master repository."""
     main = Main()
     main._setup_master(simulation=True, rebuild=True)
     mock_setup.assert_called_once_with(True, True)
@@ -33,6 +38,7 @@ def test_main_setup_master(mock_setup):
 # @patch("src.main.Chrome.Open.window")
 # @patch("src.main.platform.system", return_value="Windows")
 # def test_main_open_chrome_tabs(mock_platform, mock_chrome):
+#     """Test opening Chrome tabs."""
 #     main = Main()
 #     main._open_chrome_tabs()
 #     mock_chrome.assert_called()
@@ -40,18 +46,21 @@ def test_main_setup_master(mock_setup):
 
 @patch("src.main.Main._run")
 def test_main_simulate(mock_run):
+    """Test simulating the system."""
     main = Main()
     main.simulate(simulation_speed_factor=2.0, open_chrome_tabs=False, rebuild=True, bike_limit=100)
     mock_run.assert_called_once()
 
 # @patch("src.main.os.environ")
 # def test_main_use_local_repositories(mock_environ):
+#     """Test using local repositories."""
 #     _ = Main(use_submodules=False)
 #     assert mock_environ.__setitem__.called
 
 @patch("src.main.Chrome.Open.window")
 @patch("src.main.platform.system")
 def test_main_open_chrome_tabs_windows(mock_system, mock_chrome_open):
+    """Test opening Chrome tabs on Windows."""
     mock_system.return_value = "Windows"
     with patch.dict('os.environ', {
         "BACKEND_PORT": "8000",
@@ -65,13 +74,15 @@ def test_main_open_chrome_tabs_windows(mock_system, mock_chrome_open):
 @patch("src.main.Chrome.Open.window")
 @patch("src.main.platform.system")
 def test_main_open_chrome_tabs_non_windows(mock_system, mock_chrome_open):
+    """Test opening Chrome tabs on non-Windows platforms."""
     mock_system.return_value = "Linux"
     main = Main()
     main._open_chrome_tabs(bikes=True, frontend=True)
     mock_chrome_open.assert_not_called()
 
 @patch("src.main.Main._run")
-def test_main_run_public(mock_run):
+def test_main_run(mock_run):
+    """Test running the system."""
     main = Main()
     main.run(simulation_speed_factor=1.0, open_chrome_tabs=True, rebuild=False, bike_limit=9999)
     mock_run.assert_called_once_with(

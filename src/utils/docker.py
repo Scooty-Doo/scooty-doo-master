@@ -1,4 +1,5 @@
 # pylint: disable=broad-exception-raised, broad-exception-caught, too-few-public-methods
+"""Module to manage Docker commands."""
 
 import os
 import platform
@@ -15,9 +16,12 @@ DOCKER_COMPOSE_RESET_FILENAME = "docker-compose.reset.yml"
 DOCKER_COMPOSE_SIMULATION_FILENAME = "docker-compose.simulation.yml"
 
 class Docker:
+    """Class to manage Docker commands."""
     class Compose:
+        """Class to manage Docker Compose commands."""
         @staticmethod
         def build(directory, npm=False, reinstall=False):
+            """Method to build the Docker image."""
             is_windows = platform.system() == "Windows"
             npm_filename = "npm.cmd" if is_windows else "npm"
             def _npm_exists():
@@ -61,6 +65,7 @@ class Docker:
 
         @staticmethod
         def up(directory, npm=False):
+            """Method to start the Docker containers."""
             Docker.Compose.down(directory)
             if not npm:
                 Command.run(
@@ -75,19 +80,23 @@ class Docker:
 
         @staticmethod
         def down(directory):
+            """Method to stop the Docker containers."""
             Command.run(["docker-compose", "down"], directory=directory)
 
         @staticmethod
         def restart(directory):
+            """Method to restart the Docker containers."""
             Docker.Compose.down(directory)
             Docker.Compose.up(directory)
 
         @staticmethod
         def status(directory):
+            """Method to get the status of the Docker containers."""
             Command.run(["docker-compose", "ps"], directory=directory)
 
         @staticmethod
         def logs(directory):
+            """Method to get the logs of the Docker containers."""
             Command.run(
                 ["docker-compose", "logs", "-f"],
                 directory=directory,
@@ -95,6 +104,7 @@ class Docker:
                 )
 
         class Combined:
+            """Class to manage combined Docker Compose commands."""
             @staticmethod
             def _combine_into_command(filenames, command):
                 """
@@ -107,32 +117,39 @@ class Docker:
 
             @staticmethod
             def build(directory, filenames):
+                """Method to build the Docker images."""
                 Command.run(Docker.Compose.Combined._combine_into_command(
                     filenames, ["build"]), directory=directory, raise_exception=False)
 
             @staticmethod
             def up(directory, filenames):
+                """Method to start the Docker containers."""
                 Command.run(Docker.Compose.Combined._combine_into_command(
                     filenames, ["up", "-d"]), directory=directory, raise_exception=False)
 
             @staticmethod
             def down(directory, filenames):
+                """Method to stop the Docker containers."""
                 Command.run(Docker.Compose.Combined._combine_into_command(
                     filenames, ["down"]), directory=directory, raise_exception=False)
 
             @staticmethod
             def status(directory, filenames):
+                """Method to get the status of the Docker containers."""
                 Command.run(Docker.Compose.Combined._combine_into_command(
                     filenames, ["ps"]), directory=directory, raise_exception=False)
 
             @staticmethod
             def logs(directory, filenames):
+                """Method to get the logs of the Docker containers."""
                 Command.run(Docker.Compose.Combined._combine_into_command(
                     filenames, ["logs", "-f"]), directory=directory, raise_exception=False)
 
         class Environment:
+            """Class to manage Docker Compose environment variables."""
             @staticmethod
             def set(service, variable, value):
+                """Set an environment variable for a Docker Compose service."""
                 if service == "simulation":
                     docker_compose_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_SIMULATION_FILENAME)
                 else:
@@ -162,6 +179,7 @@ class Docker:
 
             @staticmethod
             def reset(simulation=False):
+                """Reset the Docker Compose file to the reset file."""
                 if not simulation:
                     docker_compose_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_FILENAME)
                     reset_file = os.path.join(ROOT_DIR, DOCKER_COMPOSE_RESET_FILENAME)
@@ -178,8 +196,10 @@ class Docker:
                     print(f"Reset Docker Compose file to {reset_file}.")
 
     class Container:
+        """Class to manage Docker container commands."""
         @staticmethod
         def stop(name):
+            """Stop a Docker container."""
             try:
                 Command.run(
                     ["docker", "stop", name],
@@ -192,6 +212,7 @@ class Docker:
 
         @staticmethod
         def delete(name):
+            """Delete a Docker container."""
             try:
                 Command.run(
                     ["docker", "rm", "-f", name],
@@ -203,8 +224,10 @@ class Docker:
                 print(f"Failed to delete container '{name}': {e}")
 
     class Network:
+        """Class to manage Docker network commands."""
         @staticmethod
         def create(name):
+            """Create a Docker network."""
             try:
                 Command.run(
                     ["docker", "network", "create", name],
@@ -215,11 +238,13 @@ class Docker:
 
         @staticmethod
         def recreate(name):
+            """Recreate a Docker network."""
             Docker.Network.delete(name)
             Docker.Network.create(name)
 
         @staticmethod
         def connect(network, container):
+            """Connect a container to a network."""
             try:
                 Command.run(
                     ["docker", "network", "connect", network, container],
@@ -232,6 +257,7 @@ class Docker:
 
         @staticmethod
         def delete(name):
+            """Delete a Docker network."""
             try:
                 Command.run(
                     ["docker", "network", "rm", name],
@@ -244,6 +270,7 @@ class Docker:
 
         @staticmethod
         def disconnect(network, container):
+            """Disconnect a container from a network."""
             try:
                 Command.run(
                     ["docker", "network", "disconnect", network, container],
@@ -258,6 +285,7 @@ class Docker:
 
         @staticmethod
         def inspect(name):
+            """Inspect a Docker network."""
             try:
                 Command.run(
                     ["docker", "network", "inspect", name],
@@ -269,6 +297,7 @@ class Docker:
 
         @staticmethod
         def show():
+            """Show all Docker networks."""
             try:
                 Command.run(
                     ["docker", "network", "ls"],
@@ -280,6 +309,7 @@ class Docker:
 
         @staticmethod
         def prune():
+            """Prune all unused Docker networks."""
             try:
                 Command.run(
                     ["docker", "network", "prune", "-f"],
@@ -291,6 +321,7 @@ class Docker:
                 print(f"Failed to prune unused networks: {e}")
 
     class Desktop:
+        """Class to manage Docker Desktop commands."""
         @staticmethod
         def is_running():
             """
@@ -310,6 +341,7 @@ class Docker:
 
         @staticmethod
         def start():
+            """Start the Docker Desktop application."""
             try:
                 if Docker.Desktop.is_running():
                     print("Docker Desktop is already running.")

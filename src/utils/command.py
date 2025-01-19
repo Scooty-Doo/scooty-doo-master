@@ -1,9 +1,11 @@
 # pylint: disable=too-many-arguments, too-many-positional-arguments, too-few-public-methods
+"""Module to run subprocess commands."""
 
 import subprocess
 import sys
 
 class Command:
+    """Class to run subprocess commands."""
     @staticmethod
     def run(
         command: list,
