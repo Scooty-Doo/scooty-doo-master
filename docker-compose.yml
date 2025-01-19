@@ -18,16 +18,20 @@ services:
       context: ./repositories/backend
       dockerfile: Dockerfile
     container_name: api
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
-      interval: 5s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
     depends_on:
       db:
         condition: service_healthy
     env_file: .env
+    healthcheck:
+      interval: 5m
+      retries: 3
+      start_period: 30s
+      test:
+      - CMD
+      - curl
+      - -f
+      - http://localhost:8000
+      timeout: 10s
     links:
     - db:db
     networks:
@@ -41,9 +45,9 @@ services:
       dockerfile: Dockerfile
     container_name: bike_hivemind
     depends_on:
-      db:
-        condition: service_healthy
       api:
+        condition: service_healthy
+      db:
         condition: service_healthy
     env_file: .env
     networks:
@@ -55,11 +59,19 @@ services:
     container_name: database-db-1
     env_file: .env
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "user", "-d", "sddb", "-h", "127.0.0.1"]
       interval: 5s
-      timeout: 10s
       retries: 3
       start_period: 10s
+      test:
+      - CMD
+      - pg_isready
+      - -U
+      - user
+      - -d
+      - sddb
+      - -h
+      - 127.0.0.1
+      timeout: 10s
     image: postgis/postgis
     networks:
     - scooty-web
@@ -73,7 +85,9 @@ services:
     container_name: scooty-web-prod
     depends_on:
     - api
-    env_file: .env
+    environment:
+    - REACT_APP_GITHUB_CLIENT_DEV="Ov23liXtZ2oPJjPTkI0E"
+    - REACT_APP_GITHUB_CLIENT="Ov23liXtZ2oPJjPTkI0E"
     networks:
     - scooty-web
     ports:

@@ -8,10 +8,7 @@ services:
     - bike_hivemind
     - api
     - db
-    environment:
-      BACKEND_URL: http://api:8000/
-      BIKE_LIMIT: 100
-      TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMCIsInNjb3BlcyI6WyJhZG1pbiJdfQ.ARAUHRnbeLFiTxpg9_xv5iPWtaA-u_o9GXHRwx3zlGs
+    env_file: .env
     networks:
     - scooty-web
     restart: 'no'
