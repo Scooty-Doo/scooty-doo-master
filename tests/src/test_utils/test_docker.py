@@ -1,6 +1,6 @@
 """Tests for the Docker class."""
 
-from unittest.mock import patch, call
+from unittest.mock import patch, call, mock_open
 import pytest
 from src.utils.docker import Docker
 
@@ -294,6 +294,88 @@ def test_environment_reset_file_not_found(_mock_exists):
     with patch("src.utils.docker.Directory.root", return_value="/mock/root"):
         with pytest.raises(FileNotFoundError):
             Docker.Compose.Environment.reset(simulation=False)
+
+@patch("src.utils.docker.os.path.exists", return_value=False)
+def test_environment_set_simulation_file_not_found(_mock_exists):
+    """
+    Test setting an environment variable for the
+    'simulation' service when the file is not found."""
+    with pytest.raises(FileNotFoundError) as exc_info:
+        Docker.Compose.Environment.set("simulation", "SIM_VAR", "SIM_VALUE")
+    assert "does not exist." in str(exc_info.value)
+
+@patch("src.utils.docker.shutil.copyfile")
+@patch("src.utils.docker.os.path.exists", return_value=True)
+@patch("src.utils.docker.yaml.safe_load",
+       return_value={"services": {"simulation": {"environment": {"OLD": "VALUE"}}}})
+def test_environment_set_simulation_success(
+    _mock_yaml_load, _mock_exists, mock_copyfile
+):
+    """Test setting an environment variable for the 'simulation' service."""
+    mocked_open = mock_open(read_data="some_yaml_content")
+    with patch("builtins.open", mocked_open):
+        Docker.Compose.Environment.set("simulation", "NEW_SIM_VAR", "12345")
+    assert mock_copyfile.call_count == 1
+    write_calls = [c for c in mocked_open.mock_calls if c[0] == '().write']
+    assert len(write_calls) > 0, "Expected to write updated YAML to file."
+
+@patch("src.utils.docker.os.path.exists", return_value=False)
+def test_environment_set_file_not_found(_mock_exists):
+    """Test setting an environment variable for a service that does not exist."""
+    with pytest.raises(FileNotFoundError) as exc_info:
+        Docker.Compose.Environment.set("my_service", "VAR", "value")
+    assert "does not exist." in str(exc_info.value)
+
+@patch("src.utils.docker.shutil.copyfile")
+@patch("src.utils.docker.os.path.exists", return_value=True)
+@patch("src.utils.docker.yaml.safe_load", return_value={
+    "services": {
+        "my_service": {
+            "environment": {
+                "OLD_ENV": "OLD_VAL"}}}})
+def test_environment_set_env_update_success(
+    _mock_yaml_load, _mock_exists, mock_copyfile):
+    """Test updating an environment variable in a service."""
+    mocked_open = mock_open(read_data="""
+        services:
+        my_service:
+            environment:
+            OLD_ENV: OLD_VAL
+        """)
+    with patch("builtins.open", mocked_open):
+        Docker.Compose.Environment.set("my_service", "NEW_ENV", "NEW_VAL")
+    assert mock_copyfile.call_count == 1, "A backup file should be created."
+    write_calls = [call for call in mocked_open.mock_calls if call[0] == '().write']
+    assert len(write_calls) > 0, "Expected a write call for updated YAML."
+    written_data = write_calls[0][1][0]
+    assert "services" in written_data, \
+        "Should contain at least a 'services' key in the written YAML."
+
+@patch("src.utils.docker.shutil.copyfile")
+@patch("src.utils.docker.os.path.exists", return_value=True)
+def test_environment_reset_non_simulation_success(_mock_exists, mock_copy):
+    """Test resetting the environment with simulation=False."""
+    Docker.Compose.Environment.reset(simulation=False)
+    assert mock_copy.call_count == 1
+
+@patch("src.utils.docker.shutil.copyfile")
+@patch("src.utils.docker.os.path.exists", return_value=True)
+def test_environment_reset_simulation_success(_mock_exists, mock_copy):
+    """Test resetting the environment with simulation=True."""
+    Docker.Compose.Environment.reset(simulation=True)
+    assert mock_copy.call_count == 1
+
+@patch("src.utils.docker.Directory.root", return_value="/mock/root")
+@patch("src.utils.docker.os.path.exists")
+def test_environment_reset_simulation_reset_file_not_found(mock_exists, _mock_root):
+    """Test resetting the environment with a missing reset file."""
+    def side_effect(path):
+        """Simulate a missing reset file."""
+        return not path.endswith("docker-compose.reset.yml")
+    mock_exists.side_effect = side_effect
+    with pytest.raises(FileNotFoundError) as exc_info:
+        Docker.Compose.Environment.reset(simulation=True)
+    assert "docker-compose.reset.yml does not exist." in str(exc_info.value)
 
 ### DOCKER CONTAINER ###
 
