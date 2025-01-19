@@ -1,3 +1,5 @@
+# pylint: disable=broad-exception-raised, broad-exception-caught, too-few-public-methods
+
 import os
 import platform
 import sys

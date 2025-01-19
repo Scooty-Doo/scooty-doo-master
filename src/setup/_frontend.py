@@ -1,4 +1,4 @@
-# pylint: disable=protected-access
+# pylint: disable=protected-access, broad-exception-caught
 
 import sys
 from ._environment import Environment

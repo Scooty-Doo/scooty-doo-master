@@ -1,4 +1,4 @@
-# pylint: disable=protected-access
+# pylint: disable=protected-access, broad-exception-caught, too-few-public-methods
 
 import sys
 import os

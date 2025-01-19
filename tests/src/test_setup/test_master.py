@@ -1,3 +1,5 @@
+# pylint: disable = too-many-arguments, too-many-positional-arguments
+
 from unittest.mock import patch
 from src.setup._master import Master
 from src.utils.directory import Directory

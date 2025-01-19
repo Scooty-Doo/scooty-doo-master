@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long, too-many-locals, too-many-statements, import-error, no-name-in-module, disable=unused-variable
+# pylint: disable=line-too-long, too-many-locals, too-many-statements, import-error, no-name-in-module, disable=unused-variable, broad-exception-caught
 
 import asyncio
 import os

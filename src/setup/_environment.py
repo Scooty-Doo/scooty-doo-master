@@ -1,4 +1,4 @@
-# pylint: disable=protected-access
+# pylint: disable=protected-access, too-few-public-methods
 
 import os
 import shutil

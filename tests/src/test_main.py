@@ -1,7 +1,7 @@
 # pylint: disable=protected-access
 
 from unittest.mock import patch
-from src.main import Main
+from src.main import Main # pylint: disable=no-name-in-module
 
 @patch.object(Main, "_use_submodules")
 @patch.object(Main, "_use_local_repositories")

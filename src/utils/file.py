@@ -1,3 +1,5 @@
+# pylint: disable=too-few-public-methods
+
 import json
 import os
 

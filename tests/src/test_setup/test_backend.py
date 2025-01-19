@@ -1,4 +1,4 @@
-# pylint: disable=protected-access
+# pylint: disable=protected-access, too-many-arguments, too-many-positional-arguments
 
 from unittest.mock import patch
 import pytest

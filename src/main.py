@@ -1,4 +1,4 @@
-# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position, too-many-instance-attributes, too-many-arguments, too-many-positional-arguments
 
 import os
 import logging
@@ -157,6 +157,8 @@ if __name__ == "__main__": # pragma: no cover
 
 # python -m pytest --cov=src --cov-report=html
 # python -m pytest --cov=src --cov-report=term-missing
+
+# pylin src tests simulation
 
 # NOTE: repositories/backend/start.sh may need to be "LF"
 # line endings for Docker to run the script.

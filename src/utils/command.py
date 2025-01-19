@@ -1,3 +1,5 @@
+# pylint: disable=too-many-arguments, too-many-positional-arguments, too-few-public-methods
+
 import subprocess
 import sys
 

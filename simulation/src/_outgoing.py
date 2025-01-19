@@ -1,7 +1,9 @@
+# pylint: disable=import-error, no-name-in-module, too-few-public-methods
+
 import json
 from typing import Union, List
 import httpx
-from src.utils.settings import Settings # pylint: disable=import-error, no-name-in-module
+from src.utils.settings import Settings
 
 def _url(url, endpoint):
     return f'{url.rstrip("/")}/{endpoint.lstrip("/")}'

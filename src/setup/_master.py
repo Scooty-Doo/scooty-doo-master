@@ -1,3 +1,5 @@
+# pylint: disable=too-few-public-methods
+
 import os
 from ._environment import Environment
 from ..utils.docker import Docker

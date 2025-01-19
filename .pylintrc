@@ -442,14 +442,14 @@ disable=raw-checker-failed,
         C0114, # Missing module docstring
         C0115, # Missing class docstring
         C0116,  # Missing function or method docstring
-        R0902,  # Too many instance attributes
-        W0201,  # Attribute defined outside __init__
-        R0913,  # Too many arguments
-        R0917,  # Too many positional arguments
-        R0903,  # Too few public methods
-        # W0212,  # Access to a protected member
-        W0718,  # Catching too general exception Exception (broad-exception-caught)
-        W0719   # Raising too general exception: Exception (broad-exception-raised)
+        #R0902,  # Too many instance attributes
+        #W0201,  # Attribute defined outside __init__
+        #R0913,  # Too many arguments
+        #R0917,  # Too many positional arguments
+        #R0903,  # Too few public methods
+        #W0212,  # Access to a protected member
+        #W0718,  # Catching too general exception Exception (broad-exception-caught)
+        #W0719   # Raising too general exception: Exception (broad-exception-raised)
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

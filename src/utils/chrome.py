@@ -1,3 +1,5 @@
+# pylint: disable=too-few-public-methods
+
 import platform
 from ..utils.command import Command
 

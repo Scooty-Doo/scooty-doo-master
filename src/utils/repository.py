@@ -1,3 +1,5 @@
+# pylint: disable=too-few-public-methods, broad-exception-caught
+
 from ..utils.command import Command
 
 class Repository:
