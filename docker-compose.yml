@@ -50,9 +50,6 @@ services:
       db:
         condition: service_healthy
     env_file: .env
-    environment:
-      BIKE_LIMIT: 100
-      DEFAULT_SPEED: 20000
     networks:
     - scooty-web
     ports:
